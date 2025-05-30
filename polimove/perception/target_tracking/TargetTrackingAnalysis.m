@@ -7,17 +7,16 @@ imm = false;
 
 %% Paths
 
-addpath("../../01_Tools/00_GlobalFunctions/personal/")
-addpath("../../01_Tools/00_GlobalFunctions/utilities/")
-addpath("../../01_Tools/00_GlobalFunctions/constants/")
-addpath("../../01_Tools/00_GlobalFunctions/plot/")
+addpath("../../common/personal/")
+addpath("../../common/utilities/")
+addpath("../../common/constants/")
+addpath("../../common/plot/")
 normal_path = "/home/daniele/Documents/PoliMOVE/04_Bags/";
 
-%% Load Data
+% load('../../databases/Lvms.mat');
+load('../../databases/YasMarina.mat');
 
-% load track lines
-% load('../../04_Bags/00_Databases/Lvms.mat');
-load('../../04_Bags/00_Databases/YasMarina.mat');
+%% Load Data
 
 % load log
 if (~exist('log','var'))
