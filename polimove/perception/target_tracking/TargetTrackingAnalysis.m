@@ -26,7 +26,7 @@ end
 
 % load log ref
 if(use_ref)
-    if  (~exist('log_ref','var'))
+    if  (~exist('log_ref','var')) %#ok<*UNRCH>
         [file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load ground truth');
         tmp = load(fullfile(path,file));
         log_ref = tmp.log;
@@ -402,7 +402,7 @@ c.String = {'Refresh'};
 c.Callback = @refreshTimeButtonPushed;
 
 
-function refreshTimeButtonPushed(src,event)
+function refreshTimeButtonPushed(~,~)
     axes = evalin('base', 'axes');
     traj_db = evalin('base', 'trajDatabase');
     use_ref = evalin('base', 'use_ref');
