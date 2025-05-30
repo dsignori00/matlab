@@ -1,0 +1,18 @@
+MATRICE Q DISCRETIZZATA CON TERMINI FINO A ts_^3
+
+	CTRA
+
+[qx*ts + ts^3*((qv*cos(psi)^2)/3 + (qp*v^2*sin(psi)^2)/3),   ((qv*sin(2*psi))/6 - (qp*v^2*sin(2*psi))/6)*ts^3,  - (qv*rho*v*sin(psi)*ts^3)/6 + (qv*cos(psi)*ts^2)/2, (qa*ts^3*(4*cos(psi) - rho*ts*v*sin(psi)))/24, (qv*rho*cos(psi)*ts^3)/3 - (qp*v*sin(psi)*ts^2)/2]
+[ ((qv*sin(2*psi))/6 - (qp*v^2*sin(2*psi))/6)*ts^3, qy*ts + ts^3*((qv*sin(psi)^2)/3 + (qp*v^2*cos(psi)^2)/3),  (qv*rho*v*cos(psi)*ts^3)/6 + (qv*sin(psi)*ts^2)/2, (qa*ts^3*(4*sin(psi) + rho*ts*v*cos(psi)))/24, (qv*sin(psi)*rho*ts^3)/3 + (qp*v*cos(psi)*ts^2)/2]
+[ (qv*rho*v*sin(psi)*ts^3)/6 + (qv*cos(psi)*ts^2)/2,  (qv*rho*v*cos(psi)*ts^3)/6 + (qv*sin(psi)*ts^2)/2,     (qa*ts^3)/3 + qv*ts,     (qa*ts^2)/2,      (rho*ts^2*4*qv)/8]
+[(qa*ts^3*(4*cos(psi) - rho*ts*v*sin(psi)))/24,        (qa*ts^3*(4*sin(psi) + rho*ts*v*cos(psi)))/24,   (qa*ts^2)/2,    qa*ts,       (qa*rho*ts^3)/6]
+[ (qv*rho*cos(psi)*ts^3)/3 - (qp*v*sin(psi)*ts^2)/2, (qv*sin(psi)*rho*ts^3)/3 + (qp*v*cos(psi)*ts^2)/2,   (rho*ts^2*4*qv)/8,  (qa*rho*ts^3)/6,  (qv*rho^2*ts^3)/3 + qp*ts]
+ 
+ 
+ 	CTRV
+ 	
+[qx*ts + ts^3*((qv*cos(psi)^2)/3 + (qp*v^2*sin(psi)^2)/3), ((qv*sin(2*psi))/6 - (qp*v^2*sin(2*psi))/6)*ts^3, (qv*ts^2*(3*cos(psi) - rho*ts*v*sin(psi)))/6, (qv*rho*cos(psi)*ts^3)/3 - (qp*v*sin(psi)*ts^2)/2]
+[((qv*sin(2*psi))/6 - (qp*v^2*sin(2*psi))/6)*ts^3, qy*ts + ts^3*((qv*sin(psi)^2)/3 + (qp*v^2*cos(psi)^2)/3), (qv*ts^2*(3*sin(psi) + rho*ts*v*cos(psi)))/6, (qv*sin(psi)*rho*ts^3)/3 + (qp*v*cos(psi)*ts^2)/2]
+[(qv*ts^2*(3*cos(psi) - rho*ts*v*sin(psi)))/6, (qv*ts^2*(3*sin(psi) + rho*ts*v*cos(psi)))/6,  qv*ts, (qv*rho*ts^2)/2]
+[(qv*rho*cos(psi)*ts^3)/3 - (qp*v*sin(psi)*ts^2)/2, (qv*sin(psi)*rho*ts^3)/3 + (qp*v*cos(psi)*ts^2)/2, (qv*rho*ts^2)/2, (qv*rho^2*ts^3)/3 + qp*ts]
+ 
