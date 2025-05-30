@@ -1,2 +1,2 @@
 # matlab_utils
-Repo conyìtaining all util matlab scripts for analysis
+Repo containing all useful matlab scripts for analysis.
