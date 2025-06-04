@@ -1,5 +1,5 @@
 close all
-clearvars -except log log_ref
+clearvars -except log log_ref trajDatabase
 
 use_ref = false;
 use_sim_ref = false;
@@ -13,10 +13,17 @@ addpath("../../common/constants/")
 addpath("../../common/plot/")
 normal_path = "/home/daniele/Documents/PoliMOVE/04_Bags/";
 
-% load('../../databases/Lvms.mat');
-load('../../databases/YasMarina.mat');
-
 %% Load Data
+
+%load database
+if(~exist('trajDatabase','var'))
+    trajDatabase = ChooseDatabase();
+    if(isempty(trajDatabase))
+        error('No database selected');
+    else
+        load(trajDatabase);
+    end
+end
 
 % load log
 if (~exist('log','var'))

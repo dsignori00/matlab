@@ -13,9 +13,9 @@ addpath("../../01_Tools/00_GlobalFunctions/personal/")
 addpath("../../01_Tools/00_GlobalFunctions/utilities/")
 addpath("../../01_Tools/00_GlobalFunctions/constants/")
 addpath("../../01_Tools/00_GlobalFunctions/plot/")
-normal_path = "/home/daniele/Documents/PoliMOVE/04_Bags/";
 %% Load data
 
+normal_path = "/home/daniele/Documents/PoliMOVE/04_Bags/";
 normal_path = char(normal_path);
 
 % Load log
