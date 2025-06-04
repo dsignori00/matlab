@@ -409,7 +409,7 @@ c.String = {'Refresh'};
 c.Callback = @refreshTimeButtonPushed;
 
 
-function refreshTimeButtonPushed(~,~)
+function refreshTimeButtonPushed(src,event) %#ok<INUSD>
     axes = evalin('base', 'axes');
     traj_db = evalin('base', 'trajDatabase');
     use_ref = evalin('base', 'use_ref');
