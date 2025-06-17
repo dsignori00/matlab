@@ -3,16 +3,11 @@ clearvars -except log log_ref
 use_ref = false;
 
 % load track lines
-% load('../../05_Scripts/Yas_Marina_DB/databases/Yas_Marina_apex_v5_new_pit/trajDatabase.mat');
-% load('../../../../PoliMOVE/08_Databases/PIACENZA/PIACENZA_apex_v0/trajDatabase.mat');
-% load('../../../../PoliMOVE/08_Databases/Yas_Marina/Yas_Marina_apex_v1/trajDatabase.mat');
-load('../../../../PoliMOVE/08_Databases/Yas_South/Yas_South_apex_v0/trajDatabase.mat');
+load("../databases/YasMarinaSim.mat")
 
 % addpath to extractAllFields
-addpath('../../../03_Tools/00_Common/00_Global_functions/utilities/');
+addpath("/home/daniele/Documents/Utils/matlab/polimove/common/utilities");
 
-% load('C:\Users\Riccardo\OneDrive - Politecnico di Milano\IACMove\iac\09_Databases\00_Trajectories_DB\GW\GoodWood.mat')
-% load log
 if (~exist('log','var'))
     [file,path] = uigetfile('*.mat','Load log','../../../02_Data/');
     load(fullfile(path,file));
