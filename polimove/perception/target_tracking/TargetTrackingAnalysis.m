@@ -429,6 +429,7 @@ c.Callback = @refreshTimeButtonPushed;
 function refreshTimeButtonPushed(src,event) %#ok<INUSD>
     axes = evalin('base', 'axes');
     traj_db = evalin('base', 'trajDatabase');
+    v2v_only = evalin('base','v2v_only');
     use_ref = evalin('base', 'use_ref');
     use_sim_ref = evalin('base', 'use_sim_ref');
     col.lidar = evalin('base', 'col.lidar');

@@ -1,6 +1,10 @@
 close all
 clearvars -except log log_2 log_3 log_ref
 
+%#ok<*UNRCH>
+%#ok<*INUSD>
+%#ok<*NASGU>
+
 use_log2         = true;
 use_log3         = false;
 use_sim_ref      = false;
@@ -28,7 +32,7 @@ if ~exist('log', 'var')
         load(fullfile(path, file));
     end
 end
-name1 = 'alpha 0.1';
+name1 = 'develop';
 
 
 % load log 2
@@ -43,7 +47,7 @@ if(use_log2)
         clearvars tmp;
         end
     end
-    name2 = 'alpha 0.0';
+    name2 = 'imm disabled';
 end
 
 
@@ -146,7 +150,7 @@ if(use_log2)
 end
 
 if(use_log3)
-    tt_stamp3 = log_3.perception__opponents.stamp__tot - double(log.time_offset_nsec-log_3.time_offset_nsec)*1e-9;
+    tt_stamp3 = log_3.perception__opponents.stamp__tot - double(log.time_offset_nsec-log_3.time_offset_nsec)*1e-9; 
     % relative
     tt_x_rel3 = log_3.perception__opponents.opponents__x_rel;
     tt_y_rel3 = log_3.perception__opponents.opponents__y_rel;
@@ -208,7 +212,7 @@ f=1;
 axes(f) = nexttile([1,1]);
 hold on;
 plot(tt_stamp,tt_count,'Color',col.tt1,'DisplayName',name1);
-max_opp = max(tt_count);
+max_opp = max(tt_count); 
 if(use_log2)
     plot(tt_stamp2,tt_count2,'Color',col.tt2,'DisplayName',name2);
     max_opp = max([tt_count2; tt_count]);
@@ -221,7 +225,6 @@ if(use_sim_ref)
     plot(tt_stamp_ref,tt_count_ref,'Color',col.ref,'DisplayName','ref')
 end
 
-%ylim([-0.5 max_opp+1])
 grid on;
 title('opponent count [#]');
 legend show

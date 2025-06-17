@@ -2,6 +2,9 @@ clearvars -except log log_ref
 
 use_ref = false;
 
+%#ok<*UNRCH>
+%#ok<*INUSD>
+
 % load track lines
 load("../databases/YasMarinaSim.mat")
 
@@ -188,7 +191,6 @@ plot(t_loc_lidar,log.estimation.lidar_loc_report__visualization_label__type(log.
 grid on;
 legend show;
 active_labels = [];
-active_labels = [];
 % for i=1:length(labels_value)
 %     if(ismember(labels_value(i),log.estimation.gps_pos_report__visualization_label__type) || ...
 %        ismember(labels_value(i),log.estimation.lidar_loc_report__visualization_label__type))
@@ -279,7 +281,6 @@ for i=1:4
     end
 end
 grid on;
-lgd=legend('show');
 c0 = uicontrol('Style','pushbutton');
 c0.Position(3)=100;
 c0.Position(4)=20;
