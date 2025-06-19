@@ -103,7 +103,7 @@ tt_ax(tt_ax==0)=nan;
 tt_yaw_map = log.perception__opponents.opponents__psi;
 tt_yaw_map(tt_yaw_map==0)=nan;
 tt_count = log.perception__opponents.count;
-max_opp = 1; %max(tt_count);
+max_opp = max(tt_count);
 
 % GROUND TRUTH
 if(use_sim_ref)
@@ -162,7 +162,7 @@ v2v_frequency = messageFreq(v2v_sens_stamp);
 axes(f) = nexttile([1,1]);
 f=f+1;
 hold on;
-plot(v2v_sens_stamp,v2v_frequency,'Color',col.v2v,'DisplayName','V2V');
+plot(v2v_sens_stamp,v2v_frequency,'Color',col.v2v,'DisplayName','v2v');
 grid on;
 title('Frequency [Hz]');
 legend
@@ -178,7 +178,7 @@ tiledlayout(3,2,'Padding','compact');
 axes(f) = nexttile([1,1]);
 f=f+1;
 hold on;
-plot(v2v_sens_stamp,v2v_x_rel(:,1:max_opp),'o','MarkerFaceColor',col.v2v,'MarkerEdgeColor',col.v2v,'MarkerSize',sz,'DisplayName','V2V');
+plot(v2v_sens_stamp,v2v_x_rel(:,1:max_opp),'o','MarkerFaceColor',col.v2v,'MarkerEdgeColor',col.v2v,'MarkerSize',sz,'DisplayName','v2v');
 plot(tt_stamp, tt_x_rel(:,1:max_opp), 'Color',col.tt,'DisplayName','tt');
 if(use_ref || use_sim_ref)
     plot(tt_stamp_ref, tt_x_rel_ref, 'Color',col.ref,'DisplayName','Ground Truth');
@@ -191,7 +191,7 @@ legend
 axes(f) = nexttile([1,1]);
 f=f+1;
 hold on;
-plot(v2v_sens_stamp,v2v_y_rel(:,1:max_opp),'o','MarkerFaceColor',col.v2v,'MarkerEdgeColor',col.v2v,'MarkerSize',sz,'DisplayName','V2V');
+plot(v2v_sens_stamp,v2v_y_rel(:,1:max_opp),'o','MarkerFaceColor',col.v2v,'MarkerEdgeColor',col.v2v,'MarkerSize',sz,'DisplayName','v2v');
 plot(tt_stamp, tt_y_rel(:,1:max_opp), 'Color',col.tt,'DisplayName','tt');
 if(use_ref || use_sim_ref)
     plot(tt_stamp_ref, tt_y_rel_ref, 'Color',col.ref,'DisplayName','Ground Truth');
@@ -216,7 +216,7 @@ legend
 axes(f) = nexttile([1,2]);
 f=f+1;
 hold on;
-area(tt_stamp,log.perception__opponents.opponents__v2v_meas(:,1:max_opp),'FaceColor',col.v2v,'EdgeColor',col.v2v,'DisplayName','V2V');
+area(tt_stamp,log.perception__opponents.opponents__v2v_meas(:,1:max_opp),'FaceColor',col.v2v,'EdgeColor',col.v2v,'DisplayName','v2v');
 grid on;
 title('Count')
 linkaxes(axes,'x')
@@ -231,7 +231,7 @@ tiledlayout(3,2,'Padding','compact');
 axes(f) = nexttile([1,1]);
 f=f+1;
 hold on;
-plot(v2v_sens_stamp,v2v_x_map(:,1:max_opp),'o','MarkerFaceColor',col.v2v,'MarkerEdgeColor',col.v2v,'MarkerSize',sz,'DisplayName','V2V');
+plot(v2v_sens_stamp,v2v_x_map(:,1:max_opp),'o','MarkerFaceColor',col.v2v,'MarkerEdgeColor',col.v2v,'MarkerSize',sz,'DisplayName','v2v');
 plot(tt_stamp,tt_x_map(:,1:max_opp),'Color',col.tt,'DisplayName','tt');
 if(use_ref || use_sim_ref)
     plot(tt_stamp_ref,tt_x_map_ref,'Color',col.ref,'DisplayName','Ground Truth');
@@ -244,7 +244,7 @@ legend
 axes(f) = nexttile([1,1]);
 f=f+1;
 hold on;
-plot(v2v_sens_stamp,v2v_y_map(:,1:max_opp),'o','MarkerFaceColor',col.v2v,'MarkerEdgeColor',col.v2v,'MarkerSize',sz,'DisplayName','V2V');
+plot(v2v_sens_stamp,v2v_y_map(:,1:max_opp),'o','MarkerFaceColor',col.v2v,'MarkerEdgeColor',col.v2v,'MarkerSize',sz,'DisplayName','v2v');
 plot(tt_stamp,tt_y_map(:,1:max_opp),'Color',col.tt,'DisplayName','tt');
 if(use_ref || use_sim_ref)
     plot(tt_stamp_ref,tt_y_map_ref,'Color',col.ref,'DisplayName','Ground Truth');
@@ -282,7 +282,7 @@ legend
 axes(f) = nexttile([1,2]);
 f=f+1;
 hold on;
-plot(v2v_sens_stamp,v2v_yaw_map(:,1:max_opp),'o','MarkerFaceColor',col.v2v,'MarkerEdgeColor',col.v2v,'MarkerSize',sz,'DisplayName','V2V');
+plot(v2v_sens_stamp,v2v_yaw_map(:,1:max_opp),'o','MarkerFaceColor',col.v2v,'MarkerEdgeColor',col.v2v,'MarkerSize',sz,'DisplayName','v2v');
 plot(tt_stamp,tt_yaw_map(:,1:max_opp),'Color',col.tt,'DisplayName','tt');
 if(use_ref || use_sim_ref)
     plot(tt_stamp_ref,tt_yaw_map_ref,'Color',col.ref,'DisplayName','Ground Truth');
@@ -314,6 +314,7 @@ function refreshTimeButtonPushed(src,event)
     tt_stamp=evalin('base','tt_stamp');
     tt_x_map = evalin('base', 'tt_x_map');
     tt_y_map = evalin('base', 'tt_y_map');
+    max_opp = evalin('base', 'max_opp');
     if(use_ref || use_sim_ref)
         tt_stamp_ref=evalin('base','tt_stamp_ref');
         tt_x_map_ref = evalin('base', 'tt_x_map_ref');
@@ -338,7 +339,6 @@ function refreshTimeButtonPushed(src,event)
     grid on
     xlabel('x[m]')
     ylabel('y[m]')
-    % ylim([-1000,1500])
     axis 'equal'
 
     % plot track lines
@@ -347,9 +347,10 @@ function refreshTimeButtonPushed(src,event)
     plot(traj_db(id_left).X, traj_db(id_left).Y, 'color', 'k', 'LineWidth', 1, 'HandleVisibility','off');
     plot(traj_db(id_right).X, traj_db(id_right).Y, 'color', 'k', 'LineWidth', 1, 'HandleVisibility','off');
 
-
-    plot(v2v_x_map(t1_v2v:tend_v2v), v2v_y_map(t1_v2v:tend_v2v),'.','markersize',20,'Color',col.v2v,'displayname','V2V');
-    plot(tt_x_map(t1_tt:tend_tt),tt_y_map(t1_tt:tend_tt),'Color',col.tt,'DisplayName','tt');
+    for k=1:max_opp
+        plot(v2v_x_map(t1_v2v:tend_v2v,k), v2v_y_map(t1_v2v:tend_v2v,k),'.','markersize',20,'Color',col.v2v,'displayname',[num2str(k),' - v2v' ]);
+        plot(tt_x_map(t1_tt:tend_tt,k),tt_y_map(t1_tt:tend_tt,k),'Color',col.tt,'DisplayName',[num2str(k),' - tt' ]);
+    end
     if(use_ref || use_sim_ref)
         plot(tt_x_map_ref(t1_tt_ref:tend_tt_ref),tt_y_map_ref(t1_tt_ref:tend_tt_ref),'Color',col.ref,'DisplayName','Grond Truth');
     end
