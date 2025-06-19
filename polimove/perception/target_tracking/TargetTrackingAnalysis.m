@@ -77,6 +77,8 @@ v2v_x_map(v2v_x_map==0)=nan;
 v2v_y_map(v2v_y_map==0)=nan;
 v2v_yaw_map(v2v_yaw_map==0)=nan;
 v2v_vx_map(v2v_vx_map==0)=nan;
+v2v_yaw_map = unwrap(v2v_yaw_map);
+
 
 % TARGET TRACKING MAIN
 tt_stamp = log.perception__opponents.stamp__tot;
@@ -279,13 +281,10 @@ legend
 % yaw
 axes(f) = nexttile([1,2]);
 f=f+1;
-tt_yaw_map = mod(tt_yaw_map,2*pi);
 hold on;
-v2v_yaw_map = mod(v2v_yaw_map,2*pi);
 plot(v2v_sens_stamp,v2v_yaw_map(:,1:max_opp),'o','MarkerFaceColor',col.v2v,'MarkerEdgeColor',col.v2v,'MarkerSize',sz,'DisplayName','V2V');
 plot(tt_stamp,tt_yaw_map(:,1:max_opp),'Color',col.tt,'DisplayName','tt');
 if(use_ref || use_sim_ref)
-    tt_yaw_map_ref = mod(tt_yaw_map_ref,2*pi);
     plot(tt_stamp_ref,tt_yaw_map_ref,'Color',col.ref,'DisplayName','Ground Truth');
 end
 grid on;
