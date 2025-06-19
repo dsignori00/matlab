@@ -4,7 +4,6 @@ clearvars -except log log_ref trajDatabase
 use_ref = false;
 use_sim_ref = false;
 imm = false;
-max_tracks = -1;
 
 %#ok<*UNRCH>
 %#ok<*INUSD>
@@ -57,10 +56,6 @@ set(0, 'DefaultLineLineWidth', 2);
 
 %% NAMING
 col.tt = '#0072BD';
-col.lidar = '#77AC30';
-col.radar = '#4DBEEE';
-col.camera = '#EDB120';
-col.pointpillars = '#D95319';
 col.v2v = '#A2142F';
 col.ref = '#000000';
 sz=3; % Marker size
@@ -106,11 +101,6 @@ tt_ax(tt_ax==0)=nan;
 tt_yaw_map = log.perception__opponents.opponents__psi;
 tt_yaw_map(tt_yaw_map==0)=nan;
 tt_count = log.perception__opponents.count;
-if(max_tracks > 0 && max_tracks < max(tt_count))
-    max_opp = max_tracks;
-else
-    max_opp = max(tt_count);
-end
 
 % GROUND TRUTH
 if(use_sim_ref)
@@ -153,19 +143,6 @@ ylim([-1 5])
 grid on;
 title('RaceType');
 
-% count
-axes(f) = nexttile([1,1]);
-f=f+1;
-hold on;
-area(tt_stamp,log.perception__opponents.opponents__rad_clust_meas(:,1:max_opp),'FaceColor',col.radar,'EdgeColor',col.radar,'DisplayName','Rad Clust');
-area(tt_stamp,log.perception__opponents.opponents__lid_pp_meas(:,1:max_opp),'FaceColor',col.pointpillars,'EdgeColor',col.pointpillars,'DisplayName','Lid PP');
-area(tt_stamp,log.perception__opponents.opponents__lid_clust_meas(:,1:max_opp),'FaceColor',col.lidar,'EdgeColor',col.lidar,'DisplayName','Lid Clust');
-area(tt_stamp,log.perception__opponents.opponents__cam_yolo_meas(:,1:max_opp),'FaceColor',col.camera,'EdgeColor',col.camera,'DisplayName','Camera');
-area(tt_stamp,log.perception__opponents.opponents__v2v_meas(:,1:max_opp),'FaceColor',col.lidar,'EdgeColor',col.v2v,'DisplayName','V2V');
-grid on;
-title('Count')
-legend
-
 % decision maker
 axes(f) = nexttile([1,1]);
 f=f+1;
@@ -176,6 +153,16 @@ yticklabels({'RACING','TAILGATING','OVERTAKE','ABORT','CRITICAL'});
 ylim([-1 5])
 grid on;
 title('Decision Maker state')
+
+% v2v frequency
+v2v_frequency = messageFreq(v2v_sens_stamp);
+axes(f) = nexttile([1,1]);
+f=f+1;
+hold on;
+plot(v2v_sens_stamp,v2v_frequency,'Color',col.v2v,'DisplayName','V2V');
+grid on;
+title('Frequency [Hz]');
+legend
 
 linkaxes(axes,'x')
 
@@ -318,10 +305,6 @@ function refreshTimeButtonPushed(src,event)
     traj_db = evalin('base', 'trajDatabase');
     use_ref = evalin('base', 'use_ref');
     use_sim_ref = evalin('base', 'use_sim_ref');
-    col.lidar = evalin('base', 'col.lidar');
-    col.radar = evalin('base', 'col.radar');
-    col.camera = evalin('base', 'col.camera');
-    col.pointpillars = evalin('base', 'col.pointpillars');
     col.v2v = evalin('base', 'col.v2v');
     col.tt = evalin('base', 'col.tt');
     col.ref = evalin('base', 'col.ref');
@@ -375,6 +358,12 @@ end
 
 %% FIGURE IMM
 if(imm)
+
+    col.ctrv = '#D95319';
+    col.ctra = '#4DBEEE';
+    col.cma = '#77AC30';
+    col.cmb = '#EDB120';
+
     figure('name','Imm')
     tiledlayout(3,1,'Padding','compact');
     
@@ -405,10 +394,10 @@ if(imm)
     axes(f) = nexttile([1,1]);
     f=f+1;
     hold on;
-    plot(tt_stamp,log.perception__opponents.opponents__ctra_prob(:,1:max_opp),'Color',col.radar,'DisplayName','CTRA');
-    plot(tt_stamp,log.perception__opponents.opponents__ctrv_prob(:,1:max_opp),'Color',col.pointpillars,'DisplayName','CTRV');
-    plot(tt_stamp,log.perception__opponents.opponents__cm_acc_prob(:,1:max_opp),'Color',col.lidar,'DisplayName','CONST ACC');
-    plot(tt_stamp,log.perception__opponents.opponents__cm_dec_prob(:,1:max_opp),'Color',col.camera,'DisplayName','CONST DEC');
+    plot(tt_stamp,log.perception__opponents.opponents__ctra_prob(:,1:max_opp),'Color',col.ctra,'DisplayName','CTRA');
+    plot(tt_stamp,log.perception__opponents.opponents__ctrv_prob(:,1:max_opp),'Color',col.ctrv,'DisplayName','CTRV');
+    plot(tt_stamp,log.perception__opponents.opponents__cm_acc_prob(:,1:max_opp),'Color',col.cma,'DisplayName','CONST ACC');
+    plot(tt_stamp,log.perception__opponents.opponents__cm_dec_prob(:,1:max_opp),'Color',col.cmb,'DisplayName','CONST DEC');
     grid on;
     title('Model Prob')
     linkaxes(axes,'x')
