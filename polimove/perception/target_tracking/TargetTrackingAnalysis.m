@@ -101,6 +101,7 @@ tt_ax(tt_ax==0)=nan;
 tt_yaw_map = log.perception__opponents.opponents__psi;
 tt_yaw_map(tt_yaw_map==0)=nan;
 tt_count = log.perception__opponents.count;
+max_opp = 1; %max(tt_count);
 
 % GROUND TRUTH
 if(use_sim_ref)
