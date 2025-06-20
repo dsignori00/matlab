@@ -1,4 +1,33 @@
-function log_new = old2new_mat(log_old)
+close all
+clearvars
+clc
+
+% load ego log
+if (~exist('log','var'))
+    [file,path] = uigetfile('*.mat','Load mat');
+    tmp = load(fullfile(path,file));
+    log = tmp.log;
+    clearvars tmp;
+end
+
+log = old2new(log);
+
+output_path = fullfile(path, file);
+fprintf("\nSaving data to: %s\n", output_path);
+
+try
+    save(output_path, 'log', '-v7.3');
+catch e
+    warning("WARNING: Could not save files");
+    warning("Error type:  " + e.message);
+end
+
+
+
+%%  FUNCTIONS
+
+
+function log_new = old2new(log_old)
 
 % get topic names
 log_old = orderfields(log_old);

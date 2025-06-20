@@ -6,7 +6,6 @@ clearvars -except log log_ref trajDatabase
 
 %% Paths
 
-addpath("../../common/personal/")
 addpath("../../common/utilities/")
 addpath("../../common/constants/")
 addpath("../../common/plot/")
