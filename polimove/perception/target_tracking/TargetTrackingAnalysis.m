@@ -157,7 +157,7 @@ grid on;
 title('Decision Maker state')
 
 % v2v frequency
-v2v_frequency = messageFreq(v2v_sens_stamp);
+v2v_frequency = MessageFreq(v2v_sens_stamp);
 axes(f) = nexttile([1,1]);
 f=f+1;
 hold on;
@@ -348,6 +348,8 @@ function refreshTimeButtonPushed(src,event)
 
     for k=1:max_opp
         plot(v2v_x_map(t1_v2v:tend_v2v,k), v2v_y_map(t1_v2v:tend_v2v,k),'.','markersize',20,'Color',col.v2v,'displayname',[num2str(k),' - v2v' ]);
+    end
+    for k=1:max_opp
         plot(tt_x_map(t1_tt:tend_tt,k),tt_y_map(t1_tt:tend_tt,k),'Color',col.tt,'DisplayName',[num2str(k),' - tt' ]);
     end
     if(use_ref || use_sim_ref)
