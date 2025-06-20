@@ -13,7 +13,6 @@ compute_err_std  = false;
 
 %% Paths
 
-addpath("../../01_Tools/00_GlobalFunctions/personal/")
 addpath("../../01_Tools/00_GlobalFunctions/utilities/")
 addpath("../../01_Tools/00_GlobalFunctions/constants/")
 addpath("../../01_Tools/00_GlobalFunctions/plot/")
