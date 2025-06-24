@@ -1,4 +1,4 @@
-function phl = plotTrajDatabase2025(traj_DB, legend_on, grayScaleOn)
+function phl = PlotTrajDatabase2025(traj_DB, legend_on, grayScaleOn)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %         poliMove - IAC - plotTrajDatabaseV2                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
