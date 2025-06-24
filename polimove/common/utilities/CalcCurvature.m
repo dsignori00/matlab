@@ -1,4 +1,4 @@
-function rho = calcCurvature(x,y,downsampling,closed_path)
+function rho = CalcCurvature(x,y,downsampling,closed_path)
 
 if size(x) ~= size(y)
     error('Inputs dimensions must agree.')

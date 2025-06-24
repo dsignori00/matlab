@@ -303,7 +303,6 @@ function updateLapSelection(src, ~, source)
     if ~isempty(fig_curv)
         updateCurvPlot(lap_selected);
     end
-
 end
 
 
@@ -332,7 +331,7 @@ function updateTrajectory(lap_selected)
 
     xlabel(ax_traj, 'X Position (m)');
     ylabel(ax_traj, 'Y Position (m)');
-    legend(ax_traj, 'Location', 'northeast');
+    legend(ax_traj, 'Location', 'best');
     grid(ax_traj, 'on');
     box(ax_traj, 'on');
     axis(ax_traj, 'equal');
@@ -358,15 +357,7 @@ function updateSpeed(lap_selected)
     plot(ax_speed, sharedData.ego_index(idx_ego), sharedData.ego_vx(idx_ego), ...
          'DisplayName', 'Ego Speed', 'Color', sharedData.colors(1,:));
 
-    ego_index = sharedData.ego_index(idx_ego);
-    ego_lap_time = sharedData.ego_lap_time(idx_ego);
-    
-    % Ensure unique indices for ego
-    [ego_index_unique, ia] = unique(ego_index, 'stable');
-    ego_lap_time_unique = ego_lap_time(ia);
-
-    yline(ax_lapdiff, [0 0], 'Color', 'k', 'LineStyle', '--', 'HandleVisibility', 'off');
-
+    % Plot V2V Speed and Time Differences
     for kk = 1:sharedData.max_opp
         opp_name = sharedData.name_map(kk);
         idx_opp = (sharedData.v2v_laps(:, kk) == lap_selected);
@@ -376,33 +367,52 @@ function updateSpeed(lap_selected)
              'Color', sharedData.colors(kk+1, :), ...
              'DisplayName', sprintf('%d - %s', kk, opp_name));
 
-        % Lap Time Difference Plot
-        if nnz(idx_opp) > 1
-            opp_index = double(sharedData.v2v_index(idx_opp, kk));
-            opp_lap_time = sharedData.v2v_lap_time(idx_opp, kk);
-
-            ego_interp = interp1(ego_index_unique, ego_lap_time_unique, opp_index, 'linear', 'extrap');
-            lap_time_diff = opp_lap_time - ego_interp;
-
-            plot(ax_lapdiff, opp_index, lap_time_diff, ...
-                'Color', sharedData.colors(kk+1,:), ...
-                'DisplayName', sprintf('%d - %s', kk, opp_name));
+        % Ego plot
+        ego_idx = find(sharedData.ego_laps == lap_selected);
+        if numel(ego_idx) > 1
+            plot(ax_lapdiff, sharedData.ego_index(ego_idx), sharedData.ego_lap_time(ego_idx), ...
+                 'Color', sharedData.colors(1,:), ...
+                 'DisplayName', '0 - POLIMOVE');
         end
+        
+        % Opponent plots
+        for kk = 1:sharedData.max_opp
+            opp_name = sharedData.name_map(kk);
+            opp_idx = find(sharedData.v2v_laps(:,kk) == lap_selected);
+            if numel(opp_idx) > 1
+                plot(ax_lapdiff, sharedData.v2v_index(opp_idx,kk), sharedData.v2v_lap_time(opp_idx,kk), ...
+                     'Color', sharedData.colors(kk+1,:), ...
+                     'DisplayName', sprintf('%d - %s', kk, opp_name));
+            end
+        end
+
+        % % Match lengths (assumes data is roughly aligned)
+        % n = min(length(ego_times), length(opp_times));
+        % if n > 1
+        %     % Interpolate ego times to opponent's index if mismatched
+        %     ego_interp = interp1(find(idx_ego), ego_times, find(idx_opp(1:n)), 'linear', 'extrap');
+        %     time_diff = opp_times(1:n) - ego_interp;
+        % 
+        %     plot(ax_lapdiff, sharedData.v2v_index(idx_opp(1:n), kk), time_diff, ...
+        %          'Color', sharedData.colors(kk+1,:), ...
+        %          'DisplayName', sprintf('%d - %s', kk, opp_name));
+        % end
     end
 
     % Final formatting
     xlabel(ax_speed, 'Closest Index');
     ylabel(ax_speed, 'Speed (km/h)');
-    legend(ax_speed, 'Location', 'northeast');
+    legend(ax_speed, 'Location', 'best');
     grid(ax_speed, 'on');
     box(ax_speed, 'on');
 
     xlabel(ax_lapdiff, 'Closest Index');
-    ylabel(ax_lapdiff, 'Delta Lap Time (s)');
-    legend(ax_lapdiff, 'Location', 'northeast');
+    ylabel(ax_lapdiff, '\Delta Lap Time (s)');
+    legend(ax_lapdiff, 'Location', 'best');
     grid(ax_lapdiff, 'on');
     box(ax_lapdiff, 'on');
 
+    linkaxes([ax_speed, ax_lapdiff], 'x');
 end
 
 
@@ -428,7 +438,7 @@ function updateCurvPlot(lap_selected)
     end
     ylabel(ax_curv, 'Curvature (1/m)');
     title(ax_curv, sprintf('Curvature - Lap %d', lap_selected));
-    legend(ax_curv, 'Location', 'northeast');
+    legend(ax_curv, 'Location', 'best');
     grid(ax_curv, 'on');
     box(ax_curv, 'on');
     % max_curv = 1e-3;
@@ -444,21 +454,14 @@ function updateCurvPlot(lap_selected)
     ylabel(ax_ay, 'Lateral Acceleration (m/s^2)');
     xlabel(ax_ay, 'Closest Index');
     title(ax_ay, sprintf('Lateral Acceleration - Lap %d', lap_selected));
-    legend(ax_ay, 'Location', 'northeast');
+    legend(ax_ay, 'Location', 'best');
     grid(ax_ay, 'on');
     box(ax_ay, 'on');
     % max_ay = max_curv*(300*MPS2KPH)^2;
     % ylim(ax_ay, [-max_ay, max_ay]);
 
+    linkaxes([ax_curv, ax_ay], 'x'); 
 end
 
-
-% Link x-axis limits manually between Speed and Curvature figures
-ax_speed = getappdata(fig_speed, 'ax');
-ax_lapdiff = getappdata(fig_speed, 'ax_lapdiff');
-ax_curv = getappdata(fig_curv, 'ax_curv');
-ax_ay = getappdata(fig_curv, 'ax_ay');
-
-linkaxes([ax_speed, ax_curv, ax_ay, ax_lapdiff], 'x');
 
 
