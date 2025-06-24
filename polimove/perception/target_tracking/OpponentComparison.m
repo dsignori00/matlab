@@ -173,7 +173,8 @@ setappdata(fig_traj, 'popup', popup_traj);
 
 % Speed figure
 fig_speed = figure('Name','Speed Profile');
-ax_speed = axes('Parent', fig_speed, 'Position', [0.1 0.2 0.85 0.75]);
+ax_speed = subplot(2,1,1, 'Parent', fig_speed);  % Speed plot
+ax_lapdiff = subplot(2,1,2, 'Parent', fig_speed);  % Lap time delta plot
 
 % Create dropdown menu for lap selection in Speed figure
 popup_speed = uicontrol('Style', 'popupmenu', ...
@@ -182,6 +183,7 @@ popup_speed = uicontrol('Style', 'popupmenu', ...
           'Callback', @(src, evt) updateLapSelection(src, evt, 'speed'));
 
 setappdata(fig_speed, 'ax', ax_speed);
+setappdata(fig_speed, 'ax_lapdiff', ax_lapdiff);  % Add new axis handle
 setappdata(fig_speed, 'popup', popup_speed);
 
 % Curvature and Lateral Acceleration figure
@@ -219,6 +221,8 @@ sharedData.v2v_curv = v2v_curv;
 sharedData.v2v_ay = v2v_ay;
 sharedData.ego_curv = ego_curv;
 sharedData.ego_ay = ego_ay;
+sharedData.ego_lap_time = ego_lap_time;
+sharedData.v2v_lap_time = v2v_lap_time;
 
 % Save to root for callback access (or use nested functions / guidata)
 setappdata(0, 'sharedData', sharedData);
@@ -299,6 +303,7 @@ function updateLapSelection(src, ~, source)
     if ~isempty(fig_curv)
         updateCurvPlot(lap_selected);
     end
+
 end
 
 
@@ -337,26 +342,77 @@ function updateSpeed(lap_selected)
     sharedData = getappdata(0, 'sharedData');
     fig_speed = findobj('Name', 'Speed Profile');
     ax_speed = getappdata(fig_speed, 'ax');
+    ax_lapdiff = getappdata(fig_speed, 'ax_lapdiff');
+
+    % Clear and prepare plots
     cla(ax_speed);
+    cla(ax_lapdiff);
     hold(ax_speed, 'on');
+    hold(ax_lapdiff, 'on');
+
     title(ax_speed, sprintf('Speed Profile - Lap %d', lap_selected));
+    title(ax_lapdiff, sprintf('Lap-relative Time Difference - Lap %d', lap_selected));
 
+    % Plot Ego Speed
     idx_ego = (sharedData.ego_laps == lap_selected);
-    plot(ax_speed, sharedData.ego_index(idx_ego), sharedData.ego_vx(idx_ego), 'DisplayName', 'Ego Speed', 'Color', sharedData.colors(1,:));
+    plot(ax_speed, sharedData.ego_index(idx_ego), sharedData.ego_vx(idx_ego), ...
+         'DisplayName', 'Ego Speed', 'Color', sharedData.colors(1,:));
 
+
+    % Ego plot
+    ego_idx = find(sharedData.ego_laps == lap_selected);
+    if numel(ego_idx) > 1
+        plot(ax_lapdiff, sharedData.ego_index(ego_idx), sharedData.ego_lap_time(ego_idx), ...
+                'Color', sharedData.colors(1,:), ...
+                'DisplayName', '0 - POLIMOVE');
+    end
+        
+    % Plot V2V Speed and Time Differences
     for kk = 1:sharedData.max_opp
         opp_name = sharedData.name_map(kk);
         idx_opp = (sharedData.v2v_laps(:, kk) == lap_selected);
+
+        % Speed Plot
         plot(ax_speed, sharedData.v2v_index(idx_opp, kk), sharedData.v2v_vx(idx_opp, kk), ...
-            'Color', sharedData.colors(kk+1, :), 'DisplayName', sprintf('%d - %s', kk, opp_name));
+             'Color', sharedData.colors(kk+1, :), ...
+             'DisplayName', sprintf('%d - %s', kk, opp_name));
+
+
+        % Lap Time plots
+        if numel(idx_opp) > 1
+            plot(ax_lapdiff, sharedData.v2v_index(idx_opp,kk), sharedData.v2v_lap_time(idx_opp,kk), ...
+                    'Color', sharedData.colors(kk+1,:), ...
+                    'DisplayName', sprintf('%d - %s', kk, opp_name));
+        end
+
+        % % Match lengths (assumes data is roughly aligned)
+        % n = min(length(ego_times), length(opp_times));
+        % if n > 1
+        %     % Interpolate ego times to opponent's index if mismatched
+        %     ego_interp = interp1(find(idx_ego), ego_times, find(idx_opp(1:n)), 'linear', 'extrap');
+        %     time_diff = opp_times(1:n) - ego_interp;
+        % 
+        %     plot(ax_lapdiff, sharedData.v2v_index(idx_opp(1:n), kk), time_diff, ...
+        %          'Color', sharedData.colors(kk+1,:), ...
+        %          'DisplayName', sprintf('%d - %s', kk, opp_name));
+        % end
     end
 
+    % Final formatting
     xlabel(ax_speed, 'Closest Index');
     ylabel(ax_speed, 'Speed (km/h)');
+    legend(ax_speed, 'Location', 'best');
     grid(ax_speed, 'on');
     box(ax_speed, 'on');
-    legend(ax_speed, 'Location', 'best');
+
+    xlabel(ax_lapdiff, 'Closest Index');
+    ylabel(ax_lapdiff, '\Delta Lap Time (s)');
+    legend(ax_lapdiff, 'Location', 'best');
+    grid(ax_lapdiff, 'on');
+    box(ax_lapdiff, 'on');
+
 end
+
 
 function updateCurvPlot(lap_selected)
     sharedData = getappdata(0, 'sharedData');
@@ -402,8 +458,16 @@ function updateCurvPlot(lap_selected)
     % max_ay = max_curv*(300*MPS2KPH)^2;
     % ylim(ax_ay, [-max_ay, max_ay]);
 
-    linkaxes([ax_curv, ax_ay], 'x'); 
 end
 
 
+% Link x-axis limits manually between Speed and Curvature figures
+ax_speed = getappdata(fig_speed, 'ax');
+ax_lapdiff = getappdata(fig_speed, 'ax_lapdiff');
+ax_curv = getappdata(fig_curv, 'ax_curv');
+ax_ay = getappdata(fig_curv, 'ax_ay');
+
+% Function to sync limits
+addlistener(ax_speed, 'XLim', 'PostSet', @(src,evt) set([ax_curv, ax_ay], 'XLim', get(ax_speed, 'XLim')));
+addlistener(ax_curv, 'XLim', 'PostSet', @(src,evt) set([ax_speed, ax_lapdiff], 'XLim', get(ax_curv, 'XLim')));
 
