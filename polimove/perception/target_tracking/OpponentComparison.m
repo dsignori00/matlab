@@ -5,6 +5,9 @@ clearvars -except log log_ref trajDatabase ego_index
 %#ok<*INUSD>
 %#ok<*USENS>
 
+%% Flags
+multi_run = false;   % if true, a different mat for ego and opponent will be loaded
+
 %% Paths
 
 addpath("../../common/utilities/")
@@ -13,7 +16,6 @@ addpath("../../common/plot/")
 normal_path = "/home/daniele/Documents/PoliMOVE/04_Bags/";
 
 run('PhysicalConstants.m');
-
 
 %% Settings
 
@@ -43,16 +45,23 @@ if(~exist('trajDatabase','var'))
 end
 
 % load log
-if (~exist('log','var'))
+if(~exist('log','var'))
     [file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load log');
     load(fullfile(path,file));
+end
+if(multi_run)
+    if(~exist('log_ego','var'))
+        [file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load ego log');
+        load(fullfile(path,file));
+    end
+else
+    log_ego = log;
 end
 
 DateTime = datetime(log.time_offset_nsec,'ConvertFrom','epochtime','TicksPerSecond',1e9,'Format','dd-MMM-yyyy HH:mm:ss');
 
 % V2V DETECTIONS
 v2v_sens_stamp = log.perception__v2v__detections.sensor_stamp__tot;
-
 % map
 v2v_x = log.perception__v2v__detections.detections__x_map;
 v2v_y = log.perception__v2v__detections.detections__y_map;
@@ -68,20 +77,29 @@ v2v_count = log.perception__v2v__detections.count;
 max_opp = max(v2v_count);
 
 % ESTIMATION
-ego_x = log.estimation.x_cog;
-ego_y = log.estimation.y_cog;
-ego_vx = log.estimation.vx*MPS2KPH; 
-ego_yaw = log.estimation.heading;
-
+ego_stamp = log_ego.estimation.stamp__tot;
+ego_x = log_ego.estimation.x_cog;
+ego_y = log_ego.estimation.y_cog;
+ego_vx = log_ego.estimation.vx*MPS2KPH; 
+ego_yaw = log_ego.estimation.heading;
+ego_ay = log_ego.estimation.ay;
 ego_x(ego_x==0)=nan;
 ego_y(ego_y==0)=nan;
 ego_vx(ego_vx==0)=nan;
 ego_yaw(ego_yaw==0)=nan;
 ego_yaw = unwrap(ego_yaw);
+ego_ay(ego_ay==0)=nan;
 
 %% PROCESSING
 
-% compute ego closest idx
+% Keep only valid detections
+v2v_x(:,max_opp+1:end)=[];
+v2v_y(:,max_opp+1:end)=[];
+v2v_vx(:,max_opp+1:end)=[];
+v2v_yaw(:,max_opp+1:end)=[];
+v2v_index(:,max_opp+1:end)=[];
+
+% Compute ego closest idx
 if(~exist('ego_index','var'))
     ego_index = NaN(size(ego_x));
     for i = 1:length(ego_x)
@@ -91,13 +109,51 @@ if(~exist('ego_index','var'))
     end
 end
 
-% assign lap number
-v2v_laps = NaN(size(v2v_index));
+% Assign lap number and calc curvature
+v2v_laps = NaN(size(v2v_index,1),max_opp);
+v2v_curv = NaN(size(v2v_index,1),max_opp);
+ego_curv = CalcCurvature(ego_x, ego_y, 1, false);
 ego_laps = AssignLap(ego_index);
 for k=1:max_opp
     v2v_laps(:,k) = AssignLap(v2v_index(:,k));
+    v2v_curv(:,k) = CalcCurvature(v2v_x(:,k), v2v_y(:,k), 1, false);
 end
 max_lap = max(v2v_laps(:), [], 'omitnan');
+
+% % Trajectory smoothing
+% ego_line.x = ego_x;
+% ego_line.y = ego_y;
+% ego_line = LineSmoothingEdgeCost(ego_line, 0.1, 2000, 1000, 5, 1e-07, 1e-07);
+% for k=1:max_opp
+%         opp_line.x = v2v_x(:,k);
+%         opp_line.y = v2v_y(:,k);
+%         opp_line = LineSmoothingEdgeCost(opp_line, 0.1, 2000, 1000, 5, 1e-07, 1e-07);
+%         v2v_curv(:,k) = CalcCurvature(opp_line.x, opp_line.y, 1, true);
+% end
+
+% compute lateral acceleration
+v2v_ay = v2v_curv.*v2v_vx.^2;
+
+% Lap Time progression
+ego_lap_time = NaN(size(ego_stamp));  
+v2v_lap_time = NaN(size(v2v_index,1),max_opp);  
+
+unique_laps = unique(ego_laps(~isnan(ego_laps)));
+for lap = unique_laps'
+    idx = (ego_laps == lap);
+    ego_lap_time(idx) = ego_stamp(idx) - ego_stamp(find(idx, 1, 'first'));
+end
+
+for k = 1:max_opp
+    laps_k = v2v_laps(:,k);
+    unique_laps = unique(laps_k(~isnan(laps_k)));
+    
+    for lap = unique_laps'
+        idx = (laps_k == lap);
+        lap_start_time = v2v_sens_stamp(find(idx, 1, 'first'));
+        v2v_lap_time(idx, k) = v2v_sens_stamp(idx) - lap_start_time;
+    end
+end
 
 
 %% PLOTTING
@@ -128,6 +184,22 @@ popup_speed = uicontrol('Style', 'popupmenu', ...
 setappdata(fig_speed, 'ax', ax_speed);
 setappdata(fig_speed, 'popup', popup_speed);
 
+% Curvature and Lateral Acceleration figure
+fig_curv = figure('Name', 'Curvature and Lateral Acceleration');
+
+ax_curv = subplot(2,1,1, 'Parent', fig_curv);
+ax_ay = subplot(2,1,2, 'Parent', fig_curv);
+
+% Create dropdown for lap selection
+popup_curv = uicontrol('Style', 'popupmenu', ...
+          'String', compose("Lap %d", 1:max_lap), ...
+          'Position', [20 20 100 25], ...
+          'Callback', @(src, evt) updateCurvPlot(src, evt, fig_curv));
+
+setappdata(fig_curv, 'ax_curv', ax_curv);
+setappdata(fig_curv, 'ax_ay', ax_ay);
+setappdata(fig_curv, 'popup', popup_curv);
+
 % Store shared data in base workspace or a struct accessible to both callbacks
 sharedData.v2v_laps = v2v_laps;
 sharedData.v2v_x = v2v_x;
@@ -143,6 +215,10 @@ sharedData.ego_index = ego_index;
 sharedData.ego_vx = ego_vx;
 sharedData.v2v_index = v2v_index;
 sharedData.v2v_vx = v2v_vx;
+sharedData.v2v_curv = v2v_curv;
+sharedData.v2v_ay = v2v_ay;
+sharedData.ego_curv = ego_curv;
+sharedData.ego_ay = ego_ay;
 
 % Save to root for callback access (or use nested functions / guidata)
 setappdata(0, 'sharedData', sharedData);
@@ -150,27 +226,81 @@ setappdata(0, 'sharedData', sharedData);
 % Initial plots, lap 1
 updateTrajectory(1);
 updateSpeed(1);
+updateCurvPlot(1);
 
 %% Callback to sync selections and update both plots
+
 function updateLapSelection(src, ~, source)
-    %sharedData = getappdata(0, 'sharedData');
     lap_selected = src.Value;
 
-    % Update both dropdowns except the one that triggered the callback to avoid recursion
-    if strcmp(source, 'traj')
-        fig_speed = findobj('Name', 'Speed Profile');
-        popup_speed = getappdata(fig_speed, 'popup');
-        set(popup_speed, 'Value', lap_selected);
-    else
-        fig_traj = findobj('Name', 'Trajectory');
-        popup_traj = getappdata(fig_traj, 'popup');
-        set(popup_traj, 'Value', lap_selected);
+    % Find all figures by name
+    fig_traj = findobj('Name', 'Trajectory');
+    fig_speed = findobj('Name', 'Speed Profile');
+    fig_curv = findobj('Name', 'Curvature and Lateral Acceleration');
+
+    % Update dropdowns of other figures (not the one that triggered this callback)
+    switch source
+        case 'traj'
+            % Update speed popup
+            if ~isempty(fig_speed)
+                popup_speed = getappdata(fig_speed, 'popup');
+                if popup_speed.Value ~= lap_selected
+                    set(popup_speed, 'Value', lap_selected);
+                end
+            end
+            % Update curvature popup
+            if ~isempty(fig_curv)
+                popup_curv = getappdata(fig_curv, 'popup');
+                if popup_curv.Value ~= lap_selected
+                    set(popup_curv, 'Value', lap_selected);
+                end
+            end
+            
+        case 'speed'
+            % Update trajectory popup
+            if ~isempty(fig_traj)
+                popup_traj = getappdata(fig_traj, 'popup');
+                if popup_traj.Value ~= lap_selected
+                    set(popup_traj, 'Value', lap_selected);
+                end
+            end
+            % Update curvature popup
+            if ~isempty(fig_curv)
+                popup_curv = getappdata(fig_curv, 'popup');
+                if popup_curv.Value ~= lap_selected
+                    set(popup_curv, 'Value', lap_selected);
+                end
+            end
+            
+        case 'curv'
+            % Update trajectory popup
+            if ~isempty(fig_traj)
+                popup_traj = getappdata(fig_traj, 'popup');
+                if popup_traj.Value ~= lap_selected
+                    set(popup_traj, 'Value', lap_selected);
+                end
+            end
+            % Update speed popup
+            if ~isempty(fig_speed)
+                popup_speed = getappdata(fig_speed, 'popup');
+                if popup_speed.Value ~= lap_selected
+                    set(popup_speed, 'Value', lap_selected);
+                end
+            end
     end
 
-    % Update both plots
-    updateTrajectory(lap_selected);
-    updateSpeed(lap_selected);
+    % Update all plots regardless of source
+    if ~isempty(fig_traj)
+        updateTrajectory(lap_selected);
+    end
+    if ~isempty(fig_speed)
+        updateSpeed(lap_selected);
+    end
+    if ~isempty(fig_curv)
+        updateCurvPlot(lap_selected);
+    end
 end
+
 
 function updateTrajectory(lap_selected)
     sharedData = getappdata(0, 'sharedData');
@@ -226,6 +356,53 @@ function updateSpeed(lap_selected)
     grid(ax_speed, 'on');
     box(ax_speed, 'on');
     legend(ax_speed, 'Location', 'best');
+end
+
+function updateCurvPlot(lap_selected)
+    sharedData = getappdata(0, 'sharedData');
+    fig_curv = findobj('Name', 'Curvature and Lateral Acceleration');
+    ax_curv = getappdata(fig_curv, 'ax_curv');
+    ax_ay = getappdata(fig_curv, 'ax_ay');
+
+    % Clear axes
+    cla(ax_curv);
+    cla(ax_ay);
+    hold(ax_curv, 'on');
+    hold(ax_ay, 'on');
+
+    % Plot curvature
+    idx_ego = (sharedData.ego_laps == lap_selected);
+    plot(ax_curv, sharedData.ego_index(idx_ego), sharedData.ego_curv(idx_ego), 'Color', sharedData.colors(1,:), 'DisplayName', '0 - POLIMOVE');
+    for k=1:sharedData.max_opp
+        idx_opp = (sharedData.v2v_laps(:,k) == lap_selected);
+        plot(ax_curv, sharedData.v2v_index(idx_opp,k), sharedData.v2v_curv(idx_opp,k), ...
+            'Color', sharedData.colors(k+1,:), 'DisplayName', sprintf('%d - %s', k, sharedData.name_map(k)));
+    end
+    ylabel(ax_curv, 'Curvature (1/m)');
+    title(ax_curv, sprintf('Curvature - Lap %d', lap_selected));
+    legend(ax_curv, 'Location', 'best');
+    grid(ax_curv, 'on');
+    box(ax_curv, 'on');
+    % max_curv = 1e-3;
+    % ylim(ax_curv, [-max_curv, max_curv]);
+
+    % Plot lateral acceleration
+    plot(ax_ay, sharedData.ego_index(idx_ego), sharedData.ego_ay(idx_ego), 'Color', sharedData.colors(1,:), 'DisplayName', '0 - POLIMOVE');
+    for k=1:sharedData.max_opp
+        idx_opp = (sharedData.v2v_laps(:,k) == lap_selected);
+        plot(ax_ay, sharedData.v2v_index(idx_opp,k), sharedData.v2v_ay(idx_opp,k), ...
+            'Color', sharedData.colors(k+1,:), 'DisplayName', sprintf('%d - %s', k, sharedData.name_map(k)));
+    end
+    ylabel(ax_ay, 'Lateral Acceleration (m/s^2)');
+    xlabel(ax_ay, 'Closest Index');
+    title(ax_ay, sprintf('Lateral Acceleration - Lap %d', lap_selected));
+    legend(ax_ay, 'Location', 'best');
+    grid(ax_ay, 'on');
+    box(ax_ay, 'on');
+    % max_ay = max_curv*(300*MPS2KPH)^2;
+    % ylim(ax_ay, [-max_ay, max_ay]);
+
+    linkaxes([ax_curv, ax_ay], 'x'); 
 end
 
 
