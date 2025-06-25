@@ -231,6 +231,28 @@ setappdata(fig_curv, 'ax_curv', ax_curv);
 setappdata(fig_curv, 'ax_ay', ax_ay);
 setappdata(fig_curv, 'popup', popup_curv);
 
+% Get names ordered by opponent ID values
+ids = sort(cell2mat(values(opponent))); 
+names = cellfun(@(k) name_map(k), num2cell(ids), 'UniformOutput', false);
+
+% Now format for checklist
+checklist_strings = compose("%d - %s", ids(:), string(names(:)));
+
+
+% Default: select all opponents
+default_selection = 1:max_opp;
+
+checkbox_traj = createOpponentCheckboxes(fig_traj, checklist_strings, default_selection,'traj');
+setappdata(fig_traj,'checklist',checkbox_traj);
+
+% Speed figure
+checkbox_speed = createOpponentCheckboxes(fig_speed, checklist_strings, default_selection,'speed');
+setappdata(fig_speed,'checklist',checkbox_speed);
+
+% Curvature figure
+checkbox_curv  = createOpponentCheckboxes(fig_curv , checklist_strings, default_selection,'curv');
+setappdata(fig_curv ,'checklist',checkbox_curv );
+
 % Store shared data in base workspace or a struct accessible to both callbacks
 sharedData.v2v_laps = v2v_laps;
 sharedData.v2v_x = v2v_x;
@@ -335,23 +357,115 @@ function updateLapSelection(src, ~, source)
 
 end
 
+function sel = getSelectedOpponents(figH)
+    % Return index vector of selected opponents for a given figure
+    cbs = getappdata(figH,'checklist');
+    sel = find(arrayfun(@(h) get(h,'Value'), cbs));
+end
+
+function syncCheckboxGroup(figH, selIdx)
+    % Force the check-boxes in figH to reflect selIdx
+    if isempty(figH), return; end
+    cbs = getappdata(figH,'checklist');
+    for k = 1:numel(cbs)
+        cbs(k).Value = ismember(k, selIdx);
+    end
+end
+
+function cb = createOpponentCheckboxes(parentFig, checklist_strings, default_selection, tag)
+    nOpp = numel(checklist_strings);
+    panel = uipanel('Parent',parentFig, ...
+        'Units','pixels', ...
+        'Position',[20 50 110 20*nOpp+30], ...
+        'Title','Opponents', ...
+        'BorderType','etchedin');
+
+    cb = gobjects(nOpp,1);
+    for k = 1:nOpp
+        % Capture k and tag to pass to callback
+        cb(k) = uicontrol('Parent',panel, ...
+            'Style','checkbox', ...
+            'String',checklist_strings{k}, ...
+            'Units','pixels', ...
+            'Position',[5, 20*nOpp - 20*k + 5, 100, 18], ...
+            'Value',ismember(k,default_selection), ...
+            'Callback',@(src,evt)updateOpponentSelection(src,evt,tag));
+    end
+end
+
+function updateOpponentSelection(src,~,sourceTag)
+    % Find the figure corresponding to sourceTag
+    switch sourceTag
+        case 'traj'
+            fig_source = findobj('Name', 'Trajectory');
+        case 'speed'
+            fig_source = findobj('Name', 'Speed Profile');
+        case 'curv'
+            fig_source = findobj('Name', 'Curvature and Lateral Acceleration');
+        otherwise
+            return; % unknown source
+    end
+    
+    % Get selected opponents in source figure only
+    selected_opps = getSelectedOpponents(fig_source);
+
+    % Now sync all figures to this selection (including the source itself)
+    fig_traj  = findobj('Name','Trajectory');
+    fig_speed = findobj('Name','Speed Profile');
+    fig_curv  = findobj('Name','Curvature and Lateral Acceleration');
+
+    % Sync checkboxes in all figures
+    syncCheckboxGroup(fig_traj ,selected_opps);
+    syncCheckboxGroup(fig_speed,selected_opps);
+    syncCheckboxGroup(fig_curv ,selected_opps);
+
+    % Redraw plots with current lap selection (use traj popup value as source)
+    if ~isempty(fig_traj )
+        popup = getappdata(fig_traj ,'popup');  updateTrajectory(popup.Value); end
+    if ~isempty(fig_speed)
+        popup = getappdata(fig_speed,'popup');  updateSpeed(popup.Value);     end
+    if ~isempty(fig_curv )
+        popup = getappdata(fig_curv ,'popup');  updateCurvPlot(popup.Value);  end
+end
+
 
 function updateTrajectory(lap_selected)
     sharedData = getappdata(0, 'sharedData');
+    
+    % Safely get or rebuild the figure and axis
     fig_traj = findobj('Name', 'Trajectory');
+    if isempty(fig_traj) || ~isvalid(fig_traj)
+        warning('Trajectory figure not found or closed.');
+        return;
+    end
+
     ax_traj = getappdata(fig_traj, 'ax');
+    if isempty(ax_traj) || ~isvalid(ax_traj)
+        warning('Axis handle is missing or invalid. Rebuilding.');
+        ax_traj = axes('Parent', fig_traj);
+        setappdata(fig_traj, 'ax', ax_traj);
+    end
+
     cla(ax_traj);
     hold(ax_traj, 'on');
     title(ax_traj, sprintf('Trajectory - Lap %d', lap_selected));
 
     idx = (sharedData.ego_laps == lap_selected);
-    plot(ax_traj, sharedData.ego_x(idx), sharedData.ego_y(idx), '.', 'Color', sharedData.colors(1,:), 'DisplayName', '0 - POLIMOVE');
+    plot(ax_traj, sharedData.ego_x(idx), sharedData.ego_y(idx), '.', ...
+         'Color', sharedData.colors(1,:), 'DisplayName', '0 - POLIMOVE');
 
-    for kk = 1:sharedData.max_opp
-        opp_name = sharedData.name_map(kk);
-        idx_opp = (sharedData.v2v_laps(:,kk) == lap_selected);
-        plot(ax_traj, sharedData.v2v_x(idx_opp,kk), sharedData.v2v_y(idx_opp,kk), '.', 'Color', sharedData.colors(kk+1,:), ...
-            'DisplayName', sprintf('%d - %s', kk, opp_name));
+    selected_opps = getSelectedOpponents(fig_traj);
+
+    for kk = selected_opps(:)'  % scalar each time
+        try
+            opp_name = sharedData.name_map(kk);
+            idx_opp = (sharedData.v2v_laps(:,kk) == lap_selected);
+            plot(ax_traj, sharedData.v2v_x(idx_opp,kk), sharedData.v2v_y(idx_opp,kk), '.', ...
+                 'Color', sharedData.colors(kk+1,:), ...
+                 'DisplayName', sprintf('%d - %s', kk, opp_name));
+        catch ME
+            warning("Skipping opponent %d: %s", kk, ME.message);
+        end
     end
 
     id_left = length(sharedData.trajDatabase) - 2;
@@ -366,6 +480,7 @@ function updateTrajectory(lap_selected)
     box(ax_traj, 'on');
     axis(ax_traj, 'equal');
 end
+
 
 function updateSpeed(lap_selected)
     sharedData = getappdata(0, 'sharedData');
@@ -396,7 +511,9 @@ function updateSpeed(lap_selected)
 
     yline(ax_lapdiff, [0 0], 'Color', 'k', 'LineStyle', '--', 'HandleVisibility', 'off');
 
-    for kk = 1:sharedData.max_opp
+    selected_opps = getSelectedOpponents(fig_speed);
+
+    for kk = selected_opps(:)'
         opp_name = sharedData.name_map(kk);
         idx_opp = (sharedData.v2v_laps(:, kk) == lap_selected);
 
