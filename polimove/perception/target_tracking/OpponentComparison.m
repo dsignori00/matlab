@@ -187,88 +187,125 @@ end
 
 %% PLOTTING
 
-% Trajectory figure
-fig_traj = figure('Name','Trajectory');
-ax_traj = axes('Parent', fig_traj, 'Position', [0.1 0.2 0.85 0.75]);
-
-% Labels for dropdowns (added to fig_traj)
-uicontrol('Parent', fig_traj, 'Style', 'text', 'String', 'Ego Lap:', ...
-    'Position', [20, 80, 120, 20], 'HorizontalAlignment', 'left');
-uicontrol('Parent', fig_traj, 'Style', 'text', 'String', 'Opp Lap:', ...
-    'Position', [150, 80, 120, 20], 'HorizontalAlignment', 'left');
-
-% Create dropdowns for fig_traj
-popup_ego_traj = uicontrol('Parent', fig_traj, 'Style','popupmenu', ...
-    'String',compose("Ego Lap %d",1:max_lap), 'Position',[20,55,120,25], ...
-    'Callback',@(src,evt)updateLapSelection(src,evt,'ego'));
-popup_opp_traj = uicontrol('Parent', fig_traj, 'Style','popupmenu', ...
-    'String',compose("Opp Lap %d",1:max_lap), 'Position',[150,55,120,25], ...
-    'Callback',@(src,evt)updateLapSelection(src,evt,'opp'));
-
-setappdata(fig_traj, 'popup_ego', popup_ego_traj);
-setappdata(fig_traj, 'popup_opp', popup_opp_traj);
-setappdata(fig_traj, 'ax', ax_traj);
-
-% Speed figure
-fig_speed = figure('Name','Speed Profile');
-ax_speed = subplot(2,1,1, 'Parent', fig_speed);
-ax_lapdiff = subplot(2,1,2, 'Parent', fig_speed);
-
-% Labels for dropdowns (added to fig_speed)
-uicontrol('Parent', fig_speed, 'Style', 'text', 'String', 'Ego Lap:', ...
-    'Position', [20, 80, 120, 20], 'HorizontalAlignment', 'left');
-uicontrol('Parent', fig_speed, 'Style', 'text', 'String', 'Opp Lap:', ...
-    'Position', [150, 80, 120, 20], 'HorizontalAlignment', 'left');
-
-% Create dropdowns for fig_speed
-popup_ego_speed = uicontrol('Parent', fig_speed, 'Style','popupmenu', ...
-    'String',compose("Lap %d",1:max_lap), 'Position',[20,55,120,25], ...
-    'Callback',@(src,evt)updateLapSelection(src,evt,'ego'));
-popup_opp_speed = uicontrol('Parent', fig_speed, 'Style','popupmenu', ...
-    'String',compose("Lap %d",1:max_lap), 'Position',[150,55,120,25], ...
-    'Callback',@(src,evt)updateLapSelection(src,evt,'opp'));
-
-setappdata(fig_speed, 'popup_ego', popup_ego_speed);
-setappdata(fig_speed, 'popup_opp', popup_opp_speed);
-setappdata(fig_speed, 'ax', ax_speed);
-setappdata(fig_speed, 'ax_lapdiff', ax_lapdiff);
-
-% Curvature and Lateral Acceleration figure
-fig_curv = figure('Name','Curvature and Lateral Acceleration');
-ax_curv = subplot(2,1,1, 'Parent', fig_curv);
-ax_ay = subplot(2,1,2, 'Parent', fig_curv);
-
-% Labels for dropdowns (added to fig_curv)
-uicontrol('Parent', fig_curv, 'Style', 'text', 'String', 'Ego Lap:', ...
-    'Position', [20, 80, 120, 20], 'HorizontalAlignment', 'left');
-uicontrol('Parent', fig_curv, 'Style', 'text', 'String', 'Opp Lap:', ...
-    'Position', [150, 80, 120, 20], 'HorizontalAlignment', 'left');
-
-% Create dropdowns for fig_curv
-popup_ego_curv = uicontrol('Parent', fig_curv, 'Style','popupmenu', ...
-    'String',compose("Ego Lap %d",1:max_lap), 'Position',[20,55,120,25], ...
-    'Callback',@(src,evt)updateLapSelection(src,evt,'ego'));
-popup_opp_curv = uicontrol('Parent', fig_curv, 'Style','popupmenu', ...
-    'String',compose("Opp Lap %d",1:max_lap), 'Position',[150,55,120,25], ...
-    'Callback',@(src,evt)updateLapSelection(src,evt,'opp'));
-
-setappdata(fig_curv, 'popup_ego', popup_ego_curv);
-setappdata(fig_curv, 'popup_opp', popup_opp_curv);
-setappdata(fig_curv, 'ax_curv', ax_curv);
-setappdata(fig_curv, 'ax_ay', ax_ay);
-
 % Checkbox for opponents selection
 ids = sort(cell2mat(values(opponent))); 
 names = cellfun(@(k) name_map(k), num2cell(ids), 'UniformOutput', false);
 checklist_strings = compose("%d - %s", ids(:), string(names(:)));
 default_selection = 1:max_opp;
 
-checkbox_traj = createOpponentCheckboxes(fig_traj, checklist_strings, default_selection,'traj');
-setappdata(fig_traj,'checklist',checkbox_traj);
-checkbox_speed = createOpponentCheckboxes(fig_speed, checklist_strings, default_selection,'speed');
-setappdata(fig_speed,'checklist',checkbox_speed);
-checkbox_curv  = createOpponentCheckboxes(fig_curv , checklist_strings, default_selection,'curv');
-setappdata(fig_curv ,'checklist',checkbox_curv );
+% === TRAJECTORY FIGURE ===
+fig_traj = figure('Name','Trajectory');
+
+% Opponent panel (left side, vertical layout)
+panel_traj = uipanel('Parent', fig_traj, ...
+    'Units','normalized', ...
+    'Position',[0.02 0.1 0.12 0.8], ...
+    'Title','Controls');
+
+% Axes
+ax_width = 0.68;
+ax_left = 0.14 + (0.86 - ax_width)/2;
+ax_traj = axes('Parent', fig_traj, ...
+    'Position', [ax_left, 0.1, ax_width, 0.85]);
+    
+% --- Checklist (top of the panel) ---
+checkbox_traj = createOpponentCheckboxes(panel_traj, checklist_strings, default_selection, 'traj');
+setappdata(fig_traj, 'checklist', checkbox_traj);
+
+% Compute vertical offset below checklist
+n_cb = numel(checkbox_traj);
+checklist_height = n_cb * 0.04 + 0.05;  
+nextY = 1 - checklist_height - 0.08;
+
+% --- Opponent Lap label and dropdown ---
+uicontrol('Parent', panel_traj, 'Style', 'text', 'String', 'Opponent Lap:', ...
+    'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.05], 'HorizontalAlignment', 'left');
+nextY = nextY - 0.04;
+
+popup_opp_traj = uicontrol('Parent', panel_traj, 'Style', 'popupmenu', ...
+    'String', compose("Opp Lap %d", 1:max_lap), ...
+    'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.06], ...
+    'Callback', @(src,evt)updateLapSelection(src,evt,'opp'));
+
+nextY = nextY - 0.05;
+
+% --- Ego Lap label and dropdown ---
+uicontrol('Parent', panel_traj, 'Style', 'text', 'String', 'Ego Lap:', ...
+    'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.05], 'HorizontalAlignment', 'left');
+nextY = nextY - 0.04;
+
+popup_ego_traj = uicontrol('Parent', panel_traj, 'Style', 'popupmenu', ...
+    'String', compose("Ego Lap %d", 1:max_lap), ...
+    'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.06], ...
+    'Callback', @(src,evt)updateLapSelection(src,evt,'ego'));
+
+% Save to appdata
+setappdata(fig_traj, 'popup_ego', popup_ego_traj);
+setappdata(fig_traj, 'popup_opp', popup_opp_traj);
+setappdata(fig_traj, 'ax', ax_traj);
+
+
+% === SPEED FIGURE ===
+fig_speed = figure('Name','Speed Profile');
+ax_speed = subplot(2,1,1, 'Parent', fig_speed);
+ax_lapdiff = subplot(2,1,2, 'Parent', fig_speed);
+
+panel_speed = uipanel('Parent', fig_speed, ...
+    'Units','normalized', 'Position',[0.02 0.5 0.25 0.45], ...
+    'Title','Opponents');
+checkbox_speed = createOpponentCheckboxes(panel_speed, checklist_strings, default_selection, 'speed');
+setappdata(fig_speed, 'checklist', checkbox_speed);
+
+uicontrol('Parent', fig_speed, 'Style', 'text', 'String', 'Opponent Lap:', ...
+    'Units','normalized', 'Position',[0.03 0.42 0.08 0.04], 'HorizontalAlignment', 'left');
+popup_opp_speed = uicontrol('Parent', fig_speed, 'Style', 'popupmenu', ...
+    'String', compose("Opp Lap %d", 1:max_lap), ...
+    'Units','normalized', 'Position',[0.03 0.38 0.08 0.05], ...
+    'Callback', @(src,evt)updateLapSelection(src,evt,'opp'));
+
+uicontrol('Parent', fig_speed, 'Style', 'text', 'String', 'Ego Lap:', ...
+    'Units','normalized', 'Position',[0.03 0.32 0.08 0.04], 'HorizontalAlignment', 'left');
+popup_ego_speed = uicontrol('Parent', fig_speed, 'Style', 'popupmenu', ...
+    'String', compose("Ego Lap %d", 1:max_lap), ...
+    'Units','normalized', 'Position',[0.03 0.28 0.08 0.05], ...
+    'Callback', @(src,evt)updateLapSelection(src,evt,'ego'));
+
+setappdata(fig_speed, 'popup_ego', popup_ego_speed);
+setappdata(fig_speed, 'popup_opp', popup_opp_speed);
+setappdata(fig_speed, 'ax', ax_speed);
+setappdata(fig_speed, 'ax_lapdiff', ax_lapdiff);
+
+
+% === CURVATURE FIGURE ===
+fig_curv = figure('Name','Curvature and Lateral Acceleration');
+ax_curv = subplot(2,1,1, 'Parent', fig_curv);
+ax_ay = subplot(2,1,2, 'Parent', fig_curv);
+
+panel_curv = uipanel('Parent', fig_curv, ...
+    'Units','normalized', 'Position',[0.02 0.5 0.25 0.45], ...
+    'Title','Opponents');
+checkbox_curv = createOpponentCheckboxes(panel_curv, checklist_strings, default_selection, 'curv');
+setappdata(fig_curv, 'checklist', checkbox_curv);
+
+uicontrol('Parent', fig_curv, 'Style', 'text', 'String', 'Opponent Lap:', ...
+    'Units','normalized', 'Position',[0.03 0.42 0.08 0.04], 'HorizontalAlignment', 'left');
+popup_opp_curv = uicontrol('Parent', fig_curv, 'Style', 'popupmenu', ...
+    'String', compose("Opp Lap %d", 1:max_lap), ...
+    'Units','normalized', 'Position',[0.03 0.38 0.08 0.05], ...
+    'Callback', @(src,evt)updateLapSelection(src,evt,'opp'));
+
+uicontrol('Parent', fig_curv, 'Style', 'text', 'String', 'Ego Lap:', ...
+    'Units','normalized', 'Position',[0.03 0.32 0.08 0.04], 'HorizontalAlignment', 'left');
+popup_ego_curv = uicontrol('Parent', fig_curv, 'Style', 'popupmenu', ...
+    'String', compose("Ego Lap %d", 1:max_lap), ...
+    'Units','normalized', 'Position',[0.03 0.28 0.08 0.05], ...
+    'Callback', @(src,evt)updateLapSelection(src,evt,'ego'));
+
+setappdata(fig_curv, 'popup_ego', popup_ego_curv);
+setappdata(fig_curv, 'popup_opp', popup_opp_curv);
+setappdata(fig_curv, 'ax_curv', ax_curv);
+setappdata(fig_curv, 'ax_ay', ax_ay);
+
 
 % Store shared data in base workspace or a struct accessible to both callbacks
 sharedData.v2v_laps = v2v_laps;
@@ -353,22 +390,26 @@ end
 
 function cb = createOpponentCheckboxes(parentFig, checklist_strings, default_selection, tag)
     nOpp = numel(checklist_strings);
+    base_height_per_opp = 0.028;  
+    panel_height = min(base_height_per_opp * nOpp + 0.05, 0.9);  
+
     panel = uipanel('Parent',parentFig, ...
-        'Units','pixels', ...
-        'Position',[20 50 110 20*nOpp+30], ...
+        'Units', 'normalized', ...
+        'Position', [0.02, 0.95 - panel_height, 0.90, panel_height], ...
         'Title','Opponents', ...
         'BorderType','etchedin');
 
     cb = gobjects(nOpp,1);
     for k = 1:nOpp
-        % Capture k and tag to pass to callback
-        cb(k) = uicontrol('Parent',panel, ...
-            'Style','checkbox', ...
-            'String',checklist_strings{k}, ...
-            'Units','pixels', ...
-            'Position',[5, 20*nOpp - 20*k + 5, 100, 18], ...
-            'Value',ismember(k,default_selection), ...
-            'Callback',@(src,evt)updateOpponentSelection(src,evt,tag));
+        base_height_per_opp = 0.15;
+        ypos = 1 - (k * base_height_per_opp) - 0.08;  % Top to bottom
+        cb(k) = uicontrol('Parent', panel, ...
+            'Style', 'checkbox', ...
+            'String', checklist_strings{k}, ...
+            'Units', 'normalized', ...
+            'Position', [0.05, ypos, 0.9, base_height_per_opp], ...
+            'Value', ismember(k, default_selection), ...
+            'Callback', @(src, evt) updateOpponentSelection(src, evt, tag));
     end
 end
 
