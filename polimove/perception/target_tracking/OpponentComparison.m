@@ -7,6 +7,7 @@ clearvars -except log log_ref trajDatabase ego_index
 
 %% Flags
 multi_run = false;   % if true, a different mat for ego and opponent will be loaded
+save_v2v  = false;   % if true, save the processed v2v data
 
 %% Paths
 
@@ -27,7 +28,7 @@ set(0, 'DefaultLineLineWidth', 2);
 colors = lines(20); 
 
 % opponent names
-opponent = containers.Map({'HUMBDA', 'TII'}, [1, 2]);
+opponent = containers.Map({'TUM','CONSTRUCTOR','HUMBDA', 'TII','MODENA','KINETIZ'}, [1, 4, 3, 2, 5, 6]);
 opponent_names = keys(opponent);
 opponent_values = values(opponent);
 name_map = containers.Map(cell2mat(opponent_values), opponent_names);
@@ -46,13 +47,15 @@ end
 
 % load log
 if(~exist('log','var'))
-    [file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load log');
-    load(fullfile(path,file));
+    [opp_file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load log');
+    load(fullfile(path, opp_file));
 end
 if(multi_run)
     if(~exist('log_ego','var'))
         [file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load ego log');
-        load(fullfile(path,file));
+        tmp = load(fullfile(path,file));
+        log_ego = tmp.log;
+        clearvars tmp;
     end
 else
     log_ego = log;
@@ -153,6 +156,32 @@ for k = 1:max_opp
         lap_start_time = v2v_sens_stamp(find(idx, 1, 'first'));
         v2v_lap_time(idx, k) = v2v_sens_stamp(idx) - lap_start_time;
     end
+end
+%% SAVE PROCESSED DATA
+
+if(save_v2v)
+    v2v_data = struct();
+
+    v2v_data.x        = v2v_x;          % [m]  posizione X dei veicoli rivali
+    v2v_data.y        = v2v_y;          % [m]  posizione Y dei veicoli rivali
+    v2v_data.vx       = v2v_vx;         % [m/s] velocità longitudinale
+    v2v_data.yaw      = v2v_yaw;        % [rad] angolo di imbardata
+    v2v_data.index    = v2v_index;      % indice punto traiettoria più vicino
+
+    v2v_data.laps     = v2v_laps;       % numero di giro assegnato
+    v2v_data.curv     = v2v_curv;       % curvatura (1/raggio)
+    v2v_data.ay       = v2v_ay;         % accelerazione laterale
+    v2v_data.lap_time = v2v_lap_time;   % tempo di percorrenza giro (s)
+
+    v2v_data.max_opp  = max_opp;        % numero di avversari considerati
+    v2v_data.max_lap  = max_lap;        % massimo numero di giri trovati
+
+    [~, name, ~] = fileparts(opp_file);  % estrae il nome base senza estensione
+    output_filename = fullfile(path, [name, '_processed.mat']);
+
+    % Salvataggio
+    save(output_filename, 'v2v_data');
+    fprintf('Processed data saved: %s\n', output_filename);
 end
 
 
