@@ -1,13 +1,17 @@
 close all
-clearvars -except log log_ref trajDatabase ego_index
+clearvars -except log log_ego trajDatabase ego_index v2v_index
 
 %#ok<*UNRCH>
 %#ok<*INUSD>
 %#ok<*USENS>
+%#ok<*NASGU>
 
 %% Flags
-multi_run = false;   % if true, a different mat for ego and opponent will be loaded
-save_v2v  = false;   % if true, save the processed v2v data
+multi_run   = false;    % if true, a different mat for ego and opponent will be loaded
+ego_vs_ego  = false;    % if true, ego vs ego will be plotted
+save_v2v    = false;   % if true, save the processed v2v data
+
+opponent = containers.Map({'TUM','CONSTRUCTOR','HUMBDA', 'TII','MODENA','KINETIZ'}, [1, 4, 3, 2, 5, 6]); 
 
 %% Paths
 
@@ -28,10 +32,12 @@ set(0, 'DefaultLineLineWidth', 2);
 colors = lines(20); 
 
 % opponent names
-opponent = containers.Map({'TUM','CONSTRUCTOR','HUMBDA', 'TII','MODENA','KINETIZ'}, [1, 4, 3, 2, 5, 6]);
+if(ego_vs_ego)
+    opponent = containers.Map({'Ego 2'}, 1); 
+end
 opponent_names = keys(opponent);
 opponent_values = values(opponent);
-name_map = containers.Map(cell2mat(opponent_values), opponent_names);
+name_map = containers.Map(opponent_values, opponent_names);
 
 %% Load Data
 
@@ -47,8 +53,12 @@ end
 
 % load log
 if(~exist('log','var'))
-    [opp_file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load log');
-    load(fullfile(path, opp_file));
+    if(ego_vs_ego)
+        [opp_file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load ego2 log');
+    else
+        [opp_file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load opponent log');
+    end
+        load(fullfile(path, opp_file));
 end
 if(multi_run)
     if(~exist('log_ego','var'))
@@ -64,20 +74,35 @@ end
 DateTime = datetime(log.time_offset_nsec,'ConvertFrom','epochtime','TicksPerSecond',1e9,'Format','dd-MMM-yyyy HH:mm:ss');
 
 % V2V DETECTIONS
-v2v_sens_stamp = log.perception__v2v__detections.sensor_stamp__tot;
-% map
-v2v_x = log.perception__v2v__detections.detections__x_map;
-v2v_y = log.perception__v2v__detections.detections__y_map;
-v2v_vx = log.perception__v2v__detections.detections__vx*MPS2KPH;
-v2v_yaw = log.perception__v2v__detections.detections__yaw_map;
-v2v_index = log.perception__v2v__detections.detections__closest_idx;
-v2v_x(v2v_x==0)=nan;
-v2v_y(v2v_y==0)=nan;
-v2v_vx(v2v_vx==0)=nan;
-v2v_yaw(v2v_yaw==0)=nan;
-v2v_yaw = unwrap(v2v_yaw);
-v2v_count = log.perception__v2v__detections.count;
-max_opp = max(v2v_count);
+if(~ego_vs_ego)
+    v2v_sens_stamp = log.perception__v2v__detections.sensor_stamp__tot;
+    % map
+    v2v_x = log.perception__v2v__detections.detections__x_map;
+    v2v_y = log.perception__v2v__detections.detections__y_map;
+    v2v_vx = log.perception__v2v__detections.detections__vx*MPS2KPH;
+    v2v_yaw = log.perception__v2v__detections.detections__yaw_map;
+    v2v_index = log.perception__v2v__detections.detections__closest_idx;
+    v2v_x(v2v_x==0)=nan;
+    v2v_y(v2v_y==0)=nan;
+    v2v_vx(v2v_vx==0)=nan;
+    v2v_yaw(v2v_yaw==0)=nan;
+    v2v_yaw = unwrap(v2v_yaw);
+    v2v_count = log.perception__v2v__detections.count;
+    max_opp = max(v2v_count);
+else
+    v2v_sens_stamp = log_ego.estimation.stamp__tot;
+    v2v_x = log_ego.estimation.x_cog;
+    v2v_y = log_ego.estimation.y_cog;
+    v2v_vx = log_ego.estimation.vx*MPS2KPH; 
+    v2v_yaw = log_ego.estimation.heading; 
+    v2v_x(v2v_x==0)=nan;
+    v2v_y(v2v_y==0)=nan;
+    v2v_vx(v2v_vx==0)=nan;
+    v2v_yaw(v2v_yaw==0)=nan;
+    v2v_yaw = unwrap(v2v_yaw);
+    v2v_count = 1;
+    max_opp = 1; 
+end
 
 % ESTIMATION
 ego_stamp = log_ego.estimation.stamp__tot;
@@ -95,22 +120,44 @@ ego_ay(ego_ay==0)=nan;
 
 %% PROCESSING
 
+
+% Compute ego closest idx
+if ~exist('ego_index', 'var')
+    ego_index = NaN(size(ego_x));
+    trajX = trajDatabase(10).X(:);
+    trajY = trajDatabase(10).Y(:);
+
+    for i = 1:length(ego_x)
+        if ~isnan(ego_x(i)) && ~isnan(ego_y(i))
+            dx = trajX - ego_x(i);
+            dy = trajY - ego_y(i);
+            [~, ego_index(i)] = min(dx.^2 + dy.^2);
+        end
+    end
+end
+
+if(ego_vs_ego)
+    if ~exist('v2v_index', 'var')
+        v2v_index = NaN(size(v2v_x));
+        trajX = trajDatabase(10).X(:);
+        trajY = trajDatabase(10).Y(:);
+
+        for i = 1:length(v2v_x)
+            if ~isnan(v2v_x(i)) && ~isnan(v2v_y(i))
+                dx = trajX - v2v_x(i);
+                dy = trajY - v2v_y(i);
+                [~, v2v_index(i)] = min(dx.^2 + dy.^2);
+            end
+        end
+    end
+end
+
 % Keep only valid detections
 v2v_x(:,max_opp+1:end)=[];
 v2v_y(:,max_opp+1:end)=[];
 v2v_vx(:,max_opp+1:end)=[];
 v2v_yaw(:,max_opp+1:end)=[];
 v2v_index(:,max_opp+1:end)=[];
-
-% Compute ego closest idx
-if(~exist('ego_index','var'))
-    ego_index = NaN(size(ego_x));
-    for i = 1:length(ego_x)
-        if ~isnan(ego_x(i)) && ~isnan(ego_y(i))
-            ego_index(i) = ComputeClosestIdx(ego_x(i), ego_y(i), trajDatabase(10));
-        end
-    end
-end
 
 % Assign lap number and calc curvature
 v2v_laps = NaN(size(v2v_index,1),max_opp);
@@ -122,17 +169,6 @@ for k=1:max_opp
     v2v_curv(:,k) = CalcCurvature(v2v_x(:,k), v2v_y(:,k), 1, false);
 end
 max_lap = max(v2v_laps(:), [], 'omitnan');
-
-% % Trajectory smoothing
-% ego_line.x = ego_x;
-% ego_line.y = ego_y;
-% ego_line = LineSmoothingEdgeCost(ego_line, 0.1, 2000, 1000, 5, 1e-07, 1e-07);
-% for k=1:max_opp
-%         opp_line.x = v2v_x(:,k);
-%         opp_line.y = v2v_y(:,k);
-%         opp_line = LineSmoothingEdgeCost(opp_line, 0.1, 2000, 1000, 5, 1e-07, 1e-07);
-%         v2v_curv(:,k) = CalcCurvature(opp_line.x, opp_line.y, 1, true);
-% end
 
 % compute lateral acceleration
 v2v_ay = v2v_curv.*v2v_vx.^2;
@@ -213,7 +249,8 @@ setappdata(fig_traj, 'checklist', checkbox_traj);
 
 % Compute vertical offset below checklist
 n_cb = numel(checkbox_traj);
-checklist_height = n_cb * 0.04 + 0.05;  
+base_height_per_opp = 0.05; 
+checklist_height = min(base_height_per_opp * n_cb + 0.1, 0.9); 
 nextY = 1 - checklist_height - 0.08;
 
 % --- Opponent Lap label and dropdown ---
@@ -249,9 +286,9 @@ fig_speed = figure('Name','Speed Profile');
 
 % Main axis on the right
 ax_left = 0.14 + 0.05;
-ax_lapdiff = axes('Parent', fig_speed, ...
-    'Position', [ax_left, 0.575, 1 - ax_left - 0.05, 0.30]);  % Top axis
 ax_speed = axes('Parent', fig_speed, ...
+    'Position', [ax_left, 0.575, 1 - ax_left - 0.05, 0.30]);  % Top axis
+ax_lapdiff = axes('Parent', fig_speed, ...
     'Position', [ax_left, 0.175, 1 - ax_left - 0.05, 0.30]);  % Bottom axis
 
 % Control panel (left)
@@ -264,8 +301,6 @@ checkbox_speed = createOpponentCheckboxes(panel_speed, checklist_strings, defaul
 setappdata(fig_speed, 'checklist', checkbox_speed);
 
 % Compute vertical offset
-n_cb = numel(checkbox_speed);
-checklist_height = n_cb * 0.04 + 0.05;
 nextY = 1 - checklist_height - 0.08;
 
 % Opponent Lap label & dropdown
@@ -310,8 +345,6 @@ panel_curv = uipanel('Parent', fig_curv, ...
 checkbox_curv = createOpponentCheckboxes(panel_curv, checklist_strings, default_selection, 'curv');
 setappdata(fig_curv, 'checklist', checkbox_curv);
 
-n_cb = numel(checkbox_curv);
-checklist_height = n_cb * 0.04 + 0.05;
 nextY = 1 - checklist_height - 0.08;
 
 uicontrol('Parent', panel_curv, 'Style', 'text', 'String', 'Opponent Lap:', ...
@@ -420,7 +453,7 @@ end
 
 function cb = createOpponentCheckboxes(parentFig, checklist_strings, default_selection, tag)
     nOpp = numel(checklist_strings);
-    base_height_per_opp = 0.028;  
+    base_height_per_opp = 0.05;  
     panel_height = min(base_height_per_opp * nOpp + 0.05, 0.9);  
 
     panel = uipanel('Parent',parentFig, ...
@@ -431,7 +464,7 @@ function cb = createOpponentCheckboxes(parentFig, checklist_strings, default_sel
 
     cb = gobjects(nOpp,1);
     for k = 1:nOpp
-        base_height_per_opp = 0.15;
+        base_height_per_opp = (1 - 0.05) / nOpp;  
         ypos = 1 - (k * base_height_per_opp) - 0.08;  % Top to bottom
         cb(k) = uicontrol('Parent', panel, ...
             'Style', 'checkbox', ...
