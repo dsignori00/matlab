@@ -191,65 +191,82 @@ end
 fig_traj = figure('Name','Trajectory');
 ax_traj = axes('Parent', fig_traj, 'Position', [0.1 0.2 0.85 0.75]);
 
-% Create dropdown menu for lap selection in Trajectory figure
-popup_traj = uicontrol('Style', 'popupmenu', ...
-          'String', compose("Lap %d", 1:max_lap), ...
-          'Position', [20 20 100 25], ...
-          'Callback', @(src, evt) updateLapSelection(src, evt, 'traj'));
+% Labels for dropdowns (added to fig_traj)
+uicontrol('Parent', fig_traj, 'Style', 'text', 'String', 'Ego Lap:', ...
+    'Position', [20, 80, 120, 20], 'HorizontalAlignment', 'left');
+uicontrol('Parent', fig_traj, 'Style', 'text', 'String', 'Opp Lap:', ...
+    'Position', [150, 80, 120, 20], 'HorizontalAlignment', 'left');
 
+% Create dropdowns for fig_traj
+popup_ego_traj = uicontrol('Parent', fig_traj, 'Style','popupmenu', ...
+    'String',compose("Ego Lap %d",1:max_lap), 'Position',[20,55,120,25], ...
+    'Callback',@(src,evt)updateLapSelection(src,evt,'ego'));
+popup_opp_traj = uicontrol('Parent', fig_traj, 'Style','popupmenu', ...
+    'String',compose("Opp Lap %d",1:max_lap), 'Position',[150,55,120,25], ...
+    'Callback',@(src,evt)updateLapSelection(src,evt,'opp'));
+
+setappdata(fig_traj, 'popup_ego', popup_ego_traj);
+setappdata(fig_traj, 'popup_opp', popup_opp_traj);
 setappdata(fig_traj, 'ax', ax_traj);
-setappdata(fig_traj, 'popup', popup_traj);
 
 % Speed figure
 fig_speed = figure('Name','Speed Profile');
-ax_speed = subplot(2,1,1, 'Parent', fig_speed);  % Speed plot
-ax_lapdiff = subplot(2,1,2, 'Parent', fig_speed);  % Lap time delta plot
+ax_speed = subplot(2,1,1, 'Parent', fig_speed);
+ax_lapdiff = subplot(2,1,2, 'Parent', fig_speed);
 
-% Create dropdown menu for lap selection in Speed figure
-popup_speed = uicontrol('Style', 'popupmenu', ...
-          'String', compose("Lap %d", 1:max_lap), ...
-          'Position', [20 20 100 25], ...
-          'Callback', @(src, evt) updateLapSelection(src, evt, 'speed'));
+% Labels for dropdowns (added to fig_speed)
+uicontrol('Parent', fig_speed, 'Style', 'text', 'String', 'Ego Lap:', ...
+    'Position', [20, 80, 120, 20], 'HorizontalAlignment', 'left');
+uicontrol('Parent', fig_speed, 'Style', 'text', 'String', 'Opp Lap:', ...
+    'Position', [150, 80, 120, 20], 'HorizontalAlignment', 'left');
 
+% Create dropdowns for fig_speed
+popup_ego_speed = uicontrol('Parent', fig_speed, 'Style','popupmenu', ...
+    'String',compose("Lap %d",1:max_lap), 'Position',[20,55,120,25], ...
+    'Callback',@(src,evt)updateLapSelection(src,evt,'ego'));
+popup_opp_speed = uicontrol('Parent', fig_speed, 'Style','popupmenu', ...
+    'String',compose("Lap %d",1:max_lap), 'Position',[150,55,120,25], ...
+    'Callback',@(src,evt)updateLapSelection(src,evt,'opp'));
+
+setappdata(fig_speed, 'popup_ego', popup_ego_speed);
+setappdata(fig_speed, 'popup_opp', popup_opp_speed);
 setappdata(fig_speed, 'ax', ax_speed);
-setappdata(fig_speed, 'ax_lapdiff', ax_lapdiff);  % Add new axis handle
-setappdata(fig_speed, 'popup', popup_speed);
+setappdata(fig_speed, 'ax_lapdiff', ax_lapdiff);
 
 % Curvature and Lateral Acceleration figure
-fig_curv = figure('Name', 'Curvature and Lateral Acceleration');
-
+fig_curv = figure('Name','Curvature and Lateral Acceleration');
 ax_curv = subplot(2,1,1, 'Parent', fig_curv);
 ax_ay = subplot(2,1,2, 'Parent', fig_curv);
 
-% Create dropdown for lap selection
-popup_curv = uicontrol('Style', 'popupmenu', ...
-          'String', compose("Lap %d", 1:max_lap), ...
-          'Position', [20 20 100 25], ...
-          'Callback', @(src, evt) updateCurvPlot(src, evt, fig_curv));
+% Labels for dropdowns (added to fig_curv)
+uicontrol('Parent', fig_curv, 'Style', 'text', 'String', 'Ego Lap:', ...
+    'Position', [20, 80, 120, 20], 'HorizontalAlignment', 'left');
+uicontrol('Parent', fig_curv, 'Style', 'text', 'String', 'Opp Lap:', ...
+    'Position', [150, 80, 120, 20], 'HorizontalAlignment', 'left');
 
+% Create dropdowns for fig_curv
+popup_ego_curv = uicontrol('Parent', fig_curv, 'Style','popupmenu', ...
+    'String',compose("Ego Lap %d",1:max_lap), 'Position',[20,55,120,25], ...
+    'Callback',@(src,evt)updateLapSelection(src,evt,'ego'));
+popup_opp_curv = uicontrol('Parent', fig_curv, 'Style','popupmenu', ...
+    'String',compose("Opp Lap %d",1:max_lap), 'Position',[150,55,120,25], ...
+    'Callback',@(src,evt)updateLapSelection(src,evt,'opp'));
+
+setappdata(fig_curv, 'popup_ego', popup_ego_curv);
+setappdata(fig_curv, 'popup_opp', popup_opp_curv);
 setappdata(fig_curv, 'ax_curv', ax_curv);
 setappdata(fig_curv, 'ax_ay', ax_ay);
-setappdata(fig_curv, 'popup', popup_curv);
 
-% Get names ordered by opponent ID values
+% Checkbox for opponents selection
 ids = sort(cell2mat(values(opponent))); 
 names = cellfun(@(k) name_map(k), num2cell(ids), 'UniformOutput', false);
-
-% Now format for checklist
 checklist_strings = compose("%d - %s", ids(:), string(names(:)));
-
-
-% Default: select all opponents
 default_selection = 1:max_opp;
 
 checkbox_traj = createOpponentCheckboxes(fig_traj, checklist_strings, default_selection,'traj');
 setappdata(fig_traj,'checklist',checkbox_traj);
-
-% Speed figure
 checkbox_speed = createOpponentCheckboxes(fig_speed, checklist_strings, default_selection,'speed');
 setappdata(fig_speed,'checklist',checkbox_speed);
-
-% Curvature figure
 checkbox_curv  = createOpponentCheckboxes(fig_curv , checklist_strings, default_selection,'curv');
 setappdata(fig_curv ,'checklist',checkbox_curv );
 
@@ -274,88 +291,50 @@ sharedData.ego_curv = ego_curv;
 sharedData.ego_ay = ego_ay;
 sharedData.ego_lap_time = ego_lap_time;
 sharedData.v2v_lap_time = v2v_lap_time;
+sharedData.lap_ego = 1;
+sharedData.lap_opp = 1;
+
 
 % Save to root for callback access (or use nested functions / guidata)
 setappdata(0, 'sharedData', sharedData);
 
 % Initial plots, lap 1
-updateTrajectory(1);
-updateSpeed(1);
-updateCurvPlot(1);
+updateTrajectoryLaps();
+updateSpeedLaps();
+updateCurvLaps();
 
 %% Callback to sync selections and update both plots
 
-function updateLapSelection(src, ~, source)
-    lap_selected = src.Value;
+function updateLapSelection(src,~,whichLap)
+    shared = getappdata(0,'sharedData');
+    shared.(['lap_' whichLap]) = src.Value;
+    setappdata(0,'sharedData',shared);
 
-    % Find all figures by name
-    fig_traj = findobj('Name', 'Trajectory');
-    fig_speed = findobj('Name', 'Speed Profile');
-    fig_curv = findobj('Name', 'Curvature and Lateral Acceleration');
-
-    % Update dropdowns of other figures (not the one that triggered this callback)
-    switch source
-        case 'traj'
-            % Update speed popup
-            if ~isempty(fig_speed)
-                popup_speed = getappdata(fig_speed, 'popup');
-                if popup_speed.Value ~= lap_selected
-                    set(popup_speed, 'Value', lap_selected);
-                end
-            end
-            % Update curvature popup
-            if ~isempty(fig_curv)
-                popup_curv = getappdata(fig_curv, 'popup');
-                if popup_curv.Value ~= lap_selected
-                    set(popup_curv, 'Value', lap_selected);
-                end
-            end
-            
-        case 'speed'
-            % Update trajectory popup
-            if ~isempty(fig_traj)
-                popup_traj = getappdata(fig_traj, 'popup');
-                if popup_traj.Value ~= lap_selected
-                    set(popup_traj, 'Value', lap_selected);
-                end
-            end
-            % Update curvature popup
-            if ~isempty(fig_curv)
-                popup_curv = getappdata(fig_curv, 'popup');
-                if popup_curv.Value ~= lap_selected
-                    set(popup_curv, 'Value', lap_selected);
-                end
-            end
-            
-        case 'curv'
-            % Update trajectory popup
-            if ~isempty(fig_traj)
-                popup_traj = getappdata(fig_traj, 'popup');
-                if popup_traj.Value ~= lap_selected
-                    set(popup_traj, 'Value', lap_selected);
-                end
-            end
-            % Update speed popup
-            if ~isempty(fig_speed)
-                popup_speed = getappdata(fig_speed, 'popup');
-                if popup_speed.Value ~= lap_selected
-                    set(popup_speed, 'Value', lap_selected);
-                end
-            end
+    % Update all dropdowns to stay synced
+    tags = {'traj','speed','curv'};
+    for t = tags
+        fig = findobj('Name', figureName(t{1}));
+        if isempty(fig), continue; end
+        popup = getappdata(fig, ['popup_' whichLap]);
+        if ~isempty(popup) && isvalid(popup) && popup.Value ~= src.Value
+            popup.Value = src.Value;
+        end
     end
 
-    % Update all plots regardless of source
-    if ~isempty(fig_traj)
-        updateTrajectory(lap_selected);
-    end
-    if ~isempty(fig_speed)
-        updateSpeed(lap_selected);
-    end
-    if ~isempty(fig_curv)
-        updateCurvPlot(lap_selected);
-    end
-
+    % Refresh all plots
+    updateTrajectoryLaps;
+    updateSpeedLaps;
+    updateCurvLaps;
 end
+
+function nm = figureName(tag)
+    switch tag
+        case 'traj', nm = 'Trajectory';
+        case 'speed', nm = 'Speed Profile';
+        case 'curv', nm = 'Curvature and Lateral Acceleration';
+    end
+end
+
 
 function sel = getSelectedOpponents(figH)
     % Return index vector of selected opponents for a given figure
@@ -393,8 +372,8 @@ function cb = createOpponentCheckboxes(parentFig, checklist_strings, default_sel
     end
 end
 
-function updateOpponentSelection(src,~,sourceTag)
-    % Find the figure corresponding to sourceTag
+function updateOpponentSelection(~,~,sourceTag)
+    % Determine source figure
     switch sourceTag
         case 'traj'
             fig_source = findobj('Name', 'Trajectory');
@@ -403,199 +382,130 @@ function updateOpponentSelection(src,~,sourceTag)
         case 'curv'
             fig_source = findobj('Name', 'Curvature and Lateral Acceleration');
         otherwise
-            return; % unknown source
+            return;
     end
-    
-    % Get selected opponents in source figure only
+
+    % Get selected opponents from the source figure
     selected_opps = getSelectedOpponents(fig_source);
 
-    % Now sync all figures to this selection (including the source itself)
-    fig_traj  = findobj('Name','Trajectory');
-    fig_speed = findobj('Name','Speed Profile');
-    fig_curv  = findobj('Name','Curvature and Lateral Acceleration');
-
-    % Sync checkboxes in all figures
-    syncCheckboxGroup(fig_traj ,selected_opps);
-    syncCheckboxGroup(fig_speed,selected_opps);
-    syncCheckboxGroup(fig_curv ,selected_opps);
-
-    % Redraw plots with current lap selection (use traj popup value as source)
-    if ~isempty(fig_traj )
-        popup = getappdata(fig_traj ,'popup');  updateTrajectory(popup.Value); end
-    if ~isempty(fig_speed)
-        popup = getappdata(fig_speed,'popup');  updateSpeed(popup.Value);     end
-    if ~isempty(fig_curv )
-        popup = getappdata(fig_curv ,'popup');  updateCurvPlot(popup.Value);  end
-end
-
-
-function updateTrajectory(lap_selected)
-    sharedData = getappdata(0, 'sharedData');
-    
-    % Safely get or rebuild the figure and axis
+    % Sync checkboxes across all figures
     fig_traj = findobj('Name', 'Trajectory');
-    if isempty(fig_traj) || ~isvalid(fig_traj)
-        warning('Trajectory figure not found or closed.');
-        return;
-    end
+    fig_speed = findobj('Name', 'Speed Profile');
+    fig_curv = findobj('Name', 'Curvature and Lateral Acceleration');
 
-    ax_traj = getappdata(fig_traj, 'ax');
-    if isempty(ax_traj) || ~isvalid(ax_traj)
-        warning('Axis handle is missing or invalid. Rebuilding.');
-        ax_traj = axes('Parent', fig_traj);
-        setappdata(fig_traj, 'ax', ax_traj);
-    end
+    syncCheckboxGroup(fig_traj, selected_opps);
+    syncCheckboxGroup(fig_speed, selected_opps);
+    syncCheckboxGroup(fig_curv, selected_opps);
 
-    cla(ax_traj);
-    hold(ax_traj, 'on');
-    title(ax_traj, sprintf('Trajectory - Lap %d', lap_selected));
-
-    idx = (sharedData.ego_laps == lap_selected);
-    plot(ax_traj, sharedData.ego_x(idx), sharedData.ego_y(idx), '.', ...
-         'Color', sharedData.colors(1,:), 'DisplayName', '0 - POLIMOVE');
-
-    selected_opps = getSelectedOpponents(fig_traj);
-
-    for kk = selected_opps(:)'  % scalar each time
-        try
-            opp_name = sharedData.name_map(kk);
-            idx_opp = (sharedData.v2v_laps(:,kk) == lap_selected);
-            plot(ax_traj, sharedData.v2v_x(idx_opp,kk), sharedData.v2v_y(idx_opp,kk), '.', ...
-                 'Color', sharedData.colors(kk+1,:), ...
-                 'DisplayName', sprintf('%d - %s', kk, opp_name));
-        catch ME
-            warning("Skipping opponent %d: %s", kk, ME.message);
-        end
-    end
-
-    id_left = length(sharedData.trajDatabase) - 2;
-    id_right = length(sharedData.trajDatabase) - 1;
-    plot(ax_traj, sharedData.trajDatabase(id_left).X, sharedData.trajDatabase(id_left).Y, 'k', 'LineWidth', 1, 'HandleVisibility','off');
-    plot(ax_traj, sharedData.trajDatabase(id_right).X, sharedData.trajDatabase(id_right).Y, 'k', 'LineWidth', 1, 'HandleVisibility','off');
-
-    xlabel(ax_traj, 'X Position (m)');
-    ylabel(ax_traj, 'Y Position (m)');
-    legend(ax_traj, 'Location', 'northeast');
-    grid(ax_traj, 'on');
-    box(ax_traj, 'on');
-    axis(ax_traj, 'equal');
+    % Update all plots using stored sharedData.lap_ego and lap_opp
+    updateTrajectoryLaps();
+    updateSpeedLaps();
+    updateCurvLaps();
 end
 
 
-function updateSpeed(lap_selected)
-    sharedData = getappdata(0, 'sharedData');
-    fig_speed = findobj('Name', 'Speed Profile');
-    ax_speed = getappdata(fig_speed, 'ax');
-    ax_lapdiff = getappdata(fig_speed, 'ax_lapdiff');
 
-    % Clear and prepare plots
-    cla(ax_speed);
-    cla(ax_lapdiff);
-    hold(ax_speed, 'on');
-    hold(ax_lapdiff, 'on');
 
-    title(ax_speed, sprintf('Speed Profile - Lap %d', lap_selected));
-    title(ax_lapdiff, sprintf('Lap-relative Time Difference - Lap %d', lap_selected));
+function updateTrajectoryLaps()
+    shared = getappdata(0,'sharedData');
+    fig = findobj('Name','Trajectory'); if isempty(fig), return; end
+    ax = getappdata(fig,'ax'); cla(ax); hold(ax,'on');
+    idxE = shared.ego_laps == shared.lap_ego;
+    plot(ax, shared.ego_x(idxE), shared.ego_y(idxE), '.', 'Color',shared.colors(1,:),'DisplayName','Ego');
+    opps = getSelectedOpponents(fig);
+    for kk = opps(:)'
+        idxO = shared.v2v_laps(:,kk) == shared.lap_opp;
+        plot(ax, shared.v2v_x(idxO,kk), shared.v2v_y(idxO,kk), '.', 'Color',shared.colors(kk+1,:), 'DisplayName', shared.name_map(kk));
+    end
+    legend(ax,'Location','northeast'); axis(ax,'equal'); grid(ax,'on'); box(ax,'on');
+    id_left = length(shared.trajDatabase) - 2;
+    id_right = length(shared.trajDatabase) - 1;
+    plot(ax, shared.trajDatabase(id_left).X, shared.trajDatabase(id_left).Y, 'k', 'LineWidth', 1, 'HandleVisibility','off');
+    plot(ax, shared.trajDatabase(id_right).X, shared.trajDatabase(id_right).Y, 'k', 'LineWidth', 1, 'HandleVisibility','off');
+end
+
+function updateSpeedLaps
+    shared = getappdata(0, 'sharedData');
+    fig = findobj('Name', 'Speed Profile');
+    if isempty(fig), return; end
+
+    lapE = shared.lap_ego;
+    lapO = shared.lap_opp;
+
+    ax_speed = getappdata(fig, 'ax');
+    ax_lapdiff = getappdata(fig, 'ax_lapdiff');
+
+    cla(ax_speed); cla(ax_lapdiff);
+    hold(ax_speed, 'on'); hold(ax_lapdiff, 'on');
+
+    title(ax_speed, sprintf('Speed Profile - Ego Lap %d', lapE));
+    title(ax_lapdiff, sprintf('Lap-relative Time Difference - Opp Lap %d vs Ego Lap %d', lapO, lapE));
 
     % Plot Ego Speed
-    idx_ego = (sharedData.ego_laps == lap_selected);
-    plot(ax_speed, sharedData.ego_index(idx_ego), sharedData.ego_vx(idx_ego), ...
-         'DisplayName', 'Ego Speed', 'Color', sharedData.colors(1,:));
+    idxE = shared.ego_laps == lapE;
+    plot(ax_speed, shared.ego_index(idxE), shared.ego_vx(idxE), ...
+         'DisplayName', 'Ego Speed', 'Color', shared.colors(1,:));
 
-    ego_index = sharedData.ego_index(idx_ego);
-    ego_lap_time = sharedData.ego_lap_time(idx_ego);
-    
-    % Ensure unique indices for ego
-    [ego_index_unique, ia] = unique(ego_index, 'stable');
-    ego_lap_time_unique = ego_lap_time(ia);
+    % Lap time interpolation setup
+    ego_index = shared.ego_index(idxE);
+    ego_lap_time = shared.ego_lap_time(idxE);
+    [uI, ia] = unique(double(ego_index), 'stable');  % ensure double type
+    egoLT = ego_lap_time;
 
-    yline(ax_lapdiff, [0 0], 'Color', 'k', 'LineStyle', '--', 'HandleVisibility', 'off');
+    yline(ax_lapdiff, 0, 'Color', 'k', 'LineStyle', '--', 'HandleVisibility', 'off');
 
-    selected_opps = getSelectedOpponents(fig_speed);
-
+    % Plot Opponents
+    selected_opps = getSelectedOpponents(fig);
     for kk = selected_opps(:)'
-        opp_name = sharedData.name_map(kk);
-        idx_opp = (sharedData.v2v_laps(:, kk) == lap_selected);
+        idxO = shared.v2v_laps(:, kk) == lapO;
+        if ~any(idxO), continue; end
 
-        % Speed Plot
-        plot(ax_speed, sharedData.v2v_index(idx_opp, kk), sharedData.v2v_vx(idx_opp, kk), ...
-             'Color', sharedData.colors(kk+1, :), ...
+        opp_index = double(shared.v2v_index(idxO, kk));  % ensure double
+        opp_speed = shared.v2v_vx(idxO, kk);
+        opp_lap_time = shared.v2v_lap_time(idxO, kk);
+        opp_name = shared.name_map(kk);
+
+        plot(ax_speed, opp_index, opp_speed, ...
+             'Color', shared.colors(kk+1, :), ...
              'DisplayName', sprintf('%d - %s', kk, opp_name));
 
-        % Lap Time Difference Plot
-        if nnz(idx_opp) > 1
-            opp_index = double(sharedData.v2v_index(idx_opp, kk));
-            opp_lap_time = sharedData.v2v_lap_time(idx_opp, kk);
-
-            ego_interp = interp1(ego_index_unique, ego_lap_time_unique, opp_index, 'linear', 'extrap');
-            lap_time_diff = opp_lap_time - ego_interp;
-
+        if ~isempty(uI)
+            egoInterp = interp1(uI, egoLT(ia), opp_index, 'linear', 'extrap');
+            lap_time_diff = opp_lap_time - egoInterp;
             plot(ax_lapdiff, opp_index, lap_time_diff, ...
-                'Color', sharedData.colors(kk+1,:), ...
-                'DisplayName', sprintf('%d - %s', kk, opp_name));
+                 'Color', shared.colors(kk+1,:), ...
+                 'DisplayName', sprintf('%d - %s', kk, opp_name));
         end
     end
 
-    % Final formatting
     xlabel(ax_speed, 'Closest Index');
     ylabel(ax_speed, 'Speed (km/h)');
     legend(ax_speed, 'Location', 'northeast');
-    grid(ax_speed, 'on');
-    box(ax_speed, 'on');
+    grid(ax_speed, 'on'); box(ax_speed, 'on');
 
     xlabel(ax_lapdiff, 'Closest Index');
-    ylabel(ax_lapdiff, 'Delta Lap Time (s)');
+    ylabel(ax_lapdiff, 'Δ Lap Time (s)');
     legend(ax_lapdiff, 'Location', 'northeast');
-    grid(ax_lapdiff, 'on');
-    box(ax_lapdiff, 'on');
-
+    grid(ax_lapdiff, 'on'); box(ax_lapdiff, 'on');
 end
 
 
-function updateCurvPlot(lap_selected)
-    sharedData = getappdata(0, 'sharedData');
-    fig_curv = findobj('Name', 'Curvature and Lateral Acceleration');
-    ax_curv = getappdata(fig_curv, 'ax_curv');
-    ax_ay = getappdata(fig_curv, 'ax_ay');
-
-    % Clear axes
-    cla(ax_curv);
-    cla(ax_ay);
-    hold(ax_curv, 'on');
-    hold(ax_ay, 'on');
-
-    % Plot curvature
-    idx_ego = (sharedData.ego_laps == lap_selected);
-    plot(ax_curv, sharedData.ego_index(idx_ego), sharedData.ego_curv(idx_ego), 'Color', sharedData.colors(1,:), 'DisplayName', '0 - POLIMOVE');
-    for k=1:sharedData.max_opp
-        idx_opp = (sharedData.v2v_laps(:,k) == lap_selected);
-        plot(ax_curv, sharedData.v2v_index(idx_opp,k), sharedData.v2v_curv(idx_opp,k), ...
-            'Color', sharedData.colors(k+1,:), 'DisplayName', sprintf('%d - %s', k, sharedData.name_map(k)));
+function updateCurvLaps()
+    shared = getappdata(0,'sharedData');
+    fig = findobj('Name','Curvature and Lateral Acceleration'); if isempty(fig), return; end
+    axC = getappdata(fig,'ax_curv'); axA = getappdata(fig,'ax_ay');
+    cla(axC); cla(axA); hold(axC,'on'); hold(axA,'on');
+    idxE = shared.ego_laps == shared.lap_ego;
+    plot(axC, shared.ego_index(idxE), shared.ego_curv(idxE), 'DisplayName','Ego','Color',shared.colors(1,:));
+    plot(axA, shared.ego_index(idxE), shared.ego_ay(idxE), 'DisplayName','Ego','Color',shared.colors(1,:));
+    for kk = getSelectedOpponents(fig)'
+        idxO = shared.v2v_laps(:,kk) == shared.lap_opp; if ~any(idxO), continue; end
+        plot(axC, shared.v2v_index(idxO,kk), shared.v2v_curv(idxO,kk), 'DisplayName', shared.name_map(kk), 'Color',shared.colors(kk+1,:));
+        plot(axA, shared.v2v_index(idxO,kk), shared.v2v_ay(idxO,kk), 'DisplayName', shared.name_map(kk), 'Color',shared.colors(kk+1,:));
     end
-    ylabel(ax_curv, 'Curvature (1/m)');
-    title(ax_curv, sprintf('Curvature - Lap %d', lap_selected));
-    legend(ax_curv, 'Location', 'northeast');
-    grid(ax_curv, 'on');
-    box(ax_curv, 'on');
-    % max_curv = 1e-3;
-    % ylim(ax_curv, [-max_curv, max_curv]);
-
-    % Plot lateral acceleration
-    plot(ax_ay, sharedData.ego_index(idx_ego), sharedData.ego_ay(idx_ego), 'Color', sharedData.colors(1,:), 'DisplayName', '0 - POLIMOVE');
-    for k=1:sharedData.max_opp
-        idx_opp = (sharedData.v2v_laps(:,k) == lap_selected);
-        plot(ax_ay, sharedData.v2v_index(idx_opp,k), sharedData.v2v_ay(idx_opp,k), ...
-            'Color', sharedData.colors(k+1,:), 'DisplayName', sprintf('%d - %s', k, sharedData.name_map(k)));
-    end
-    ylabel(ax_ay, 'Lateral Acceleration (m/s^2)');
-    xlabel(ax_ay, 'Closest Index');
-    title(ax_ay, sprintf('Lateral Acceleration - Lap %d', lap_selected));
-    legend(ax_ay, 'Location', 'northeast');
-    grid(ax_ay, 'on');
-    box(ax_ay, 'on');
-    % max_ay = max_curv*(300*MPS2KPH)^2;
-    % ylim(ax_ay, [-max_ay, max_ay]);
-
+    xlabel(axC,'Index'); ylabel(axC,'Curvature (1/m)'); legend(axC,'Location','northeast');
+    xlabel(axA,'Index'); ylabel(axA,'Lateral Accel (m/s²)'); legend(axA,'Location','northeast');
+    grid(axC,'on'); grid(axA,'on'); box(axC,'on'); box(axA,'on');
 end
 
 
