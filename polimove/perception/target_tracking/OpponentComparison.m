@@ -203,11 +203,10 @@ panel_traj = uipanel('Parent', fig_traj, ...
     'Title','Controls');
 
 % Axes
-ax_width = 0.68;
-ax_left = 0.14 + (0.86 - ax_width)/2;
+ax_left = 0.14 + 0.05; 
 ax_traj = axes('Parent', fig_traj, ...
-    'Position', [ax_left, 0.1, ax_width, 0.85]);
-    
+    'Position', [ax_left, 0.1, 1-ax_left-0.05, 0.8]);
+
 % --- Checklist (top of the panel) ---
 checkbox_traj = createOpponentCheckboxes(panel_traj, checklist_strings, default_selection, 'traj');
 setappdata(fig_traj, 'checklist', checkbox_traj);
@@ -223,7 +222,7 @@ uicontrol('Parent', panel_traj, 'Style', 'text', 'String', 'Opponent Lap:', ...
 nextY = nextY - 0.04;
 
 popup_opp_traj = uicontrol('Parent', panel_traj, 'Style', 'popupmenu', ...
-    'String', compose("Opp Lap %d", 1:max_lap), ...
+    'String', compose("Lap %d", 1:max_lap), ...
     'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.06], ...
     'Callback', @(src,evt)updateLapSelection(src,evt,'opp'));
 
@@ -235,7 +234,7 @@ uicontrol('Parent', panel_traj, 'Style', 'text', 'String', 'Ego Lap:', ...
 nextY = nextY - 0.04;
 
 popup_ego_traj = uicontrol('Parent', panel_traj, 'Style', 'popupmenu', ...
-    'String', compose("Ego Lap %d", 1:max_lap), ...
+    'String', compose("Lap %d", 1:max_lap), ...
     'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.06], ...
     'Callback', @(src,evt)updateLapSelection(src,evt,'ego'));
 
@@ -245,64 +244,95 @@ setappdata(fig_traj, 'popup_opp', popup_opp_traj);
 setappdata(fig_traj, 'ax', ax_traj);
 
 
-% === SPEED FIGURE ===
+% === SPEED FIGURE (mirrors Trajectory layout) ===
 fig_speed = figure('Name','Speed Profile');
-ax_speed = subplot(2,1,1, 'Parent', fig_speed);
-ax_lapdiff = subplot(2,1,2, 'Parent', fig_speed);
 
+% Main axis on the right
+ax_left = 0.14 + 0.05;
+ax_lapdiff = axes('Parent', fig_speed, ...
+    'Position', [ax_left, 0.575, 1 - ax_left - 0.05, 0.30]);  % Top axis
+ax_speed = axes('Parent', fig_speed, ...
+    'Position', [ax_left, 0.175, 1 - ax_left - 0.05, 0.30]);  % Bottom axis
+
+% Control panel (left)
 panel_speed = uipanel('Parent', fig_speed, ...
-    'Units','normalized', 'Position',[0.02 0.5 0.25 0.45], ...
-    'Title','Opponents');
+    'Units','normalized', 'Position',[0.02 0.1 0.12 0.8], ...
+    'Title','Controls');
+
+% Opponent checkboxes
 checkbox_speed = createOpponentCheckboxes(panel_speed, checklist_strings, default_selection, 'speed');
 setappdata(fig_speed, 'checklist', checkbox_speed);
 
-uicontrol('Parent', fig_speed, 'Style', 'text', 'String', 'Opponent Lap:', ...
-    'Units','normalized', 'Position',[0.03 0.42 0.08 0.04], 'HorizontalAlignment', 'left');
-popup_opp_speed = uicontrol('Parent', fig_speed, 'Style', 'popupmenu', ...
-    'String', compose("Opp Lap %d", 1:max_lap), ...
-    'Units','normalized', 'Position',[0.03 0.38 0.08 0.05], ...
-    'Callback', @(src,evt)updateLapSelection(src,evt,'opp'));
+% Compute vertical offset
+n_cb = numel(checkbox_speed);
+checklist_height = n_cb * 0.04 + 0.05;
+nextY = 1 - checklist_height - 0.08;
 
-uicontrol('Parent', fig_speed, 'Style', 'text', 'String', 'Ego Lap:', ...
-    'Units','normalized', 'Position',[0.03 0.32 0.08 0.04], 'HorizontalAlignment', 'left');
-popup_ego_speed = uicontrol('Parent', fig_speed, 'Style', 'popupmenu', ...
-    'String', compose("Ego Lap %d", 1:max_lap), ...
-    'Units','normalized', 'Position',[0.03 0.28 0.08 0.05], ...
-    'Callback', @(src,evt)updateLapSelection(src,evt,'ego'));
+% Opponent Lap label & dropdown
+uicontrol('Parent', panel_speed, 'Style', 'text', 'String', 'Opponent Lap:', ...
+    'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.05], 'HorizontalAlignment', 'left');
+nextY = nextY - 0.04;
+popup_opp_speed = uicontrol('Parent', panel_speed, 'Style', 'popupmenu', ...
+    'String', compose("Lap %d", 1:max_lap), ...
+    'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.06], ...
+    'Callback', @(src,evt) updateLapSelection(src,evt,'opp'));
+nextY = nextY - 0.05;
 
-setappdata(fig_speed, 'popup_ego', popup_ego_speed);
+% Ego Lap label & dropdown
+uicontrol('Parent', panel_speed, 'Style', 'text', 'String', 'Ego Lap:', ...
+    'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.05], 'HorizontalAlignment', 'left');
+nextY = nextY - 0.04;
+popup_ego_speed = uicontrol('Parent', panel_speed, 'Style', 'popupmenu', ...
+    'String', compose("Lap %d", 1:max_lap), ...
+    'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.06], ...
+    'Callback', @(src,evt) updateLapSelection(src,evt,'ego'));
+
+% Store handles
 setappdata(fig_speed, 'popup_opp', popup_opp_speed);
+setappdata(fig_speed, 'popup_ego', popup_ego_speed);
 setappdata(fig_speed, 'ax', ax_speed);
 setappdata(fig_speed, 'ax_lapdiff', ax_lapdiff);
 
 
-% === CURVATURE FIGURE ===
+% === CURVATURE FIGURE (same layout) ===
 fig_curv = figure('Name','Curvature and Lateral Acceleration');
-ax_curv = subplot(2,1,1, 'Parent', fig_curv);
-ax_ay = subplot(2,1,2, 'Parent', fig_curv);
+
+ax_left = 0.14 + 0.05;
+ax_curv = axes('Parent', fig_curv, ...
+    'Position', [ax_left, 0.575, 1 - ax_left - 0.05, 0.30]);  % Top axis
+ax_ay = axes('Parent', fig_curv, ...
+    'Position', [ax_left, 0.175, 1 - ax_left - 0.05, 0.30]);  % Bottom axis
 
 panel_curv = uipanel('Parent', fig_curv, ...
-    'Units','normalized', 'Position',[0.02 0.5 0.25 0.45], ...
-    'Title','Opponents');
+    'Units','normalized', 'Position',[0.02 0.1 0.12 0.8], ...
+    'Title','Controls');
+
 checkbox_curv = createOpponentCheckboxes(panel_curv, checklist_strings, default_selection, 'curv');
 setappdata(fig_curv, 'checklist', checkbox_curv);
 
-uicontrol('Parent', fig_curv, 'Style', 'text', 'String', 'Opponent Lap:', ...
-    'Units','normalized', 'Position',[0.03 0.42 0.08 0.04], 'HorizontalAlignment', 'left');
-popup_opp_curv = uicontrol('Parent', fig_curv, 'Style', 'popupmenu', ...
-    'String', compose("Opp Lap %d", 1:max_lap), ...
-    'Units','normalized', 'Position',[0.03 0.38 0.08 0.05], ...
-    'Callback', @(src,evt)updateLapSelection(src,evt,'opp'));
+n_cb = numel(checkbox_curv);
+checklist_height = n_cb * 0.04 + 0.05;
+nextY = 1 - checklist_height - 0.08;
 
-uicontrol('Parent', fig_curv, 'Style', 'text', 'String', 'Ego Lap:', ...
-    'Units','normalized', 'Position',[0.03 0.32 0.08 0.04], 'HorizontalAlignment', 'left');
-popup_ego_curv = uicontrol('Parent', fig_curv, 'Style', 'popupmenu', ...
-    'String', compose("Ego Lap %d", 1:max_lap), ...
-    'Units','normalized', 'Position',[0.03 0.28 0.08 0.05], ...
-    'Callback', @(src,evt)updateLapSelection(src,evt,'ego'));
+uicontrol('Parent', panel_curv, 'Style', 'text', 'String', 'Opponent Lap:', ...
+    'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.05], 'HorizontalAlignment', 'left');
+nextY = nextY - 0.04;
+popup_opp_curv = uicontrol('Parent', panel_curv, 'Style', 'popupmenu', ...
+    'String', compose("Lap %d", 1:max_lap), ...
+    'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.06], ...
+    'Callback', @(src,evt) updateLapSelection(src,evt,'opp'));
+nextY = nextY - 0.05;
 
-setappdata(fig_curv, 'popup_ego', popup_ego_curv);
+uicontrol('Parent', panel_curv, 'Style', 'text', 'String', 'Ego Lap:', ...
+    'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.05], 'HorizontalAlignment', 'left');
+nextY = nextY - 0.04;
+popup_ego_curv = uicontrol('Parent', panel_curv, 'Style', 'popupmenu', ...
+    'String', compose("Lap %d", 1:max_lap), ...
+    'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.06], ...
+    'Callback', @(src,evt) updateLapSelection(src,evt,'ego'));
+
 setappdata(fig_curv, 'popup_opp', popup_opp_curv);
+setappdata(fig_curv, 'popup_ego', popup_ego_curv);
 setappdata(fig_curv, 'ax_curv', ax_curv);
 setappdata(fig_curv, 'ax_ay', ax_ay);
 
@@ -463,6 +493,7 @@ function updateTrajectoryLaps()
     id_right = length(shared.trajDatabase) - 1;
     plot(ax, shared.trajDatabase(id_left).X, shared.trajDatabase(id_left).Y, 'k', 'LineWidth', 1, 'HandleVisibility','off');
     plot(ax, shared.trajDatabase(id_right).X, shared.trajDatabase(id_right).Y, 'k', 'LineWidth', 1, 'HandleVisibility','off');
+    title(ax, sprintf('Trajectory - Opp Lap %d vs Ego Lap %d', shared.lap_opp, shared.lap_ego));
 end
 
 function updateSpeedLaps
@@ -479,7 +510,7 @@ function updateSpeedLaps
     cla(ax_speed); cla(ax_lapdiff);
     hold(ax_speed, 'on'); hold(ax_lapdiff, 'on');
 
-    title(ax_speed, sprintf('Speed Profile - Ego Lap %d', lapE));
+    title(ax_speed, sprintf('Speed Profile - Opp Lap %d vs Ego Lap %d', lapO, lapE));
     title(ax_lapdiff, sprintf('Lap-relative Time Difference - Opp Lap %d vs Ego Lap %d', lapO, lapE));
 
     % Plot Ego Speed
