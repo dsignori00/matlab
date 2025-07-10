@@ -5,17 +5,17 @@ clearvars
 %% Settings
 
 % Database
-database_name = 'Yas_Marina_Sim_apex_v4';
-database_folder = 'Yas_Marina_Sim';
-
+database_name = 'YasMarinaSim';
 
 %% Add paths
 
 % Define folders
-polimove_path                  = fullfile('..', '..', '..');
-global_functions_COMMON_folder = fullfile(polimove_path, '03_Tools','00_Common', '00_Global_functions');
-traj_database_folder           = fullfile(polimove_path, '08_Databases', database_folder, database_name);
-data_folder                    = fullfile(polimove_path, '02_Data');
+
+polimove_path                  = fullfile('..', '..');
+global_functions_COMMON_folder = fullfile(polimove_path, 'common');
+traj_database                  = fullfile(polimove_path, 'databases', strcat(database_name, '.mat'));
+data_folder                    = "/home/daniele/Documents/PoliMOVE/04_Bags/";
+
  
 % Add paths
 addpath(genpath(global_functions_COMMON_folder));
@@ -29,7 +29,7 @@ plot_options;
 
 %% Load data
 % Load database
-traj_DB = load(fullfile(traj_database_folder, 'trajDatabase.mat')).trajDatabase;
+traj_DB = load(traj_database).trajDatabase;
 
 % Load data
 [data_filenames, data_path] = uigetfile(data_folder, '*.m', 'MultiSelect', 'on');
@@ -69,7 +69,7 @@ for i_log = 1 : n_logs
     track_map
 
     %%% TESTPLAN %%%
-    testplan_parameters
+    % testplan_parameters
 
     %%% ACTUATORS %%%
     % actuators_throttle
@@ -89,10 +89,10 @@ for i_log = 1 : n_logs
     dynamics_gg_plot
 
     %%% LONGITUDINAL CONTROL %%%
-    long_speed_ctrl
-    long_acceleration_ctrl
+    % long_speed_ctrl
+    % long_acceleration_ctrl
     % long_gear_ctrl
-    long_traction_ctrl
+    % long_traction_ctrl
     long_slip_ctrl
     % long_distance_ctrl
 
@@ -109,7 +109,7 @@ for i_log = 1 : n_logs
 
     %%% SPACE PLOTS %%%
     space_actuators
-    space_cmd
+    % space_cmd
     space_tracking
     space_dynamics
     space_slips

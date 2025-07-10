@@ -5,17 +5,16 @@ clearvars
 %% Settings
 
 % Database
-database_name = 'Yas_Marina_Sim_apex_v4';
-database_folder = 'Yas_Marina_Sim';
-
+database_name = 'YasMarinaSim';
 
 %% Add paths
 
 % Define folders
-polimove_path                  = fullfile('..', '..', '..');
-global_functions_COMMON_folder = fullfile(polimove_path, '03_Tools','00_Common', '00_Global_functions');
-traj_database_folder           = fullfile(polimove_path, '08_Databases', database_folder, database_name);
-data_folder                    = fullfile(polimove_path, '02_Data');
+
+polimove_path                  = fullfile('..', '..');
+global_functions_COMMON_folder = fullfile(polimove_path, 'common');
+traj_database                  = fullfile(polimove_path, 'databases', 'YasMarinaSim.mat');
+data_folder                    = "/home/daniele/Documents/PoliMOVE/04_Bags/";
  
 % Add paths
 addpath(genpath(global_functions_COMMON_folder));
@@ -29,7 +28,7 @@ plot_options;
 
 %% Load data
 % Load database
-traj_DB = load(fullfile(traj_database_folder, 'trajDatabase.mat')).trajDatabase;
+traj_DB = load(traj_database).trajDatabase;
 
 % Load data
 [data_filenames, data_path] = uigetfile(data_folder, '*.m', 'MultiSelect', 'on');
