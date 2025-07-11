@@ -11,7 +11,7 @@ multi_run   = false;    % if true, a different mat for ego and opponent will be 
 ego_vs_ego  = false;    % if true, ego vs ego will be plotted
 save_v2v    = false;   % if true, save the processed v2v data
 
-opponent = containers.Map({'TUM','CONSTRUCTOR','HUMBDA', 'TII','MODENA','KINETIZ'}, [1, 4, 3, 2, 5, 6]); 
+opponent = containers.Map({'UNIMORE','FRAIAV','KINETIZ'}, [1,2,3]); 
 
 %% Paths
 
@@ -20,7 +20,7 @@ addpath("../../common/constants/")
 addpath("../../common/plot/")
 normal_path = "/home/daniele/Documents/PoliMOVE/04_Bags/";
 
-run('PhysicalConstants.m');
+run('physical_constants.m');
 
 %% Settings
 
@@ -43,7 +43,7 @@ name_map = containers.Map(opponent_values, opponent_names);
 
 %load database
 if(~exist('trajDatabase','var'))
-    trajDatabase = ChooseDatabase();
+    trajDatabase = choose_database();
     if(isempty(trajDatabase))
         error('No database selected');
     else
@@ -162,11 +162,11 @@ v2v_index(:,max_opp+1:end)=[];
 % Assign lap number and calc curvature
 v2v_laps = NaN(size(v2v_index,1),max_opp);
 v2v_curv = NaN(size(v2v_index,1),max_opp);
-ego_curv = CalcCurvature(ego_x, ego_y, 1, false);
-ego_laps = AssignLap(ego_index);
+ego_curv = calc_curvature(ego_x, ego_y, 1, false);
+ego_laps = assign_lap(ego_index);
 for k=1:max_opp
-    v2v_laps(:,k) = AssignLap(v2v_index(:,k));
-    v2v_curv(:,k) = CalcCurvature(v2v_x(:,k), v2v_y(:,k), 1, false);
+    v2v_laps(:,k) = assign_lap(v2v_index(:,k));
+    v2v_curv(:,k) = calc_curvature(v2v_x(:,k), v2v_y(:,k), 1, false);
 end
 max_lap = max(v2v_laps(:), [], 'omitnan');
 
