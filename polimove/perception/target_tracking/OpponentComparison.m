@@ -81,7 +81,7 @@ if(~ego_vs_ego)
     v2v_y = log.perception__v2v__detections.detections__y_map;
     v2v_vx = log.perception__v2v__detections.detections__vx*MPS2KPH;
     v2v_yaw = log.perception__v2v__detections.detections__yaw_map;
-    v2v_index = log.perception__v2v__detections.detections__closest_idx;
+    %v2v_index = log.perception__v2v__detections.detections__closest_idx;
     v2v_x(v2v_x==0)=nan;
     v2v_y(v2v_y==0)=nan;
     v2v_vx(v2v_vx==0)=nan;
@@ -120,35 +120,19 @@ ego_ay(ego_ay==0)=nan;
 
 %% PROCESSING
 
+trajX = trajDatabase(10).X(:);
+trajY = trajDatabase(10).Y(:);
 
 % Compute ego closest idx
 if ~exist('ego_index', 'var')
     ego_index = NaN(size(ego_x));
-    trajX = trajDatabase(10).X(:);
-    trajY = trajDatabase(10).Y(:);
-
-    for i = 1:length(ego_x)
-        if ~isnan(ego_x(i)) && ~isnan(ego_y(i))
-            dx = trajX - ego_x(i);
-            dy = trajY - ego_y(i);
-            [~, ego_index(i)] = min(dx.^2 + dy.^2);
-        end
-    end
+    ego_index = compute_idx_sim(ego_x,ego_y, trajX, trajY);
 end
 
-if(ego_vs_ego)
-    if ~exist('v2v_index', 'var')
-        v2v_index = NaN(size(v2v_x));
-        trajX = trajDatabase(10).X(:);
-        trajY = trajDatabase(10).Y(:);
-
-        for i = 1:length(v2v_x)
-            if ~isnan(v2v_x(i)) && ~isnan(v2v_y(i))
-                dx = trajX - v2v_x(i);
-                dy = trajY - v2v_y(i);
-                [~, v2v_index(i)] = min(dx.^2 + dy.^2);
-            end
-        end
+if ~exist('v2v_index', 'var')
+    v2v_index = NaN(size(v2v_x));
+    for i=1:size(v2v_x,2)
+        v2v_index(:,i) = compute_idx_sim(v2v_x(:,i),v2v_y(:,i), trajX, trajY);
     end
 end
 
