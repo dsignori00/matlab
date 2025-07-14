@@ -23,7 +23,7 @@ import casadi.*;
 addpath("../../common/utilities/")
 addpath("../../common/constants/")
 addpath("../../common/plot/")
-normal_path = "/home/daniele/Documents/PoliMOVE/04_Bags/";
+normal_path = "../../bags/";
 
 %% Settings
 
