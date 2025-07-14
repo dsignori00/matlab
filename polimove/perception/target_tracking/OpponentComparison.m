@@ -7,6 +7,15 @@ clearvars -except log log_ego trajDatabase ego_index v2v_index
 %#ok<*NASGU>
 %#ok<*SAGROW>
 
+
+%% Flags
+multi_run           = false;               % if true, a different mat for ego and opponent will be loaded
+ego_vs_ego          = false;               % if true, ego vs ego will be plotted
+save_v2v            = false;               % if true, save the processed v2v data
+res_file_name       = 'mat/best_laps.mat'; % file to save the best laps
+opponent            = containers.Map({'UNIMORE','FRAIAV'}, [1,2]); 
+
+
 %% Paths
 
 import casadi.*;
@@ -16,18 +25,18 @@ addpath("../../common/constants/")
 addpath("../../common/plot/")
 normal_path = "/home/daniele/Documents/PoliMOVE/04_Bags/";
 
+%% Settings
+
+% Initialize filters
+LOW_PASS_FREQ = 10; % [Hz]
+LAP_TIME_MIN = 100; % [s]
+LAP_TIME_MAX = 200; % [s]
+s = tf('s');
+lowpass_filt = 1 / (s/(2*pi*LOW_PASS_FREQ) + 1);
+derivative_filt = s / (s/(2*pi*LOW_PASS_FREQ) + 1);
+
 run('PhysicalConstants.m');
 run('FitParameters.m');
-
-
-%% Flags
-multi_run           = false;               % if true, a different mat for ego and opponent will be loaded
-ego_vs_ego          = false;               % if true, ego vs ego will be plotted
-save_v2v            = false;               % if true, save the processed v2v data
-res_file_name       = 'mat/best_laps.mat'; % file to save the best laps
-opponent            = containers.Map({'UNIMORE','FRAIAV','KINETIZ'}, [1,2,3]); 
-
-%% Settings
 
 % style
 set(0,'DefaultFigureWindowStyle','docked');
@@ -43,14 +52,6 @@ end
 opponent_names = keys(opponent);
 opponent_values = values(opponent);
 name_map = containers.Map(opponent_values, opponent_names);
-
-% Initialize filters
-LOW_PASS_FREQ = 10; % [Hz]
-LAP_TIME_MIN = 100; % [s]
-LAP_TIME_MAX = 200; % [s]
-s = tf('s');
-lowpass_filt = 1 / (s/(2*pi*LOW_PASS_FREQ) + 1);
-derivative_filt = s / (s/(2*pi*LOW_PASS_FREQ) + 1);
 
 %% Load Data
 
@@ -611,9 +612,9 @@ function updateAccFig()
     plot(axA, shared.best_laps(1).s_smooth, shared.best_laps(1).ay_smooth, 'DisplayName','Ego','Color',shared.colors(1,:));
     for kk = getSelectedOpponents(fig)'+1
         atot2 = shared.best_laps(kk).ax_smooth.^2 + shared.best_laps(kk).ay_smooth.^2;
-        plot(axB, shared.best_laps(1).s_smooth, sqrt(atot2), 'DisplayName', shared.name_map(kk), 'Color',shared.colors(kk+1,:));
-        plot(axC, shared.best_laps(kk).s_smooth, shared.best_laps(kk).ax_smooth, 'DisplayName', shared.name_map(kk), 'Color',shared.colors(kk+1,:));
-        plot(axA, shared.best_laps(kk).s_smooth, shared.best_laps(kk).ay_smooth, 'DisplayName', shared.name_map(kk), 'Color',shared.colors(kk+1,:));
+        plot(axB, shared.best_laps(kk).s_smooth, sqrt(atot2), 'DisplayName', shared.name_map(kk-1), 'Color',shared.colors(kk+1,:));
+        plot(axC, shared.best_laps(kk).s_smooth, shared.best_laps(kk).ax_smooth, 'DisplayName', shared.name_map(kk-1), 'Color',shared.colors(kk,:));
+        plot(axA, shared.best_laps(kk).s_smooth, shared.best_laps(kk).ay_smooth, 'DisplayName', shared.name_map(kk-1), 'Color',shared.colors(kk,:));
     end
     xlabel(axB,'Index'); ylabel(axB,'Total (m/s²)'); legend(axB,'Location','northeast');
     xlabel(axC,'Index'); ylabel(axC,'Longitudinal (m/s²)'); legend(axC,'Location','northeast');
