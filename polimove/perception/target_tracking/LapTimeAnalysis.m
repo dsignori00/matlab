@@ -1,5 +1,5 @@
 close all
-clearvars -except log log trajDatabase ego_index v2v_index
+clearvars -except log trajDatabase ego_index
 
 %#ok<*UNRCH>
 %#ok<*USENS>
@@ -10,7 +10,7 @@ clearvars -except log log trajDatabase ego_index v2v_index
 addpath("../../common/utilities/")
 addpath("../../common/constants/")
 addpath("../../common/plot/")
-normal_path = "/home/daniele/Documents/PoliMOVE/04_Bags/";
+bags = "../../bags/";
 
 run('PhysicalConstants.m');
 
@@ -26,7 +26,7 @@ set(0, 'DefaultLineLineWidth', 2);
 
 % load database
 if(~exist('trajDatabase','var'))
-    trajDatabase = ChooseDatabase();
+    trajDatabase = choose_database();
     if(isempty(trajDatabase))
         error('No database selected');
     else
@@ -36,9 +36,10 @@ end
 
 % load log
 if(~exist('log','var'))
-    [opp_file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load log');
+    [opp_file,path] = uigetfile(fullfile(bags,'*.mat'),'Load log');
     load(fullfile(path, opp_file));
 end
+
 
 % ESTIMATION
 ego_stamp = log.estimation.stamp__tot;
@@ -59,20 +60,12 @@ ego_ay(ego_ay==0)=nan;
 % Compute ego closest idx
 if ~exist('ego_index', 'var')
     ego_index = NaN(size(ego_x));
-    trajX = trajDatabase(10).X(:);
-    trajY = trajDatabase(10).Y(:);
-
-    for i = 1:length(ego_x)
-        if ~isnan(ego_x(i)) && ~isnan(ego_y(i))
-            dx = trajX - ego_x(i);
-            dy = trajY - ego_y(i);
-            [~, ego_index(i)] = min(dx.^2 + dy.^2);
-        end
-    end
+    ego_index = compute_idx_sim(ego_x,ego_y, trajX, trajY);
 end
 
-% Assign lap number 
-ego_laps = AssignLap(ego_index);
+
+% Assign lap number
+ego_laps = assign_lap(ego_index);
 max_lap = max(ego_laps(:), [], 'omitnan');
 
 % Lap Time progression
@@ -95,4 +88,7 @@ for ii = 1:numel(lapNumbers)
                 - ego_stamp(find(idx,1,'first'));
 end
 LapTimeEgo.seconds = lapTime;
-LapTimeEgo.fulltime  = Sec2LapTime(LapTimeEgo.seconds);
+LapTimeEgo.fulltime  = sec2laptime(LapTimeEgo.seconds);
+
+
+clearvars -except log trajDatabase ego_index LapTimeEgo
