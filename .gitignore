@@ -1,2 +1,3 @@
 /polimove/perception/target_tracking/mat/
-/polimove/bags
+/polimove/bags/*
+!polimove/bags/.gitkeep
