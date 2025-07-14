@@ -1,0 +1,32 @@
+function best_lap = fit_trajectory(best_lap, CURVATURE_RESAMPLE_PARAMS, SMOOTHING_TOL)
+
+
+center_line_resampled = curvature_resample([best_lap.x_filt best_lap.y_filt], CURVATURE_RESAMPLE_PARAMS);
+
+left_border = [best_lap.x_filt - SMOOTHING_TOL.*sin(best_lap.yaw_filt), best_lap.x_filt + SMOOTHING_TOL.*cos(best_lap.yaw_filt)];
+right_border = [best_lap.x_filt + SMOOTHING_TOL.*sin(best_lap.yaw_filt), y_TUM_filt - SMOOTHING_TOL.*cos(best_lap.yaw_filt)];
+
+[smooth_center_line, d_knot_vec] = smoothing_discontinuities(center_line_resampled, left_border, right_border);
+
+N_points = size(smooth_center_line, 1);
+
+v_smooth = nan(N_points, 1);
+ax_smooth = nan(N_points, 1);
+
+for i=1:N_points
+
+    [~, curr_idx] = min((best_lap.x_filt-smooth_center_line(i, 1)).^2 + (best_lap.y_filt-smooth_center_line(i, 2)).^2);
+
+    v_smooth(i) = best_lap.v_filt(curr_idx);
+    ax_smooth(i) = best_lap.ax(curr_idx);
+
+end
+
+rho_smooth = compute_curvature(smooth_center_line, d_knot_vec);
+s_smooth = compute_curv_abscissa(smooth_center_line);
+
+s_smooth_padded = compute_curv_abscissa([smooth_center_line; smooth_center_line(1, :)]);
+
+ay_TUM_smooth = v_smooth.^2 .* rho_smooth;
+end
+

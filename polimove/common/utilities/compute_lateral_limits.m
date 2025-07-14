@@ -1,0 +1,47 @@
+function [nl, nr] = compute_lateral_limits(center_line, d_knot_vec, left_border, right_border)
+
+    N_points_c = size(center_line, 1);
+
+    center_line_knot_points = compute_knot_points(center_line, d_knot_vec);
+    center_line_normals = compute_normals(center_line, d_knot_vec);
+
+    left_border_padded = [left_border; left_border(1, :)];
+    right_border_padded = [right_border; right_border(1, :)];
+
+    nl = nan(N_points_c, 1);
+    nr = nan(N_points_c, 1);
+
+    for i=1:N_points_c
+
+        curr_point = center_line_knot_points(i, :);
+        curr_normal = center_line_normals(i, :);
+
+        diff_left_vec = left_border - curr_point;
+        diff_right_vec = right_border - curr_point;
+
+        dist_left = sqrt(min(dot(diff_left_vec.', diff_left_vec.'))).*2;
+        dist_right = sqrt(min(dot(diff_right_vec.', diff_right_vec.'))).*2;
+
+        curr_bounding_boxes = nan(2, 2);
+
+        curr_bounding_boxes(1, :) = curr_point + dist_left .* curr_normal;
+        curr_bounding_boxes(2, :) = curr_point - dist_right .* curr_normal;
+
+        [curr_x_l, curr_y_l] = polyxpoly(left_border_padded(:, 1), left_border_padded(:, 2), ...
+                                         curr_bounding_boxes(:, 1), curr_bounding_boxes(:, 2), ...
+                                        'unique');
+
+        [curr_x_r, curr_y_r] = polyxpoly(right_border_padded(:, 1), right_border_padded(:, 2), ...
+                                         curr_bounding_boxes(:, 1), curr_bounding_boxes(:, 2), ...
+                                        'unique');
+
+        curr_dl = [curr_x_l curr_y_l] - curr_point;
+        curr_dr = [curr_x_r curr_y_r] - curr_point;
+
+        nl(i) = dot(curr_dl, curr_normal);
+        nr(i) = dot(curr_dr, curr_normal);
+
+    end
+
+end
+
