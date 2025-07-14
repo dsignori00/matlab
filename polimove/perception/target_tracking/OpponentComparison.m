@@ -5,22 +5,27 @@ clearvars -except log log_ego trajDatabase ego_index v2v_index
 %#ok<*INUSD>
 %#ok<*USENS>
 %#ok<*NASGU>
-
-%% Flags
-multi_run   = false;    % if true, a different mat for ego and opponent will be loaded
-ego_vs_ego  = false;    % if true, ego vs ego will be plotted
-save_v2v    = false;   % if true, save the processed v2v data
-
-opponent = containers.Map({'UNIMORE','FRAIAV','KINETIZ'}, [1,2,3]); 
+%#ok<*SAGROW>
 
 %% Paths
+
+import casadi.*;
 
 addpath("../../common/utilities/")
 addpath("../../common/constants/")
 addpath("../../common/plot/")
 normal_path = "/home/daniele/Documents/PoliMOVE/04_Bags/";
 
-run('physical_constants.m');
+run('PhysicalConstants.m');
+run('FitParameters.m');
+
+
+%% Flags
+multi_run           = false;               % if true, a different mat for ego and opponent will be loaded
+ego_vs_ego          = false;               % if true, ego vs ego will be plotted
+save_v2v            = false;               % if true, save the processed v2v data
+res_file_name       = 'mat/best_laps.mat'; % file to save the best laps
+opponent            = containers.Map({'UNIMORE','FRAIAV','KINETIZ'}, [1,2,3]); 
 
 %% Settings
 
@@ -38,6 +43,14 @@ end
 opponent_names = keys(opponent);
 opponent_values = values(opponent);
 name_map = containers.Map(opponent_values, opponent_names);
+
+% Initialize filters
+LOW_PASS_FREQ = 10; % [Hz]
+LAP_TIME_MIN = 100; % [s]
+LAP_TIME_MAX = 200; % [s]
+s = tf('s');
+lowpass_filt = 1 / (s/(2*pi*LOW_PASS_FREQ) + 1);
+derivative_filt = s / (s/(2*pi*LOW_PASS_FREQ) + 1);
 
 %% Load Data
 
@@ -145,17 +158,12 @@ v2v_index(:,max_opp+1:end)=[];
 
 % Assign lap number and calc curvature
 v2v_laps = NaN(size(v2v_index,1),max_opp);
-v2v_curv = NaN(size(v2v_index,1),max_opp);
 ego_curv = calc_curvature(ego_x, ego_y, 1, false);
 ego_laps = assign_lap(ego_index);
 for k=1:max_opp
     v2v_laps(:,k) = assign_lap(v2v_index(:,k));
-    v2v_curv(:,k) = calc_curvature(v2v_x(:,k), v2v_y(:,k), 1, false);
 end
 max_lap = max(v2v_laps(:), [], 'omitnan');
-
-% compute lateral acceleration
-v2v_ay = v2v_curv.*v2v_vx.^2;
 
 % Lap Time progression
 ego_lap_time = NaN(size(ego_stamp));  
@@ -177,31 +185,60 @@ for k = 1:max_opp
         v2v_lap_time(idx, k) = v2v_sens_stamp(idx) - lap_start_time;
     end
 end
+
 %% SAVE PROCESSED DATA
 
+v2v_data = struct();
+
+v2v_data.x        = v2v_x;          % [m]  posizione X dei veicoli rivali
+v2v_data.y        = v2v_y;          % [m]  posizione Y dei veicoli rivali
+v2v_data.vx       = v2v_vx;         % [m/s] velocità longitudinale
+v2v_data.yaw      = v2v_yaw;        % [rad] angolo di imbardata
+v2v_data.index    = v2v_index;      % indice punto traiettoria più vicino
+
+v2v_data.laps     = v2v_laps;       % numero di giro assegnato
+v2v_data.lap_time = v2v_lap_time;   % tempo di percorrenza giro (s)
+
+v2v_data.max_opp  = max_opp;        % numero di avversari considerati
+v2v_data.max_lap  = max_lap;        % massimo numero di giri trovati
+
 if(save_v2v)
-    v2v_data = struct();
-
-    v2v_data.x        = v2v_x;          % [m]  posizione X dei veicoli rivali
-    v2v_data.y        = v2v_y;          % [m]  posizione Y dei veicoli rivali
-    v2v_data.vx       = v2v_vx;         % [m/s] velocità longitudinale
-    v2v_data.yaw      = v2v_yaw;        % [rad] angolo di imbardata
-    v2v_data.index    = v2v_index;      % indice punto traiettoria più vicino
-
-    v2v_data.laps     = v2v_laps;       % numero di giro assegnato
-    v2v_data.curv     = v2v_curv;       % curvatura (1/raggio)
-    v2v_data.ay       = v2v_ay;         % accelerazione laterale
-    v2v_data.lap_time = v2v_lap_time;   % tempo di percorrenza giro (s)
-
-    v2v_data.max_opp  = max_opp;        % numero di avversari considerati
-    v2v_data.max_lap  = max_lap;        % massimo numero di giri trovati
-
     [~, name, ~] = fileparts(opp_file);  % estrae il nome base senza estensione
     output_filename = fullfile(path, [name, '_processed.mat']);
 
     % Salvataggio
     save(output_filename, 'v2v_data');
     fprintf('Processed data saved: %s\n', output_filename);
+end
+
+% compute lateral acceleration and curvature
+Ts = mean(diff(v2v_data.lap_time(v2v_data.laps(:, 1)==1, 1)));
+dataset_polimove = reinterp_ego_data(log, Ts);
+
+if isfile(res_file_name)
+    load(res_file_name);
+else
+    best_lap_polimove = extract_best_lap(dataset_polimove, 1, LAP_TIME_MIN, LAP_TIME_MAX);
+    best_lap_polimove = filter_data(best_lap_polimove, lowpass_filt, derivative_filt, Ts);
+    best_lap_polimove = fit_trajectory(best_lap_polimove, CURVATURE_RESAMPLE_PARAMS, SMOOTHING_TOL);
+    best_laps(1) = best_lap_polimove;
+    for i = 2:max_opp+1
+        extracted = extract_best_lap(v2v_data, i-1, LAP_TIME_MIN, LAP_TIME_MAX);
+        for f = fieldnames(extracted)'
+            best_laps(i).(f{1}) = extracted.(f{1});
+        end
+        
+        filtered = filter_data(best_laps(i), lowpass_filt, derivative_filt, Ts);
+        for f = fieldnames(filtered)'
+            best_laps(i).(f{1}) = filtered.(f{1});
+        end
+    
+        fitted = fit_trajectory(best_laps(i), CURVATURE_RESAMPLE_PARAMS, SMOOTHING_TOL);
+        for f = fieldnames(fitted)'
+            best_laps(i).(f{1}) = fitted.(f{1});
+        end
+    end
+    save(res_file_name, 'best_laps');
 end
 
 
@@ -314,13 +351,15 @@ setappdata(fig_speed, 'ax_lapdiff', ax_lapdiff);
 
 
 % === CURVATURE FIGURE (same layout) ===
-fig_curv = figure('Name','Curvature and Lateral Acceleration');
+fig_curv = figure('Name','Acceleration Profile');
 
 ax_left = 0.14 + 0.05;
-ax_curv = axes('Parent', fig_curv, ...
-    'Position', [ax_left, 0.575, 1 - ax_left - 0.05, 0.30]);  % Top axis
+ax_a = axes('Parent', fig_curv, ...
+    'Position', [ax_left, 0.65, 1 - ax_left - 0.05, 0.25]);  % Top axis
+ax_ax = axes('Parent', fig_curv, ...
+    'Position', [ax_left, 0.35, 1 - ax_left - 0.05, 0.25]);  % Middle axis
 ax_ay = axes('Parent', fig_curv, ...
-    'Position', [ax_left, 0.175, 1 - ax_left - 0.05, 0.30]);  % Bottom axis
+    'Position', [ax_left, 0.05, 1 - ax_left - 0.05, 0.25]);  % Bottom axis
 
 panel_curv = uipanel('Parent', fig_curv, ...
     'Units','normalized', 'Position',[0.02 0.1 0.12 0.8], ...
@@ -330,27 +369,8 @@ checkbox_curv = createOpponentCheckboxes(panel_curv, checklist_strings, default_
 setappdata(fig_curv, 'checklist', checkbox_curv);
 
 nextY = 1 - checklist_height - 0.08;
-
-uicontrol('Parent', panel_curv, 'Style', 'text', 'String', 'Opponent Lap:', ...
-    'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.05], 'HorizontalAlignment', 'left');
-nextY = nextY - 0.04;
-popup_opp_curv = uicontrol('Parent', panel_curv, 'Style', 'popupmenu', ...
-    'String', compose("Lap %d", 1:max_lap), ...
-    'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.06], ...
-    'Callback', @(src,evt) updateLapSelection(src,evt,'opp'));
-nextY = nextY - 0.05;
-
-uicontrol('Parent', panel_curv, 'Style', 'text', 'String', 'Ego Lap:', ...
-    'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.05], 'HorizontalAlignment', 'left');
-nextY = nextY - 0.04;
-popup_ego_curv = uicontrol('Parent', panel_curv, 'Style', 'popupmenu', ...
-    'String', compose("Lap %d", 1:max_lap), ...
-    'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.06], ...
-    'Callback', @(src,evt) updateLapSelection(src,evt,'ego'));
-
-setappdata(fig_curv, 'popup_opp', popup_opp_curv);
-setappdata(fig_curv, 'popup_ego', popup_ego_curv);
-setappdata(fig_curv, 'ax_curv', ax_curv);
+setappdata(fig_curv, 'ax_a', ax_a);
+setappdata(fig_curv, 'ax_ax', ax_ax);
 setappdata(fig_curv, 'ax_ay', ax_ay);
 
 
@@ -369,14 +389,13 @@ sharedData.ego_index = ego_index;
 sharedData.ego_vx = ego_vx;
 sharedData.v2v_index = v2v_index;
 sharedData.v2v_vx = v2v_vx;
-sharedData.v2v_curv = v2v_curv;
-sharedData.v2v_ay = v2v_ay;
 sharedData.ego_curv = ego_curv;
 sharedData.ego_ay = ego_ay;
 sharedData.ego_lap_time = ego_lap_time;
 sharedData.v2v_lap_time = v2v_lap_time;
 sharedData.lap_ego = 1;
 sharedData.lap_opp = 1;
+sharedData.best_laps = best_laps;
 
 
 % Save to root for callback access (or use nested functions / guidata)
@@ -385,7 +404,7 @@ setappdata(0, 'sharedData', sharedData);
 % Initial plots, lap 1
 updateTrajectoryLaps();
 updateSpeedLaps();
-updateCurvLaps();
+updateAccFig();
 
 %% Callback to sync selections and update both plots
 
@@ -408,14 +427,13 @@ function updateLapSelection(src,~,whichLap)
     % Refresh all plots
     updateTrajectoryLaps;
     updateSpeedLaps;
-    updateCurvLaps;
 end
 
 function nm = figureName(tag)
     switch tag
         case 'traj', nm = 'Trajectory';
         case 'speed', nm = 'Speed Profile';
-        case 'curv', nm = 'Curvature and Lateral Acceleration';
+        case 'curv', nm = 'Acceleration Profile';
     end
 end
 
@@ -468,7 +486,7 @@ function updateOpponentSelection(~,~,sourceTag)
         case 'speed'
             fig_source = findobj('Name', 'Speed Profile');
         case 'curv'
-            fig_source = findobj('Name', 'Curvature and Lateral Acceleration');
+            fig_source = findobj('Name', 'Acceleration Profile');
         otherwise
             return;
     end
@@ -479,7 +497,7 @@ function updateOpponentSelection(~,~,sourceTag)
     % Sync checkboxes across all figures
     fig_traj = findobj('Name', 'Trajectory');
     fig_speed = findobj('Name', 'Speed Profile');
-    fig_curv = findobj('Name', 'Curvature and Lateral Acceleration');
+    fig_curv = findobj('Name', 'Acceleration Profile');
 
     syncCheckboxGroup(fig_traj, selected_opps);
     syncCheckboxGroup(fig_speed, selected_opps);
@@ -488,7 +506,7 @@ function updateOpponentSelection(~,~,sourceTag)
     % Update all plots using stored sharedData.lap_ego and lap_opp
     updateTrajectoryLaps();
     updateSpeedLaps();
-    updateCurvLaps();
+    updateAccFig();
 end
 
 
@@ -579,31 +597,37 @@ function updateSpeedLaps
 end
 
 
-function updateCurvLaps()
+function updateAccFig()
     shared = getappdata(0,'sharedData');
-    fig = findobj('Name','Curvature and Lateral Acceleration'); if isempty(fig), return; end
-    axC = getappdata(fig,'ax_curv'); axA = getappdata(fig,'ax_ay');
-    cla(axC); cla(axA); hold(axC,'on'); hold(axA,'on');
-    idxE = shared.ego_laps == shared.lap_ego;
-    plot(axC, shared.ego_index(idxE), shared.ego_curv(idxE), 'DisplayName','Ego','Color',shared.colors(1,:));
-    plot(axA, shared.ego_index(idxE), shared.ego_ay(idxE), 'DisplayName','Ego','Color',shared.colors(1,:));
-    for kk = getSelectedOpponents(fig)'
-        idxO = shared.v2v_laps(:,kk) == shared.lap_opp; if ~any(idxO), continue; end
-        plot(axC, shared.v2v_index(idxO,kk), shared.v2v_curv(idxO,kk), 'DisplayName', shared.name_map(kk), 'Color',shared.colors(kk+1,:));
-        plot(axA, shared.v2v_index(idxO,kk), shared.v2v_ay(idxO,kk), 'DisplayName', shared.name_map(kk), 'Color',shared.colors(kk+1,:));
+    fig = findobj('Name','Acceleration Profile'); if isempty(fig), return; end
+    axB = getappdata(fig,'ax_a'); axC = getappdata(fig,'ax_ax'); axA = getappdata(fig,'ax_ay');
+    cla(axB); cla(axC); cla(axA); hold(axB,'on'); hold(axC,'on'); hold(axA,'on');
+    atot2 = shared.best_laps(1).ax_smooth.^2 + shared.best_laps(1).ay_smooth.^2;
+    plot(axB, shared.best_laps(1).s_smooth, sqrt(atot2), 'DisplayName','Ego','Color',shared.colors(1,:));
+    plot(axC, shared.best_laps(1).s_smooth, shared.best_laps(1).ax_smooth, 'DisplayName','Ego','Color',shared.colors(1,:));
+    plot(axA, shared.best_laps(1).s_smooth, shared.best_laps(1).ay_smooth, 'DisplayName','Ego','Color',shared.colors(1,:));
+    for kk = getSelectedOpponents(fig)'+1
+        atot2 = shared.best_laps(kk).ax_smooth.^2 + shared.best_laps(kk).ay_smooth.^2;
+        plot(axB, shared.best_laps(1).s_smooth, sqrt(atot2), 'DisplayName', shared.name_map(kk), 'Color',shared.colors(kk+1,:));
+        plot(axC, shared.best_laps(kk).s_smooth, shared.best_laps(kk).ax_smooth, 'DisplayName', shared.name_map(kk), 'Color',shared.colors(kk+1,:));
+        plot(axA, shared.best_laps(kk).s_smooth, shared.best_laps(kk).ay_smooth, 'DisplayName', shared.name_map(kk), 'Color',shared.colors(kk+1,:));
     end
-    xlabel(axC,'Index'); ylabel(axC,'Curvature (1/m)'); legend(axC,'Location','northeast');
-    xlabel(axA,'Index'); ylabel(axA,'Lateral Accel (m/s²)'); legend(axA,'Location','northeast');
-    grid(axC,'on'); grid(axA,'on'); box(axC,'on'); box(axA,'on');
+    xlabel(axB,'Index'); ylabel(axB,'Total (m/s²)'); legend(axB,'Location','northeast');
+    xlabel(axC,'Index'); ylabel(axC,'Longitudinal (m/s²)'); legend(axC,'Location','northeast');
+    xlabel(axA,'Index'); ylabel(axA,'Lateral (m/s²)'); legend(axA,'Location','northeast');
+    grid(axB,'on'); grid(axC,'on'); grid(axA,'on'); box(axB); box(axC,'on'); box(axA,'on');
+    title(axB, sprintf('Best Lap Acceletation Profile'));
 end
 
 
 % Link x-axis limits manually between Speed and Curvature figures
 ax_speed = getappdata(fig_speed, 'ax');
 ax_lapdiff = getappdata(fig_speed, 'ax_lapdiff');
-ax_curv = getappdata(fig_curv, 'ax_curv');
+ax_a = getappdata(fig_curv, 'ax_a');
+ax_ax = getappdata(fig_curv, 'ax_ax');
 ax_ay = getappdata(fig_curv, 'ax_ay');
 
-linkaxes([ax_speed, ax_curv, ax_ay, ax_lapdiff], 'x');
+linkaxes([ax_speed, ax_lapdiff], 'x');
+linkaxes([ax_a, ax_ax, ax_ay], 'x');
 
 
