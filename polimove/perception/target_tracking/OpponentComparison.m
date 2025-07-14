@@ -238,6 +238,9 @@ else
             best_laps(i).(f{1}) = fitted.(f{1});
         end
     end
+    if ~exist('mat', 'dir')
+        mkdir('mat');
+    end
     save(res_file_name, 'best_laps');
 end
 
