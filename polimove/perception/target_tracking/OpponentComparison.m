@@ -46,7 +46,7 @@ colors = lines(20);
 
 % opponent names
 if(ego_vs_ego)
-    opponent = containers.Map({'Ego 2'}, 1); 
+    opponent = containers.Map({'POLIMOVE 2'}, 1); 
 end
 opponent_names = keys(opponent);
 opponent_values = values(opponent);
@@ -166,15 +166,19 @@ end
 max_lap = max(v2v_laps(:), [], 'omitnan');
 
 % Lap Time progression
-ego_lap_time = NaN(size(ego_stamp));  
-v2v_lap_time = NaN(size(v2v_index,1),max_opp);  
+ego_lap_time_prog = NaN(size(ego_stamp));  
+v2v_lap_time_prog = NaN(size(v2v_index,1),max_opp);  
 
 unique_laps = unique(ego_laps(~isnan(ego_laps)));
+ego_laptime = struct();
 for lap = unique_laps'
     idx = (ego_laps == lap);
-    ego_lap_time(idx) = ego_stamp(idx) - ego_stamp(find(idx, 1, 'first'));
+    ego_lap_time_prog(idx) = ego_stamp(idx) - ego_stamp(find(idx, 1, 'first'));
+    ego_laptime.seconds(lap) = max(ego_lap_time_prog(idx));
+    ego_laptime.fulltime(lap) = sec2laptime(ego_laptime.seconds(lap));
 end
 
+v2v_laptime = struct();
 for k = 1:max_opp
     laps_k = v2v_laps(:,k);
     unique_laps = unique(laps_k(~isnan(laps_k)));
@@ -182,9 +186,12 @@ for k = 1:max_opp
     for lap = unique_laps'
         idx = (laps_k == lap);
         lap_start_time = v2v_sens_stamp(find(idx, 1, 'first'));
-        v2v_lap_time(idx, k) = v2v_sens_stamp(idx) - lap_start_time;
+        v2v_lap_time_prog(idx, k) = v2v_sens_stamp(idx) - lap_start_time;
+        v2v_laptime(k).seconds(lap) = max(v2v_lap_time_prog(idx, k));
+        v2v_laptime(k).fulltime(lap) = sec2laptime(v2v_laptime(k).seconds(lap));        
     end
 end
+
 
 %% SAVE PROCESSED DATA
 
@@ -197,7 +204,7 @@ v2v_data.yaw      = v2v_yaw;        % [rad] angolo di imbardata
 v2v_data.index    = v2v_index;      % indice punto traiettoria più vicino
 
 v2v_data.laps     = v2v_laps;       % numero di giro assegnato
-v2v_data.lap_time = v2v_lap_time;   % tempo di percorrenza giro (s)
+v2v_data.lap_time = v2v_lap_time_prog;   % tempo di percorrenza giro (s)
 
 v2v_data.max_opp  = max_opp;        % numero di avversari considerati
 v2v_data.max_lap  = max_lap;        % massimo numero di giri trovati
@@ -394,10 +401,12 @@ sharedData.ego_vx = ego_vx;
 sharedData.v2v_index = v2v_index;
 sharedData.v2v_vx = v2v_vx;
 sharedData.ego_ay = ego_ay;
-sharedData.ego_lap_time = ego_lap_time;
-sharedData.v2v_lap_time = v2v_lap_time;
+sharedData.ego_lap_time_prog = ego_lap_time_prog;
+sharedData.v2v_lap_time_prog = v2v_lap_time_prog;
 sharedData.lap_ego = 1;
 sharedData.lap_opp = 1;
+sharedData.ego_laptime = ego_laptime;
+sharedData.v2v_laptime = v2v_laptime;
 % sharedData.best_laps = best_laps;
 
 
@@ -519,12 +528,20 @@ function updateTrajectoryLaps()
     shared = getappdata(0,'sharedData');
     fig = findobj('Name','Trajectory'); if isempty(fig), return; end
     ax = getappdata(fig,'ax'); cla(ax); hold(ax,'on');
+    laptime = shared.ego_laptime.fulltime(shared.lap_ego);
     idxE = shared.ego_laps == shared.lap_ego;
-    plot(ax, shared.ego_x(idxE), shared.ego_y(idxE), '.', 'Color',shared.colors(1,:),'DisplayName','Ego');
+    plot(ax, shared.ego_x(idxE), shared.ego_y(idxE), '.', 'Color',shared.colors(1,:), ...
+        'DisplayName',sprintf('0 - POLIMOVE - Laptime: %s', laptime));
     opps = getSelectedOpponents(fig);
+
     for kk = opps(:)'
-        idxO = shared.v2v_laps(:,kk) == shared.lap_opp;
-        plot(ax, shared.v2v_x(idxO,kk), shared.v2v_y(idxO,kk), '.', 'Color',shared.colors(kk+1,:), 'DisplayName', shared.name_map(kk));
+        lapO = shared.lap_opp;
+        opp_name = shared.name_map(kk);
+        laptime = shared.v2v_laptime(kk).fulltime(lapO);
+        idxO = shared.v2v_laps(:,kk) == lapO;
+        plot(ax, shared.v2v_x(idxO,kk), shared.v2v_y(idxO,kk), ...
+             '.', 'Color',shared.colors(kk+1,:), ...
+             'DisplayName', sprintf('%d - %s - Laptime: %s', kk, opp_name, laptime))
     end
     legend(ax,'Location','northeast'); axis(ax,'equal'); grid(ax,'on'); box(ax,'on');
     id_left = length(shared.trajDatabase) - 2;
@@ -541,6 +558,7 @@ function updateSpeedLaps
 
     lapE = shared.lap_ego;
     lapO = shared.lap_opp;
+    laptime = shared.ego_laptime.fulltime(lapE);
 
     ax_speed = getappdata(fig, 'ax');
     ax_lapdiff = getappdata(fig, 'ax_lapdiff');
@@ -554,13 +572,14 @@ function updateSpeedLaps
     % Plot Ego Speed
     idxE = shared.ego_laps == lapE;
     plot(ax_speed, shared.ego_index(idxE), shared.ego_vx(idxE), ...
-         'DisplayName', 'Ego Speed', 'Color', shared.colors(1,:));
+        'Color', shared.colors(1,:), ...
+         'DisplayName',sprintf('0 - POLIMOVE - Laptime: %s', laptime));
 
     % Lap time interpolation setup
     ego_index = shared.ego_index(idxE);
-    ego_lap_time = shared.ego_lap_time(idxE);
+    ego_lap_time_prog = shared.ego_lap_time_prog(idxE);
     [uI, ia] = unique(double(ego_index), 'stable');  % ensure double type
-    egoLT = ego_lap_time;
+    egoLT = ego_lap_time_prog;
 
     yline(ax_lapdiff, 0, 'Color', 'k', 'LineStyle', '--', 'HandleVisibility', 'off');
 
@@ -572,19 +591,20 @@ function updateSpeedLaps
 
         opp_index = double(shared.v2v_index(idxO, kk));  % ensure double
         opp_speed = shared.v2v_vx(idxO, kk);
-        opp_lap_time = shared.v2v_lap_time(idxO, kk);
+        opp_lap_time = shared.v2v_lap_time_prog(idxO, kk);
         opp_name = shared.name_map(kk);
+        laptime = shared.v2v_laptime(kk).fulltime(lapO);
 
         plot(ax_speed, opp_index, opp_speed, ...
              'Color', shared.colors(kk+1, :), ...
-             'DisplayName', sprintf('%d - %s', kk, opp_name));
+             'DisplayName', sprintf('%d - %s - Laptime: %s', kk, opp_name, laptime))
 
         if ~isempty(uI)
             egoInterp = interp1(uI, egoLT(ia), opp_index, 'linear', 'extrap');
             lap_time_diff = opp_lap_time - egoInterp;
             plot(ax_lapdiff, opp_index, lap_time_diff, ...
                  'Color', shared.colors(kk+1,:), ...
-                 'DisplayName', sprintf('%d - %s', kk, opp_name));
+                 'DisplayName', sprintf('%d - %s - Laptime: %s', kk, opp_name, laptime));
         end
     end
 
