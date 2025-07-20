@@ -9,10 +9,12 @@ clearvars -except log log_ego trajDatabase ego_index v2v_index opp_file
 
 
 %% Flags
-multi_run           = false;               % if true, a different mat for ego and opponent will be loaded
+multi_run           = true;                % if true, a different mat for ego and opponent will be loaded
 ego_vs_ego          = false;               % if true, ego vs ego will be plotted
 save_v2v            = false;               % if true, save the processed v2v data
-opponent            = containers.Map({'TUM','TII','UNIMORE','KINETIZ'}, [1,2,3,4]); 
+% opponent            = containers.Map({'TUM','TII','UNIMORE','KINETIZ'}, [1,2,3,4]); 
+ opponent            = containers.Map({'KINETIZ','TII','FR4IAV','CODE19','FLYEAGLE'},[1,2,3,4,5]); % autonomodrome - qualifying
+% opponent            = containers.Map({'KINETIZ','TUM','CONSTRUCTOR','UNIMORE','TII'}, [1,2,3,4,5]); %autonomodrome - final
 
 
 %% Paths
@@ -646,11 +648,11 @@ end
 % Link x-axis limits manually between Speed and Curvature figures
 ax_speed = getappdata(fig_speed, 'ax');
 ax_lapdiff = getappdata(fig_speed, 'ax_lapdiff');
-ax_a = getappdata(fig_curv, 'ax_a');
-ax_ax = getappdata(fig_curv, 'ax_ax');
-ax_ay = getappdata(fig_curv, 'ax_ay');
+% ax_a = getappdata(fig_curv, 'ax_a');
+% ax_ax = getappdata(fig_curv, 'ax_ax');
+% ax_ay = getappdata(fig_curv, 'ax_ay');
 
-linkaxes([ax_speed, ax_lapdiff], 'x');
-linkaxes([ax_a, ax_ax, ax_ay], 'x');
+% linkaxes([ax_speed, ax_lapdiff], 'x');
+% linkaxes([ax_a, ax_ax, ax_ay], 'x');
 
 

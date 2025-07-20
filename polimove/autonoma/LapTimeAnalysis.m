@@ -7,10 +7,10 @@ clearvars -except log trajDatabase ego_index
 
 %% Paths
 
-addpath("../../common/utilities/")
-addpath("../../common/constants/")
-addpath("../../common/plot/")
-bags = "../../bags/";
+addpath("../common/utilities/")
+addpath("../common/constants/")
+addpath("../common/plot/")
+bags = "../bags/";
 
 run('PhysicalConstants.m');
 
