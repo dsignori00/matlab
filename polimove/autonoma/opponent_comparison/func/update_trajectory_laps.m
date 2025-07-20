@@ -11,8 +11,9 @@ function update_trajectory_laps()
     for kk = opps(:)'
         lapO = shared.lap_opp;
         opp_name = shared.name_map(kk);
-        laptime = shared.v2v.laptime(kk).fulltime(lapO);
         idxO = shared.v2v.laps(:,kk) == lapO;
+        if ~any(idxO), continue; end
+        laptime = shared.v2v.laptime(kk).fulltime(lapO);
         plot(ax, shared.v2v.x(idxO,kk), shared.v2v.y(idxO,kk), ...
              '.', 'Color',shared.colors(kk+1,:), ...
              'DisplayName', sprintf('%d - %s - Laptime: %s', kk, opp_name, laptime))
