@@ -55,7 +55,6 @@ function update_speed_laps
         end
     end
 
-    xlabel(ax_speed, 'Closest Index');
     ylabel(ax_speed, 'Speed (km/h)');
     legend(ax_speed, 'Location', 'northeast');
     grid(ax_speed, 'on'); box(ax_speed, 'on');
