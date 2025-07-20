@@ -1,5 +1,5 @@
 close all
-clearvars -except log log_ego trajDatabase ego.index v2v.indexopp_file
+clearvars -except log log_ego trajDatabase ego.index v2v.index opp_file
 
 %#ok<*UNRCH>
 %#ok<*INUSD>
