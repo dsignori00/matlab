@@ -143,38 +143,7 @@ if(save_v2v)
 end
 
 % % compute lateral acceleration and curvature
-% Ts = mean(diff(v2v_data.lap_time(v2v_data.laps(:, 1)==1, 1)));
-% dataset_polimove = reinterp_ego_data(log, Ts);
-% 
-% res_file_name = fullfile("mat", opp_file + "_best_laps"); 
-% if isfile(res_file_name)
-%     load(res_file_name);
-% else
-%     best_lap_polimove = extract_best_lap(dataset_polimove, 1, LAP_TIME_MIN, LAP_TIME_MAX);
-%     best_lap_polimove = filter_data(best_lap_polimove, lowpass_filt, derivative_filt, Ts);
-%     best_lap_polimove = fit_trajectory(best_lap_polimove, CURVATURE_RESAMPLE_PARAMS, SMOOTHING_TOL);
-%     best_laps(1) = best_lap_polimove;
-%     for i = 2:v2v.max_opp+1
-%         extracted = extract_best_lap(v2v_data, i-1, LAP_TIME_MIN, LAP_TIME_MAX);
-%         for f = fieldnames(extracted)'
-%             best_laps(i).(f{1}) = extracted.(f{1});
-%         end
-% 
-%         filtered = filter_data(best_laps(i), lowpass_filt, derivative_filt, Ts);
-%         for f = fieldnames(filtered)'
-%             best_laps(i).(f{1}) = filtered.(f{1});
-%         end
-% 
-%         fitted = fit_trajectory(best_laps(i), CURVATURE_RESAMPLE_PARAMS, SMOOTHING_TOL);
-%         for f = fieldnames(fitted)'
-%             best_laps(i).(f{1}) = fitted.(f{1});
-%         end
-%     end
-%     if ~exist('mat', 'dir')
-%         mkdir('mat');
-%     end
-%     save(res_file_name, opp_file + "_best_laps");
-% end
+% best_laps = fit_best_laps(v2v, log, opp_file);
 
 
 %% PLOTTING
