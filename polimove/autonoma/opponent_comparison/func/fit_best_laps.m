@@ -16,56 +16,62 @@ function best_laps = fit_best_laps(v2v_data, log, opp_file)
 
     SMOOTHING_TOL = 1.5; % [m];
 
-    % Compute sampling time Ts from first ego lap
-    Ts = mean(diff(v2v_data.lap_time(v2v_data.laps(:, 1)==1, 1)));
-
-    % Interpolate ego vehicle data
+    Ts = mean(diff(v2v_data.laptime_prog(v2v_data.laps(:, 1)==1, 1)));
     dataset_polimove = reinterp_ego_data(log, Ts);
 
-    % Filename for caching results
-    res_file_name = fullfile("mat", opp_file + "_best_laps.mat");
-
-    if isfile(res_file_name)
-        % Load cached results
-        data = load(res_file_name);
-        best_laps = data.best_laps;
-
-    else
-        % --- Process EGO vehicle (index 1)
-        best_lap_polimove = extract_best_lap(dataset_polimove, 1, LAP_TIME_MIN, LAP_TIME_MAX);
-        best_lap_polimove = filter_data(best_lap_polimove, lowpass_filt, derivative_filt, Ts);
-        best_lap_polimove = fit_trajectory(best_lap_polimove, CURVATURE_RESAMPLE_PARAMS, SMOOTHING_TOL);
-
-        best_laps(1) = best_lap_polimove;
-
-        % --- Process each opponent
-        for i = 2:v2v.max_opp + 1
-            % Extract
-            extracted = extract_best_lap(v2v_data, i-1, LAP_TIME_MIN, LAP_TIME_MAX);
-            best_laps(i) = struct();
-
-            % Copy fields
-            for f = fieldnames(extracted)'
-                best_laps(i).(f{1}) = extracted.(f{1});
-            end
-
-            % Filter
-            filtered = filter_data(best_laps(i), lowpass_filt, derivative_filt, Ts);
-            for f = fieldnames(filtered)'
-                best_laps(i).(f{1}) = filtered.(f{1});
-            end
-
-            % Fit
-            fitted = fit_trajectory(best_laps(i), CURVATURE_RESAMPLE_PARAMS, SMOOTHING_TOL);
-            for f = fieldnames(fitted)'
-                best_laps(i).(f{1}) = fitted.(f{1});
-            end
-        end
-
-        % Save results
-        if ~exist('../mat', 'dir')
-            mkdir('../mat');
-        end
-        save(res_file_name, 'best_laps');
+    mat_dir = "mat";
+    if ~exist(mat_dir, 'dir')
+        mkdir(mat_dir);
     end
+
+    total_vehicles = v2v_data.max_opp + 1;
+
+    [~, name, ~] = fileparts(opp_file);
+    parts = split(name, "_");
+    file_prefix = parts{1};  
+    
+    for i = 1:total_vehicles
+        if i == 1
+            name = "ego";
+        else
+            name = "opp" + string(i - 1);
+        end
+    
+        filename = fullfile(mat_dir, file_prefix + "_" + name + "_best_lap.mat");
+    
+        if ~isfile(filename)
+            if i == 1
+                lap = extract_best_lap(dataset_polimove, 1, LAP_TIME_MIN, LAP_TIME_MAX);
+            else
+                lap = extract_best_lap(v2v_data, i - 1, LAP_TIME_MIN, LAP_TIME_MAX);
+            end
+    
+            lap = filter_data(lap, lowpass_filt, derivative_filt, Ts);
+            lap = fit_trajectory(lap, CURVATURE_RESAMPLE_PARAMS, SMOOTHING_TOL);
+    
+            save(filename, 'lap');
+        end
+    end
+
+    % Merge all laps into one structure
+    disp("Merging all mats...")
+    best_laps = cell(total_vehicles, 1);
+    for i = 1:total_vehicles
+        if i == 1
+            name = "ego";
+        else
+            name = "opp" + string(i - 1);
+        end
+        filename = fullfile(mat_dir, file_prefix + "_" + name + "_best_lap.mat");
+    
+        data = load(filename);
+        best_laps{i} = data.lap;   
+        delete(filename);
+    end
+    
+    % Salva struttura complessiva
+    save(fullfile(mat_dir, file_prefix + "_best_laps.mat"), 'best_laps');
+
+
 end
+
