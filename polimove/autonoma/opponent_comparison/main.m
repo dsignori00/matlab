@@ -132,8 +132,7 @@ end
 % compute lateral acceleration and curvature
 [~, name, ~] = fileparts(opp_file);
 parts = split(name, "_");
-file_prefix = parts{1}; 
-filename = fullfile("mat", file_prefix + "_best_laps.mat");
+filename = fullfile("mat", parts{1} + "_" + parts{4} + "_best_laps.mat");
 if(~isfile(filename))
     best_laps = fit_best_laps(v2v, log, opp_file);
 else
@@ -219,10 +218,10 @@ update_acc_fig();
 % Link x-axis 
 ax_speed = getappdata(fig_speed, 'ax');
 ax_lapdiff = getappdata(fig_speed, 'ax_lapdiff');
-% ax_a = getappdata(fig_curv, 'ax_a');
-% ax_ax = getappdata(fig_curv, 'ax_ax');
-% ax_ay = getappdata(fig_curv, 'ax_ay');
+ax_a = getappdata(fig_curv, 'ax_a');
+ax_ax = getappdata(fig_curv, 'ax_ax');
+ax_ay = getappdata(fig_curv, 'ax_ay');
 % linkaxes([ax_speed, ax_lapdiff], 'x');
-% linkaxes([ax_a, ax_ax, ax_ay], 'x');
+linkaxes([ax_a, ax_ax, ax_ay], 'x');
 
 
