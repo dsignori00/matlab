@@ -62,7 +62,7 @@ function best_laps = fit_best_laps(v2v_data, log, opp_file)
         else
             name = "opp" + string(i - 1);
         end
-        filename = fullfile(mat_dir, file_prefix + "_" + name + "_best_lap.mat");
+        filename = fullfile("mat", parts{1} + "_" + parts{4} + "_best_laps.mat");
     
         data = load(filename);
         best_laps{i} = data.lap;   

@@ -26,5 +26,5 @@ function update_opponent_selection(~,~,sourceTag)
     % Update all plots using stored sharedData.lap_ego and lap_opp
     update_trajectory_laps();
     update_speed_laps();
-    %update_acc_fig();
+    update_acc_fig();
 end
