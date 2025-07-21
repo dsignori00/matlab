@@ -7,13 +7,11 @@ clearvars -except log log_ego trajDatabase ego.index v2v.index opp_file
 %#ok<*NASGU>
 %#ok<*SAGROW>
 
-
 %% Flags
 multi_run           = false;                % if true, a different mat for ego and opponent will be loaded
 ego_vs_ego          = false;               % if true, ego vs ego will be plotted
 save_v2v            = false;               % if true, save the processed v2v data
 opponent            = containers.Map({'KINETIZ','TUM','CONSTRUCTOR','UNIMORE','TII'}, [1,2,3,4,5]); 
-
 
 %% Paths
 
@@ -52,6 +50,7 @@ if(~exist('trajDatabase','var'))
 end
 
 % load log
+fprintf("Loading data...")
 if(~exist('log','var'))
     if(ego_vs_ego)
         [opp_file,path] = uigetfile(fullfile(bags,'*.mat'),'Load ego2 log');
@@ -74,22 +73,26 @@ end
 
 [v2v,ego] = get_data(log, log_ego, ego_vs_ego);
 v2v = valid_opponents(v2v);
-
+fprintf(" done. \n")
 DateTime = datetime(log.time_offset_nsec,'ConvertFrom','epochtime','TicksPerSecond',1e9,'Format','dd-MMM-yyyy HH:mm:ss');
 
 %% PROCESSING
 
 % Compute ego closest idx
 if ~exist('ego.index', 'var')
+    fprintf("Computing ego indexes ...")
     ego.index = NaN(size(ego.x));
     ego.index = compute_idx_sim(ego.x,ego.y, trajDatabase(10).X(:), trajDatabase(10).Y(:));
+    fprintf(" done. \n")
 end
 
 if ~exist('v2v.index', 'var')
+    fprintf("Computing opponent indexes ...")
     v2v.index = NaN(size(v2v.x));
     for i=1:size(v2v.x,2)
         v2v.index(:,i) = compute_idx_sim(v2v.x(:,i),v2v.y(:,i), trajDatabase(10).X(:), trajDatabase(10).Y(:));
     end
+    fprintf(" done. \n")
 end
 
 % Assign lap number
@@ -126,6 +129,16 @@ for k = 1:v2v.max_opp
     end
 end
 
+% compute lateral acceleration and curvature
+[~, name, ~] = fileparts(opp_file);
+parts = split(name, "_");
+file_prefix = parts{1}; 
+filename = fullfile("mat", file_prefix + "_best_laps.mat");
+if(~isfile(filename))
+    best_laps = fit_best_laps(v2v, log, opp_file);
+else
+    load(filename);
+end
 
 %% SAVE PROCESSED DATA
 
@@ -136,10 +149,6 @@ if(save_v2v)
     save(output_filename, 'v2v');
     fprintf('Processed data saved: %s\n', output_filename);
 end
-
-% % compute lateral acceleration and curvature
-% best_laps = fit_best_laps(v2v, log, opp_file);
-
 
 %% PLOTTING
 
@@ -199,15 +208,15 @@ sharedData.name_map = name_map;
 sharedData.trajDatabase = trajDatabase;
 sharedData.lap_ego = 1;
 sharedData.lap_opp = 1;
-% sharedData.best_laps = best_laps;
+sharedData.best_laps = best_laps;
 setappdata(0, 'sharedData', sharedData);
 
 % Initial plots, lap 1
 update_trajectory_laps();
 update_speed_laps();
-%update_acc_fig();
+update_acc_fig();
 
-% Link x-axis limits manually between Speed and Curvature figures
+% Link x-axis 
 ax_speed = getappdata(fig_speed, 'ax');
 ax_lapdiff = getappdata(fig_speed, 'ax_lapdiff');
 % ax_a = getappdata(fig_curv, 'ax_a');

@@ -19,7 +19,7 @@ function dataset_polimove = reinterp_ego_data(dataset_raw, Ts)
     dataset_polimove.vx = interp1(t_est, v, t_vec);
     dataset_polimove.yaw = interp1(t_est, yaw, t_vec);
     dataset_polimove.laps = interp1(t_traj_server, double(laps), t_vec, "nearest");
-    dataset_polimove.lap_time = interp1(t_traj_server, lap_times, t_vec);
+    dataset_polimove.laptime_prog = interp1(t_traj_server, lap_times, t_vec);
 
 end
 
