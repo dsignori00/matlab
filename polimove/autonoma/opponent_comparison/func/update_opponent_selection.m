@@ -7,6 +7,8 @@ function update_opponent_selection(~,~,sourceTag)
             fig_source = findobj('Name', 'Speed Profile');
         case 'curv'
             fig_source = findobj('Name', 'Acceleration Profile');
+        case 'gg'
+            fig_source = findobj('Name', 'GG Plot');
         otherwise
             return;
     end
@@ -18,13 +20,16 @@ function update_opponent_selection(~,~,sourceTag)
     fig_traj = findobj('Name', 'Trajectory');
     fig_speed = findobj('Name', 'Speed Profile');
     fig_curv = findobj('Name', 'Acceleration Profile');
+    fig_gg = findobj('Name', 'GG Plot');
 
     sync_checkbox_group(fig_traj, selected_opps);
     sync_checkbox_group(fig_speed, selected_opps);
     sync_checkbox_group(fig_curv, selected_opps);
+    sync_checkbox_group(fig_gg, selected_opps);
 
     % Update all plots using stored sharedData.lap_ego and lap_opp
     update_trajectory_laps();
     update_speed_laps();
     update_acc_fig();
+    update_gg_plot();
 end
