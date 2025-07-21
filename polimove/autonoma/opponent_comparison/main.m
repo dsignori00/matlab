@@ -177,14 +177,20 @@ setappdata(fig_speed, 'ax', ax_speed(1));
 setappdata(fig_speed, 'ax_lapdiff', ax_speed(2));
 
 % === ACCELERATION ===
-[fig_curv, panel_curv, checkbox_curv, ~, ~] = ...
-    create_figures('Acceleration Profile', checklist_strings, default_selection, v2v, ego, 'curv');
+[fig_curv, panel_curv, checkbox_curv] = ...
+    create_figures_best_lap('Acceleration Profile', checklist_strings, default_selection, 'curv');
 ax_curv = create_axes_layout(fig_curv, 3);
 setappdata(fig_curv, 'checklist', checkbox_curv);
 setappdata(fig_curv, 'ax_a', ax_curv(1));
 setappdata(fig_curv, 'ax_ax', ax_curv(2));
 setappdata(fig_curv, 'ax_ay', ax_curv(3));
 
+% === GG PLOT ===
+[fig_gg, panel_gg, checkbox_gg] = ...
+    create_figures_best_lap('GG Plot', checklist_strings, default_selection,'gg');
+ax_gg = create_axes_layout(fig_gg, 1);
+setappdata(fig_gg, 'checklist', checkbox_gg);
+setappdata(fig_gg, 'ax_gg', ax_gg(1));
 
 % Store shared data in base workspace or a struct accessible to both callbacks
 sharedData.ego.x = ego.x;
@@ -214,6 +220,7 @@ setappdata(0, 'sharedData', sharedData);
 update_trajectory_laps();
 update_speed_laps();
 update_acc_fig();
+update_gg_plot();
 
 % Link x-axis 
 ax_speed = getappdata(fig_speed, 'ax');
