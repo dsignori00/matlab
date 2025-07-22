@@ -51,14 +51,6 @@ end
 
 % load log
 fprintf("Loading data...")
-if(~exist('log','var'))
-    if(ego_vs_ego)
-        [opp_file,path] = uigetfile(fullfile(bags,'*.mat'),'Load ego2 log');
-    else
-        [opp_file,path] = uigetfile(fullfile(bags,'*.mat'),'Load opponent log');
-    end
-        load(fullfile(path, opp_file));
-end
 
 if(multi_run)
     if(~exist('log_ego','var'))
@@ -71,8 +63,16 @@ else
     log_ego = log;
 end
 
+if(~exist('log','var'))
+    if(ego_vs_ego)
+        [opp_file,path] = uigetfile(fullfile(bags,'*.mat'),'Load ego2 log');
+    else
+        [opp_file,path] = uigetfile(fullfile(bags,'*.mat'),'Load opponent log');
+    end
+        load(fullfile(path, opp_file));
+end
+
 [v2v,ego] = get_data(log, log_ego, ego_vs_ego);
-v2v = valid_opponents(v2v);
 fprintf(" done. \n")
 DateTime = datetime(log.time_offset_nsec,'ConvertFrom','epochtime','TicksPerSecond',1e9,'Format','dd-MMM-yyyy HH:mm:ss');
 
@@ -130,13 +130,16 @@ for k = 1:v2v.max_opp
 end
 
 % compute lateral acceleration and curvature
-[~, name, ~] = fileparts(opp_file);
-parts = split(name, "_");
-filename = fullfile("mat", parts{1} + "_" + parts{4} + "_best_laps.mat");
-if(~isfile(filename))
-    best_laps = fit_best_laps(v2v, log, opp_file);
-else
-    load(filename);
+best_laps = [];
+if(~ego_vs_ego)
+    [~, name, ~] = fileparts(opp_file);
+    parts = split(name, "_");
+    filename = fullfile("mat", parts{1} + "_" + parts{4} + "_best_laps.mat");
+    if(~isfile(filename))
+        best_laps = fit_best_laps(v2v, log, opp_file);
+    else
+        load(filename);
+    end
 end
 
 %% SAVE PROCESSED DATA
