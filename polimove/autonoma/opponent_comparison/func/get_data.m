@@ -17,12 +17,13 @@ function [v2v,ego] = get_data(log, log_ego, ego_vs_ego)
         v2v.yaw = unwrap(v2v.yaw);
         v2v.count = log.perception__v2v__detections.count;
         v2v.max_opp = max(v2v.count);
+        v2v = valid_opponents(v2v);
     else
-        v2v.sens_stamp = log_ego.estimation.stamp__tot;
-        v2v.x = log_ego.estimation.x_cog;
-        v2v.y = log_ego.estimation.y_cog;
-        v2v.vx = log_ego.estimation.vx*MPS2KPH; 
-        v2v.yaw = log_ego.estimation.heading; 
+        v2v.sens_stamp = log.estimation.stamp__tot;
+        v2v.x = log.estimation.x_cog;
+        v2v.y = log.estimation.y_cog;
+        v2v.vx = log.estimation.vx*MPS2KPH; 
+        v2v.yaw = log.estimation.heading; 
         v2v.x(v2v.x==0)=nan;
         v2v.y(v2v.y==0)=nan;
         v2v.vx(v2v.vx==0)=nan;
