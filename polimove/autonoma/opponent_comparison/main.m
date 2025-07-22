@@ -52,6 +52,15 @@ end
 % load log
 fprintf("Loading data...")
 
+if(~exist('log','var'))
+    if(ego_vs_ego)
+        [opp_file,path] = uigetfile(fullfile(bags,'*.mat'),'Load ego2 log');
+    else
+        [opp_file,path] = uigetfile(fullfile(bags,'*.mat'),'Load opponent log');
+    end
+        load(fullfile(path, opp_file));
+end
+
 if(multi_run)
     if(~exist('log_ego','var'))
         [file,path] = uigetfile(fullfile(bags,'*.mat'),'Load ego log');
@@ -61,15 +70,6 @@ if(multi_run)
     end
 else
     log_ego = log;
-end
-
-if(~exist('log','var'))
-    if(ego_vs_ego)
-        [opp_file,path] = uigetfile(fullfile(bags,'*.mat'),'Load ego2 log');
-    else
-        [opp_file,path] = uigetfile(fullfile(bags,'*.mat'),'Load opponent log');
-    end
-        load(fullfile(path, opp_file));
 end
 
 [v2v,ego] = get_data(log, log_ego, ego_vs_ego);

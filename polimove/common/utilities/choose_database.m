@@ -1,6 +1,10 @@
-function [data, selectedName] = ChooseDatabase()
+function [data, selectedName] = choose_database()
     % Specifica la cartella contenente i file
-    folderPath = fullfile(getenv('HOME'), 'Documents', 'Utils', 'matlab', 'polimove', 'databases');
+    currentFilePath = mfilename('fullpath');
+    functionFolder = fileparts(currentFilePath);
+    folderPath = fullfile(functionFolder, '..', '..', 'databases');
+
+
 
     % Verifica che la cartella esista
     if ~isfolder(folderPath)
