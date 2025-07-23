@@ -9,9 +9,9 @@ function update_speed_laps
 
     ax_speed = getappdata(fig, 'ax');
     ax_lapdiff = getappdata(fig, 'ax_lapdiff');
-
     cla(ax_speed); cla(ax_lapdiff);
     hold(ax_speed, 'on'); hold(ax_lapdiff, 'on');
+    linkaxes([ax_speed, ax_lapdiff], 'off');
 
     title(ax_speed, sprintf('Speed Profile - Opp Lap %d vs Ego Lap %d', lapO, lapE));
     title(ax_lapdiff, sprintf('Lap-relative Time Difference - Opp Lap %d vs Ego Lap %d', lapO, lapE));
@@ -20,7 +20,7 @@ function update_speed_laps
     idxE = shared.ego.laps == lapE;
     plot(ax_speed, shared.ego.index(idxE), shared.ego.vx(idxE), ...
         'Color', shared.colors(1,:), ...
-         'DisplayName',sprintf('0 - POLIMOVE - Laptime: %s', laptime));
+        'DisplayName',sprintf('0 - POLIMOVE - Laptime: %s', laptime));
 
     % Lap time interpolation setup
     ego.index = shared.ego.index(idxE);
@@ -58,9 +58,11 @@ function update_speed_laps
     ylabel(ax_speed, 'Speed (km/h)');
     legend(ax_speed, 'Location', 'northeast');
     grid(ax_speed, 'on'); box(ax_speed, 'on');
-
+    axis(ax_speed,"tight")
     xlabel(ax_lapdiff, 'Closest Index');
     ylabel(ax_lapdiff, 'Δ Lap Time (s)');
     legend(ax_lapdiff, 'Location', 'northeast');
     grid(ax_lapdiff, 'on'); box(ax_lapdiff, 'on');
+    axis(ax_lapdiff,"tight")
+    linkaxes([ax_speed, ax_lapdiff], 'x');
 end

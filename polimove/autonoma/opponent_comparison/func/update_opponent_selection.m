@@ -5,7 +5,7 @@ function update_opponent_selection(~,~,sourceTag)
             fig_source = findobj('Name', 'Trajectory');
         case 'speed'
             fig_source = findobj('Name', 'Speed Profile');
-        case 'curv'
+        case 'acc'
             fig_source = findobj('Name', 'Acceleration Profile');
         case 'gg'
             fig_source = findobj('Name', 'GG Plot');

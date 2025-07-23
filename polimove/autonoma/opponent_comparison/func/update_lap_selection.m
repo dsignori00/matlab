@@ -4,7 +4,7 @@ function update_lap_selection(src,~,whichLap)
     setappdata(0,'sharedData',shared);
 
     % Update all dropdowns to stay synced
-    tags = {'traj','speed','curv'};
+    tags = {'traj','speed','acc','gg'};
     for t = tags
         fig = findobj('Name', figure_name(t{1}));
         if isempty(fig), continue; end
@@ -17,4 +17,6 @@ function update_lap_selection(src,~,whichLap)
     % Refresh all plots
     update_trajectory_laps;
     update_speed_laps;
+    update_acc_fig;
+    update_gg_plot;
 end

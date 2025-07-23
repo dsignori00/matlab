@@ -180,43 +180,35 @@ setappdata(fig_speed, 'ax', ax_speed(1));
 setappdata(fig_speed, 'ax_lapdiff', ax_speed(2));
 
 % === ACCELERATION ===
-[fig_curv, panel_curv, checkbox_curv] = ...
-    create_figures_best_lap('Acceleration Profile', checklist_strings, default_selection, 'curv');
-ax_curv = create_axes_layout(fig_curv, 3);
-setappdata(fig_curv, 'checklist', checkbox_curv);
-setappdata(fig_curv, 'ax_a', ax_curv(1));
-setappdata(fig_curv, 'ax_ax', ax_curv(2));
-setappdata(fig_curv, 'ax_ay', ax_curv(3));
+[fig_acc, panel_acc, checkbox_acc, popup_ego_acc, popup_opp_acc] = ...
+    create_figures_best_lap('Acceleration Profile', checklist_strings, default_selection, v2v, ego, 'acc', ego_vs_ego);
+ax_acc = create_axes_layout(fig_acc, 3);
+setappdata(fig_acc, 'checklist', checkbox_acc);
+setappdata(fig_acc, 'popup_ego', popup_ego_acc);
+setappdata(fig_acc, 'popup_opp', popup_opp_acc);
+setappdata(fig_acc, 'ax_a', ax_acc(1)); 
+setappdata(fig_acc, 'ax_ax', ax_acc(2));
+setappdata(fig_acc, 'ax_ay', ax_acc(3));
 
 % === GG PLOT ===
-[fig_gg, panel_gg, checkbox_gg] = ...
-    create_figures_best_lap('GG Plot', checklist_strings, default_selection,'gg');
+[fig_gg, panel_gg, checkbox_gg, popup_ego_gg, popup_opp_gg] = ...
+    create_figures_best_lap('GG Plot', checklist_strings, default_selection, v2v, ego, 'gg', ego_vs_ego);
 ax_gg = create_axes_layout(fig_gg, 1);
 setappdata(fig_gg, 'checklist', checkbox_gg);
+setappdata(fig_gg, 'popup_ego', popup_ego_gg);
+setappdata(fig_gg, 'popup_opp', popup_opp_gg);
 setappdata(fig_gg, 'ax_gg', ax_gg(1));
 
 % Store shared data in base workspace or a struct accessible to both callbacks
-sharedData.ego.x = ego.x;
-sharedData.ego.y = ego.y;
-sharedData.ego.laps = ego.laps;
-sharedData.ego.index = ego.index;
-sharedData.ego.vx = ego.vx;
-sharedData.ego.laptime = ego.laptime;
-sharedData.ego.laptime_prog = ego.laptime_prog;
-sharedData.v2v.x = v2v.x;
-sharedData.v2v.y = v2v.y;
-sharedData.v2v.laps = v2v.laps;
-sharedData.v2v.index = v2v.index;
-sharedData.v2v.vx = v2v.vx;
-sharedData.v2v.laptime = v2v.laptime;
-sharedData.v2v.laptime_prog = v2v.laptime_prog;
-sharedData.v2v.max_opp = v2v.max_opp;
+sharedData.ego = ego;
+sharedData.v2v = v2v;
 sharedData.colors = colors;
 sharedData.name_map = name_map;
 sharedData.trajDatabase = trajDatabase;
 sharedData.lap_ego = 1;
 sharedData.lap_opp = 1;
 sharedData.best_laps = best_laps;
+sharedData.ego_vs_ego = ego_vs_ego;
 setappdata(0, 'sharedData', sharedData);
 
 % Initial plots, lap 1
@@ -225,13 +217,5 @@ update_speed_laps();
 update_acc_fig();
 update_gg_plot();
 
-% Link x-axis 
-ax_speed = getappdata(fig_speed, 'ax');
-ax_lapdiff = getappdata(fig_speed, 'ax_lapdiff');
-ax_a = getappdata(fig_curv, 'ax_a');
-ax_ax = getappdata(fig_curv, 'ax_ax');
-ax_ay = getappdata(fig_curv, 'ax_ay');
-% linkaxes([ax_speed, ax_lapdiff], 'x');
-linkaxes([ax_a, ax_ax, ax_ay], 'x');
 
 
