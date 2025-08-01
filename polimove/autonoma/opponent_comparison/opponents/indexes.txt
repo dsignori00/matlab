@@ -1,0 +1,2 @@
+2025-07-16_autonoma_sim_0x        opponent            = containers.Map({'KINETIZ','TII','FR4IAV','CODE19','FLYEAGLE'},[1,2,3,4,5]);   % autonomodrome - qualifying
+2025-07-18_autonoma_sim_0x        opponent            = containers.Map({'KINETIZ','TUM','CONSTRUCTOR','UNIMORE','TII'}, [1,2,3,4,5]); % autonomodrome - final

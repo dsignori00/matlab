@@ -6,10 +6,10 @@ function best_lap = extract_best_lap(dataset, VEH_IDX, LAP_TIME_MIN, LAP_TIME_MA
 
     for i=1:N_laps
     
-        curr_lap_time = max(dataset.lap_time(dataset.laps(:, VEH_IDX) == i, VEH_IDX));
+        curr_lap_time = max(dataset.laptime_prog(dataset.laps(:, VEH_IDX) == i, VEH_IDX));
     
         if curr_lap_time > LAP_TIME_MIN
-            lap_times(i) = max(dataset.lap_time(dataset.laps(:, VEH_IDX) == i, VEH_IDX));
+            lap_times(i) = max(dataset.laptime_prog(dataset.laps(:, VEH_IDX) == i, VEH_IDX));
         else
             lap_times(i) = LAP_TIME_MAX;
         end
