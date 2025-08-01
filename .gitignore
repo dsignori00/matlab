@@ -1,3 +1,6 @@
 /polimove/perception/target_tracking/mat/
 /polimove/bags/*
+/.vscode
+
+
 !polimove/bags/.gitkeep
