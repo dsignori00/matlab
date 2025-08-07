@@ -12,4 +12,6 @@ function [fig, panel, checkbox, popup_ego, popup_opp] = create_figures_best_lap(
 
     checkbox = create_opponent_checkboxes(panel, checklist_strings, default_selection, tag);
 
+    popup_ego = [];
+    popup_opp = [];
 end
