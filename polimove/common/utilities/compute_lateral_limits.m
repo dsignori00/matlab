@@ -18,6 +18,34 @@ function [nl, nr] = compute_lateral_limits(center_line, d_knot_vec, left_border,
     segment_length = 10.0;  
     s_window = 1000.0;  
 
+    % UNCOMMENT FOR DEBUGGING
+    figure; hold on; axis equal; grid on;
+    
+    % Plot left border
+    plot(left_border_padded(:,1), left_border_padded(:,2), 'g-', 'LineWidth', 2);
+    
+    % Highlight problematic indices range
+    idx_start = 1;
+    idx_end = N_points_c;
+    
+    for i = idx_start:idx_end
+        curr_point = center_line_knot_points(i, :);
+        curr_normal = center_line_normals(i, :);
+    
+        % Plot centerline knot point
+        plot(curr_point(1), curr_point(2), 'ro', 'MarkerSize', 8, 'DisplayName', 'Centerline Point');
+    
+        % Plot normal segment at centerline point
+        p1 = curr_point - 10 * curr_normal;
+        p2 = curr_point + 10 * curr_normal;
+        plot([p1(1), p2(1)], [p1(2), p2(2)], 'b-', 'LineWidth', 1.5, 'DisplayName', 'Normal Segment');
+    end
+    
+    legend('Left Border', 'Centerline Point', 'Normal Segment');
+    title('Check intersections near problematic indices');
+    hold off;
+    %
+
     for i = 1:N_points_c
         curr_point = center_line_knot_points(i, :);
         curr_normal = center_line_normals(i, :);
@@ -119,7 +147,7 @@ function [nl, nr] = compute_lateral_limits(center_line, d_knot_vec, left_border,
             nr(i) = dot(best_dr, curr_normal);
         end
 
-        sprintf("i = %d | Left limit: %f | Right limit: %f\n", i, nl(i), nr(i));
+        fprintf("i = %d | Left limit: %f | Right limit: %f\n", i, nl(i), nr(i));
 
     end
 end
