@@ -140,18 +140,18 @@ for k = 1:v2v.max_opp
     end
 end
 
-% % compute lateral acceleration and curvature
-% best_laps = [];
-% if(~ego_vs_ego)
-%     [~, name, ~] = fileparts(opp_file);
-%     parts = split(name, "_");
-%     filename = fullfile("mat", parts{1} + "_" + parts{4} + "_best_laps.mat");
-%     if(~isfile(filename))
-%         best_laps = fit_best_laps(v2v, log, opp_file);
-%     else
-%         load(filename);
-%     end
-% end
+% compute lateral acceleration and curvature
+best_laps = [];
+if(~ego_vs_ego)
+    [~, name, ~] = fileparts(opp_file);
+    parts = split(name, "_");
+    filename = fullfile("mat", parts{1} + "_" + parts{4} + "_best_laps.mat");
+    if(~isfile(filename))
+        best_laps = fit_best_laps(v2v, log, opp_file);
+    else
+        load(filename);
+    end
+end
 
 %% SAVE PROCESSED DATA
 
@@ -190,25 +190,25 @@ setappdata(fig_speed, 'popup_opp', popup_opp_speed);
 setappdata(fig_speed, 'ax', ax_speed(1));
 setappdata(fig_speed, 'ax_lapdiff', ax_speed(2));
 
-% % === ACCELERATION ===
-% [fig_acc, panel_acc, checkbox_acc, popup_ego_acc, popup_opp_acc] = ...
-%     create_figures_best_lap('Acceleration Profile', checklist_strings, default_selection, v2v, ego, 'acc', ego_vs_ego);
-% ax_acc = create_axes_layout(fig_acc, 3);
-% setappdata(fig_acc, 'checklist', checkbox_acc);
-% setappdata(fig_acc, 'popup_ego', popup_ego_acc);
-% setappdata(fig_acc, 'popup_opp', popup_opp_acc);
-% setappdata(fig_acc, 'ax_a', ax_acc(1)); 
-% setappdata(fig_acc, 'ax_ax', ax_acc(2));
-% setappdata(fig_acc, 'ax_ay', ax_acc(3));
+% === ACCELERATION ===
+[fig_acc, panel_acc, checkbox_acc, popup_ego_acc, popup_opp_acc] = ...
+    create_figures_best_lap('Acceleration Profile', checklist_strings, default_selection, v2v, ego, 'acc', ego_vs_ego);
+ax_acc = create_axes_layout(fig_acc, 3);
+setappdata(fig_acc, 'checklist', checkbox_acc);
+setappdata(fig_acc, 'popup_ego', popup_ego_acc);
+setappdata(fig_acc, 'popup_opp', popup_opp_acc);
+setappdata(fig_acc, 'ax_a', ax_acc(1)); 
+setappdata(fig_acc, 'ax_ax', ax_acc(2));
+setappdata(fig_acc, 'ax_ay', ax_acc(3));
 
-% % === GG PLOT ===
-% [fig_gg, panel_gg, checkbox_gg, popup_ego_gg, popup_opp_gg] = ...
-%     create_figures_best_lap('GG Plot', checklist_strings, default_selection, v2v, ego, 'gg', ego_vs_ego);
-% ax_gg = create_axes_layout(fig_gg, 1);
-% setappdata(fig_gg, 'checklist', checkbox_gg);
-% setappdata(fig_gg, 'popup_ego', popup_ego_gg);
-% setappdata(fig_gg, 'popup_opp', popup_opp_gg);
-% setappdata(fig_gg, 'ax_gg', ax_gg(1));
+% === GG PLOT ===
+[fig_gg, panel_gg, checkbox_gg, popup_ego_gg, popup_opp_gg] = ...
+    create_figures_best_lap('GG Plot', checklist_strings, default_selection, v2v, ego, 'gg', ego_vs_ego);
+ax_gg = create_axes_layout(fig_gg, 1);
+setappdata(fig_gg, 'checklist', checkbox_gg);
+setappdata(fig_gg, 'popup_ego', popup_ego_gg);
+setappdata(fig_gg, 'popup_opp', popup_opp_gg);
+setappdata(fig_gg, 'ax_gg', ax_gg(1));
 
 % Store shared data in base workspace or a struct accessible to both callbacks
 sharedData.ego = ego;
@@ -218,15 +218,12 @@ sharedData.name_map = name_map;
 sharedData.trajDatabase = trajDatabase;
 sharedData.lap_ego = 1;
 sharedData.lap_opp = 1;
-% sharedData.best_laps = best_laps;
+sharedData.best_laps = best_laps;
 sharedData.ego_vs_ego = ego_vs_ego;
 setappdata(0, 'sharedData', sharedData);
 
 % Initial plots, lap 1
 update_trajectory_laps();
 update_speed_laps();
-% update_acc_fig();
-% update_gg_plot();
-
-
-
+update_acc_fig();
+update_gg_plot();
