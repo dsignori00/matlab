@@ -11,7 +11,7 @@ clearvars -except log log_ego trajDatabase ego.index v2v.index opp_file
 multi_run           = false;                % if true, a different mat for ego and opponent will be loaded
 ego_vs_ego          = false;               % if true, ego vs ego will be plotted
 save_v2v            = false;               % if true, save the processed v2v data
-opponent            = containers.Map({'KINETIZ','TUM','CONSTRUCTOR','UNIMORE','TII'}, [1,2,3,4,5]); 
+opponent            = containers.Map({'FR4IAV','UNIMORE','CONSTRUCTOR','TII','TUM','KINETIZ'}, [1,2,3,4,5,6]); 
 
 %% Paths
 
@@ -21,6 +21,7 @@ addpath("../../common/utilities/")
 addpath("../../common/constants/")
 addpath("../../common/plot/")
 addpath("func")
+addpath("opponents")
 bags = "../../bags/";
 
 %% Settings
@@ -28,14 +29,6 @@ bags = "../../bags/";
 run('PhysicalConstants.m');
 run('PlottingStyle.m');
 colors = lines(20); 
-
-% opponent names
-if(ego_vs_ego)
-    opponent = containers.Map({'POLIMOVE 2'}, 1); 
-end
-opponent_names = keys(opponent);
-opponent_values = values(opponent);
-name_map = containers.Map(opponent_values, opponent_names);
 
 %% Load Data
 
@@ -75,6 +68,25 @@ end
 [v2v,ego] = get_data(log, log_ego, ego_vs_ego);
 fprintf(" done. \n")
 DateTime = datetime(log.time_offset_nsec,'ConvertFrom','epochtime','TicksPerSecond',1e9,'Format','dd-MMM-yyyy HH:mm:ss');
+
+% opponent names
+T = readtable('indexes.csv', 'Delimiter', ';', 'ReadVariableNames', true);
+rowIdx = strcmp(T.bag, opp_file);
+if any(rowIdx)
+    mapStr = T.map{rowIdx};
+    opponent = eval(mapStr);
+else
+    opponent = [];
+    error('Run non trovata nella file indexes.');
+end
+
+if(ego_vs_ego)
+    opponent = containers.Map({'POLIMOVE 2'}, 1); 
+end
+opponent_names = keys(opponent);
+opponent_values = values(opponent);
+name_map = containers.Map(opponent_values, opponent_names);
+
 
 %% PROCESSING
 
