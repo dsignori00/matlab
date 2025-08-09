@@ -45,33 +45,28 @@ function best_laps = fit_best_laps(v2v_data, log, opp_file)
             else
                 lap = extract_best_lap(v2v_data, i - 1, LAP_TIME_MIN, LAP_TIME_MAX);
             end
-    
-            lap = filter_data(lap, lowpass_filt, derivative_filt, Ts);
-            lap = fit_trajectory(lap, CURVATURE_RESAMPLE_PARAMS, SMOOTHING_TOL);
-    
+            
+            if(~isnan(lap.x))
+                lap = filter_data(lap, lowpass_filt, derivative_filt, Ts);
+                lap = fit_trajectory(lap, CURVATURE_RESAMPLE_PARAMS, SMOOTHING_TOL);
+            end 
             save(filename, 'lap');
         end
     end
 
     % Merge all laps into one structure
-    disp("Merging all mats...")
-    best_laps = cell(total_vehicles, 1);
-    for i = 1:total_vehicles
-        if i == 1
-            name = "ego";
-        else
-            name = "opp" + string(i - 1);
-        end
-        filename = fullfile("mat", parts{1} + "_" + parts{4} + "_best_laps.mat");
+    fprintf("Merging all mats...")
+    pattern = fullfile("mat", parts{1} + "_*_best_lap.mat");
+    files = dir(pattern);
+    best_laps = cell(numel(files),1);
     
+    for i = 1:numel(files)
+        filename = fullfile(files(i).folder, files(i).name);
         data = load(filename);
-        best_laps{i} = data.lap;   
+        best_laps{i} = data.lap;
         delete(filename);
     end
-    
-    % Salva struttura complessiva
-    save(fullfile(mat_dir, file_prefix + "_best_laps.mat"), 'best_laps');
-
-
+    save(fullfile(mat_dir, parts{1} + "_" + parts{4} + "_best_laps.mat"), 'best_laps');
+    fprintf(" done. \n")
 end
 

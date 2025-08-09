@@ -15,8 +15,8 @@ function [nl, nr] = compute_lateral_limits(center_line, d_knot_vec, left_border,
     nl = nan(N_points_c, 1);
     nr = nan(N_points_c, 1);
 
-    segment_length = 1000.0;  
-    s_window = 100.0;      
+    segment_length = 10.0;  
+    s_window = 1000.0;  
 
     for i = 1:N_points_c
         curr_point = center_line_knot_points(i, :);
