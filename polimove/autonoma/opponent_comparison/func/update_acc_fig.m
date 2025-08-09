@@ -39,7 +39,7 @@ function update_acc_fig()
         plot(axA, shared.best_laps{1,1}.s_smooth, shared.best_laps{1,1}.ay_smooth, 'DisplayName','Ego','Color',shared.colors(1,:));
         for kk = get_selected_opponents(fig)'+1
             atot2 = shared.best_laps{kk,1}.ax_smooth.^2 + shared.best_laps{kk,1}.ay_smooth.^2;
-            plot(axB, shared.best_laps{kk,1}.s_smooth, sqrt(atot2), 'DisplayName', shared.name_map(kk-1), 'Color',shared.colors(kk+1,:));
+            plot(axB, shared.best_laps{kk,1}.s_smooth, sqrt(atot2), 'DisplayName', shared.name_map(kk-1), 'Color',shared.colors(kk,:));
             plot(axC, shared.best_laps{kk,1}.s_smooth, shared.best_laps{kk,1}.ax_smooth, 'DisplayName', shared.name_map(kk-1), 'Color',shared.colors(kk,:));
             plot(axA, shared.best_laps{kk,1}.s_smooth, shared.best_laps{kk,1}.ay_smooth, 'DisplayName', shared.name_map(kk-1), 'Color',shared.colors(kk,:));
         end
