@@ -11,7 +11,6 @@ clearvars -except log log_ego trajDatabase ego.index v2v.index opp_file
 multi_run           = false;                % if true, a different mat for ego and opponent will be loaded
 ego_vs_ego          = false;               % if true, ego vs ego will be plotted
 save_v2v            = false;               % if true, save the processed v2v data
-opponent            = containers.Map({'FR4IAV','UNIMORE','CONSTRUCTOR','TII','TUM','KINETIZ'}, [1,2,3,4,5,6]); 
 
 %% Paths
 
