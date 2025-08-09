@@ -1,18 +1,17 @@
 function best_lap = extract_best_lap(dataset, VEH_IDX, LAP_TIME_MIN, LAP_TIME_MAX)
 
-    N_laps = max(dataset.laps(:, VEH_IDX));
-
-    lap_times = nan(N_laps, 1);
-
-    for i=1:N_laps
+    lap_ids = unique(dataset.laps(:, VEH_IDX));
+    lap_times = nan(numel(lap_ids), 1);
     
+    k = 1;
+    for i = lap_ids' 
         curr_lap_time = max(dataset.laptime_prog(dataset.laps(:, VEH_IDX) == i, VEH_IDX));
-
         if curr_lap_time < LAP_TIME_MIN || curr_lap_time > LAP_TIME_MAX
-            lap_times(i) = NaN;
+            lap_times(k) = NaN;
         else
-            lap_times(i) = curr_lap_time;
+            lap_times(k) = curr_lap_time;
         end
+        k = k+1;
     end
 
     [min_time, best_lap_idx] = min(lap_times, [], 'omitnan');
@@ -20,7 +19,7 @@ function best_lap = extract_best_lap(dataset, VEH_IDX, LAP_TIME_MIN, LAP_TIME_MA
     if isnan(min_time)        
         best_lap = fill_with_nan();
     else
-        idx_vec = dataset.laps(:, VEH_IDX) == best_lap_idx;
+        idx_vec = dataset.laps(:, VEH_IDX) == lap_ids(best_lap_idx);
 
         x = dataset.x(idx_vec, VEH_IDX);
         y = dataset.y(idx_vec, VEH_IDX);
