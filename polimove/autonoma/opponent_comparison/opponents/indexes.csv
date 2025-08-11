@@ -5,3 +5,6 @@ bag;map;comment
 2025-08-08_autonoma_sim_00.mat;containers.Map({'KINETIZ','FR4IAV','TUM','UNIMORE','TII','CONSTRUCTOR'}, [1,2,3,4,5,6]);suzuka - open session 2
 2025-08-08_autonoma_sim_01.mat;containers.Map({'KINETIZ','FR4IAV','TUM','UNIMORE','TII','CONSTRUCTOR'}, [1,2,3,4,5,6]);suzuka - open session 2
 2025-08-08_autonoma_sim_02.mat;containers.Map({'KINETIZ','FR4IAV','TUM','UNIMORE','TII','CONSTRUCTOR'}, [1,2,3,4,5,6]);suzuka - open session 2
+2025-08-11_autonoma_sim_00.mat;containers.Map({'FLYEAGLE','KINETIZ','TGM','TII'}, [1,2,3,4]);suzuka - qualifying practise
+2025-08-11_autonoma_sim_01.mat;containers.Map({'FLYEAGLE','KINETIZ','TGM','TII'}, [1,2,3,4]);suzuka - qualifying (flyeagle)
+2025-08-11_autonoma_sim_02.mat;containers.Map({'FLYEAGLE','KINETIZ','TGM','TII'}, [1,2,3,4]);suzuka - qualifying (other teams)
