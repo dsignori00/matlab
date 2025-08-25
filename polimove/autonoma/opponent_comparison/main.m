@@ -8,7 +8,7 @@ clearvars -except log log_ego trajDatabase ego.index v2v.index opp_file
 %#ok<*SAGROW>
 
 %% Flags
-multi_run           = false;                % if true, a different mat for ego and opponent will be loaded
+multi_run           = false;               % if true, a different mat for ego and opponent will be loaded
 ego_vs_ego          = false;               % if true, ego vs ego will be plotted
 save_v2v            = false;               % if true, save the processed v2v data
 
@@ -43,6 +43,10 @@ end
 
 % load log
 fprintf("Loading data...")
+
+if (ego_vs_ego)
+    multi_run = true; 
+end
 
 if(~exist('log','var'))
     if(ego_vs_ego)
@@ -114,6 +118,7 @@ for k=1:v2v.max_opp
 end
 
 % Lap Time progression
+fprintf("Computing laptime progression ...")
 ego.laptime_prog = NaN(size(ego.stamp));  
 v2v.laptime_prog = NaN(size(v2v.index,1),v2v.max_opp);  
 
@@ -139,17 +144,22 @@ for k = 1:v2v.max_opp
         v2v.laptime(k).fulltime(lap) = sec2laptime(v2v.laptime(k).seconds(lap));        
     end
 end
+fprintf(" done. \n")
 
 % compute lateral acceleration and curvature
 best_laps = [];
-if(~ego_vs_ego)
+if ~ego_vs_ego
+    best_laps = [];
     [~, name, ~] = fileparts(opp_file);
     parts = split(name, "_");
     filename = fullfile("mat", parts{1} + "_" + parts{4} + "_best_laps.mat");
     if(~isfile(filename))
-        best_laps = fit_best_laps(v2v, log, opp_file);
+        best_laps = fit_best_laps(v2v, log, opp_file, false);
     else
         load(filename);
+    end
+    if (multi_run)
+        best_laps{1,1} = fit_best_laps(v2v, log_ego, opp_file, true);
     end
 end
 
@@ -173,7 +183,7 @@ default_selection = 1:v2v.max_opp;
 
 % === TRAJECTORY ===
 [fig_traj, panel_traj, checkbox_traj, popup_ego, popup_opp] = ...
-    create_figures('Trajectory', checklist_strings, default_selection, v2v, ego, 'traj');
+    create_figures('Trajectory', checklist_strings, default_selection, v2v, ego, 'traj', ego_vs_ego);
 ax_traj = create_axes_layout(fig_traj, 1);
 setappdata(fig_traj, 'checklist', checkbox_traj);
 setappdata(fig_traj, 'popup_ego', popup_ego);
@@ -182,7 +192,7 @@ setappdata(fig_traj, 'ax', ax_traj);
 
 % === SPEED ===
 [fig_speed, panel_speed, checkbox_speed, popup_ego_speed, popup_opp_speed] = ...
-    create_figures('Speed Profile', checklist_strings, default_selection, v2v, ego, 'speed');
+    create_figures('Speed Profile', checklist_strings, default_selection, v2v, ego, 'speed', ego_vs_ego);
 ax_speed = create_axes_layout(fig_speed, 2);
 setappdata(fig_speed, 'checklist', checkbox_speed);
 setappdata(fig_speed, 'popup_ego', popup_ego_speed);

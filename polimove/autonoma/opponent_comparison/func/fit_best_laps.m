@@ -1,4 +1,4 @@
-function best_laps = fit_best_laps(v2v_data, log, opp_file)
+function best_laps = fit_best_laps(v2v_data, log, opp_file, multi_run)
 
     LOW_PASS_FREQ = 10; % [Hz]
     LAP_TIME_MIN = 100; % [s]
@@ -50,6 +50,10 @@ function best_laps = fit_best_laps(v2v_data, log, opp_file)
                 lap = filter_data(lap, lowpass_filt, derivative_filt, Ts);
                 lap = fit_trajectory(lap, CURVATURE_RESAMPLE_PARAMS, SMOOTHING_TOL);
             end 
+            if multi_run
+                best_laps = lap;
+                return;
+            end
             save(filename, 'lap');
         end
     end
