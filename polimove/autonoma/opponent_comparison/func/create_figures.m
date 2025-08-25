@@ -1,4 +1,4 @@
-function [fig, panel, checkbox, popup_ego, popup_opp] = create_figures(name, checklist_strings, default_selection, v2v, ego, tag)
+function [fig, panel, checkbox, popup_ego, popup_opp] = create_figures(name, checklist_strings, default_selection, v2v, ego, tag, ego_vs_ego)
     fig = figure('Name', name);
     panel = uipanel('Parent', fig, ...
         'Units','normalized', ...
@@ -16,7 +16,11 @@ function [fig, panel, checkbox, popup_ego, popup_opp] = create_figures(name, che
     nextY = 1 - checklist_height - 0.08;
 
     % Opponent lap
-    uicontrol('Parent', panel, 'Style', 'text', 'String', 'Opponent Lap:', ...
+    opp_label = "Opponent Lap:";
+    if (ego_vs_ego)
+        opp_label = "Ego 2 Lap:";
+    end
+    uicontrol('Parent', panel, 'Style', 'text', 'String', opp_label, ...
         'Units','normalized', 'Position', [0.05, nextY, 0.9, 0.05], 'HorizontalAlignment', 'left');
     nextY = nextY - 0.04;
     popup_opp = uicontrol('Parent', panel, 'Style', 'popupmenu', ...
