@@ -93,7 +93,7 @@ name_map = containers.Map(opponent_values, opponent_names);
 
 %% PROCESSING
 
-% Compute ego closest idx
+% Compute closest idxs
 if ~exist('ego.index', 'var')
     fprintf("Computing ego indexes ...")
     ego.index = NaN(size(ego.x));
