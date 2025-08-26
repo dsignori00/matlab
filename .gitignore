@@ -1,6 +1,4 @@
-/polimove/autonoma/opponent_comparison/mat/
 /polimove/bags/*
 /.vscode
-
 
 !polimove/bags/.gitkeep
