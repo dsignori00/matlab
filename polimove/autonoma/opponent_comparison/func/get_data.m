@@ -9,7 +9,6 @@ function [v2v,ego] = get_data(log, log_ego, ego_vs_ego)
         v2v.y = log.perception__v2v__detections.detections__y_map;
         v2v.vx = log.perception__v2v__detections.detections__vx*MPS2KPH;
         v2v.yaw = log.perception__v2v__detections.detections__yaw_map;
-        v2v.index = log.perception__v2v__detections.detections__closest_idx;
         v2v.x(v2v.x==0)=nan;
         v2v.y(v2v.y==0)=nan;
         v2v.vx(v2v.vx==0)=nan;
