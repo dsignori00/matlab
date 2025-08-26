@@ -1,4 +1,4 @@
-function best_laps = fit_best_laps(v2v_data, log, opp_file, multi_run)
+function best_laps = fit_best_laps(v2v_data, ego, opp_file, multi_run)
 
     LOW_PASS_FREQ = 10; % [Hz]
     LAP_TIME_MIN = 100; % [s]
@@ -17,7 +17,7 @@ function best_laps = fit_best_laps(v2v_data, log, opp_file, multi_run)
     SMOOTHING_TOL = 1.5; % [m];
 
     Ts = mean(diff(v2v_data.laptime_prog(v2v_data.laps(:, 1)==1, 1)));
-    dataset_polimove = reinterp_ego_data(log, Ts);
+    % dataset_polimove = reinterp_ego_data(ego, Ts);
 
     mat_dir = "mat";
     if ~exist(mat_dir, 'dir')
@@ -41,7 +41,7 @@ function best_laps = fit_best_laps(v2v_data, log, opp_file, multi_run)
     
         if ~isfile(filename)
             if i == 1
-                lap = extract_best_lap(dataset_polimove, 1, LAP_TIME_MIN, LAP_TIME_MAX);
+                lap = extract_best_lap(ego, 1, LAP_TIME_MIN, LAP_TIME_MAX);
             else
                 lap = extract_best_lap(v2v_data, i - 1, LAP_TIME_MIN, LAP_TIME_MAX);
             end

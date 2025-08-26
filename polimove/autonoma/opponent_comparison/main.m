@@ -154,7 +154,7 @@ if ~ego_vs_ego
     parts = split(name, "_");
     filename = fullfile("mat", parts{1} + "_" + parts{4} + "_best_laps.mat");
     if(~isfile(filename))
-        best_laps = fit_best_laps(v2v, log, opp_file, false);
+        best_laps = fit_best_laps(v2v, ego, opp_file);
     else
         load(filename);
     end
