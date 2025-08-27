@@ -1,6 +1,9 @@
 function new_points = resample_line(points, s_vec_interp)
 
-    points_closed = [points; points(1, :)];
+    % points_closed = [points; points(1, :)];
+
+    valid_idx = find(vecnorm(points(2:end, :) - points(1:end-1, :), 2, 2) > 1e-4) + 1;
+    points_closed = [points(1, :); points(valid_idx, :); points(1, :)];
 
     s_vec = compute_curv_abscissa(points_closed);
 
