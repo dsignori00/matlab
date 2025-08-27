@@ -1,5 +1,5 @@
 close all
-clearvars -except log log_ego trajDatabase ego.index v2v.index opp_file turn_idxs
+clearvars -except log log_ego trajDatabase ego.index v2v.index opp_file turn_s
 
 %#ok<*UNRCH>
 %#ok<*INUSD>
@@ -42,12 +42,13 @@ line_opt = { ...
 %load database
 if(~exist('trajDatabase','var'))
     [trajDatabase, db_name] = choose_database();
-    turn_idxs = load_turns(db_name);
     if(isempty(trajDatabase))
         error('No database selected');
     else
         load(trajDatabase);
     end
+    turn_idxs = load_turns(db_name);
+    turn_s = trajDatabase(10).S(turn_idxs);
 end
 
 % load log
@@ -239,7 +240,7 @@ sharedData.lap_ego = 1;
 sharedData.lap_opp = 1;
 sharedData.best_laps = best_laps;
 sharedData.ego_vs_ego = ego_vs_ego;
-sharedData.turn_idxs = turn_idxs;
+sharedData.turn_s = turn_s;
 sharedData.line_opt = line_opt;
 setappdata(0, 'sharedData', sharedData);
 

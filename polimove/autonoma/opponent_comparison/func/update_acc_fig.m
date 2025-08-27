@@ -45,6 +45,11 @@ function update_acc_fig()
         end
         title(axB, sprintf('Best Lap Acceletation Profile'));
     end
+    for k = 1:numel(shared.turn_s)
+        xline(axB, shared.turn_s(k), '--', 'Label', num2str(k), shared.line_opt{:});
+        xline(axC, shared.turn_s(k), '--', 'Label', num2str(k), shared.line_opt{:});
+        xline(axA, shared.turn_s(k), '--', 'Label', num2str(k), shared.line_opt{:});
+    end
     xlabel(axB,'Index'); ylabel(axB,'Total (m/s²)'); legend(axB,'Location','northeast');
     xlabel(axC,'Index'); ylabel(axC,'Longitudinal (m/s²)'); legend(axC,'Location','northeast');
     xlabel(axA,'Index'); ylabel(axA,'Lateral (m/s²)'); legend(axA,'Location','northeast');
