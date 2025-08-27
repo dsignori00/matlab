@@ -1,5 +1,5 @@
 close all
-clearvars -except log log_ego trajDatabase ego.index v2v.index opp_file
+clearvars -except log log_ego trajDatabase ego.index v2v.index opp_file turn_idxs
 
 %#ok<*UNRCH>
 %#ok<*INUSD>
@@ -28,12 +28,21 @@ bags = "../../bags/";
 run('PhysicalConstants.m');
 run('PlottingStyle.m');
 colors = lines(20); 
+line_opt = { ...
+    'Color', [0.5 0.5 0.5], ...
+    'LineWidth', 1.1, ...
+    'LabelHorizontalAlignment', 'left', ...
+    'LabelVerticalAlignment', 'bottom', ...
+    'LabelOrientation', 'horizontal', ...
+    'HandleVisibility','off' ...
+};
 
 %% Load Data
 
 %load database
 if(~exist('trajDatabase','var'))
-    trajDatabase = choose_database();
+    [trajDatabase, db_name] = choose_database();
+    turn_idxs = load_turns(db_name);
     if(isempty(trajDatabase))
         error('No database selected');
     else
@@ -230,6 +239,8 @@ sharedData.lap_ego = 1;
 sharedData.lap_opp = 1;
 sharedData.best_laps = best_laps;
 sharedData.ego_vs_ego = ego_vs_ego;
+sharedData.turn_idxs = turn_idxs;
+sharedData.line_opt = line_opt;
 setappdata(0, 'sharedData', sharedData);
 
 % Initial plots, lap 1
