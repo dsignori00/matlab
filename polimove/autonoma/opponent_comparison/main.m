@@ -78,7 +78,7 @@ rowIdx = strcmp(T.bag, opp_file);
 if any(rowIdx)
     mapStr = T.map{rowIdx};
     opponent = eval(mapStr);
-else
+elseif (~ego_vs_ego)
     opponent = [];
     error('Run non trovata nel file indexes.');
 end
