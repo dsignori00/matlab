@@ -80,7 +80,7 @@ if any(rowIdx)
     opponent = eval(mapStr);
 else
     opponent = [];
-    error('Run non trovata nella file indexes.');
+    error('Run non trovata nel file indexes.');
 end
 
 if(ego_vs_ego)
