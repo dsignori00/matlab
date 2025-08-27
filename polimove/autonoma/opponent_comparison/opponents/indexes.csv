@@ -1,5 +1,5 @@
 bag;map;comment
-2025-06-20_autonoma_sim_04.mat;containers.Map({'KINETIZ','TUM','CONSTRUCTOR','HUMDA','TII','MODENA'},[1,2,3,4,5,6]);yas marina - grand final
+2025-06-20_autonoma_sim_04.mat;containers.Map({'TUM','KINETIZ','CONSTRUCTOR','HUMDA','TII','MODENA'},[1,2,3,4,5,6]);yas marina - grand final
 2025-07-16_autonoma_sim_0x.mat;containers.Map({'KINETIZ','TII','FR4IAV','CODE19','FLYEAGLE'},[1,2,3,4,5]);autonodrome - qualifying
 2025-07-18_autonoma_sim_03.mat;containers.Map({'KINETIZ','TUM','CONSTRUCTOR','UNIMORE','TII'}, [1,2,3,4,5]);autonodrome - final
 2025-08-07_autonoma_sim_00.mat;containers.Map({'TUM','TII','UNIMORE','TGM','CODE19','KINETIZ'}, [1,2,3,4,5,6]);suzuka - open session 1
