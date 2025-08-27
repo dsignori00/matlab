@@ -17,6 +17,7 @@ function best_laps = fit_best_laps(v2v_data, ego, opp_file, multi_run)
     SMOOTHING_TOL = 1.5; % [m];
 
     Ts = mean(diff(v2v_data.laptime_prog(v2v_data.laps(:, 1)==1, 1)));
+    Ts_ego = mean(diff(ego.stamp));
     % dataset_polimove = reinterp_ego_data(ego, Ts);
 
     mat_dir = "mat";
@@ -42,14 +43,23 @@ function best_laps = fit_best_laps(v2v_data, ego, opp_file, multi_run)
         if ~isfile(filename)
             if i == 1
                 lap = extract_best_lap(ego, 1, LAP_TIME_MIN, LAP_TIME_MAX);
+
+                if(~isnan(lap.x))
+                    lap = filter_data(lap, lowpass_filt, derivative_filt, Ts_ego);
+                    lap = fit_trajectory(lap, CURVATURE_RESAMPLE_PARAMS, SMOOTHING_TOL);
+                end 
+
             else
+
                 lap = extract_best_lap(v2v_data, i - 1, LAP_TIME_MIN, LAP_TIME_MAX);
+
+                if(~isnan(lap.x))
+                    lap = filter_data(lap, lowpass_filt, derivative_filt, Ts);
+                    lap = fit_trajectory(lap, CURVATURE_RESAMPLE_PARAMS, SMOOTHING_TOL);
+                end 
+
             end
             
-            if(~isnan(lap.x))
-                lap = filter_data(lap, lowpass_filt, derivative_filt, Ts);
-                lap = fit_trajectory(lap, CURVATURE_RESAMPLE_PARAMS, SMOOTHING_TOL);
-            end 
             if multi_run
                 best_laps = lap;
                 return;
