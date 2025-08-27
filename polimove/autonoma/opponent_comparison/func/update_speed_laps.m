@@ -55,6 +55,10 @@ function update_speed_laps
         end
     end
 
+    for k = 1:numel(shared.turn_idxs)
+        xline(ax_speed, shared.turn_idxs(k), '--', 'Label', num2str(k), shared.line_opt{:});
+        xline(ax_lapdiff, shared.turn_idxs(k), '--', 'Label', num2str(k), shared.line_opt{:});
+    end
     ylabel(ax_speed, 'Speed (km/h)');
     legend(ax_speed, 'Location', 'northeast');
     grid(ax_speed, 'on'); box(ax_speed, 'on');
