@@ -14,3 +14,6 @@ bag;map;comment
 2025-08-13_autonoma_sim_01.mat;containers.Map({'TUM','KINETIZ','CONSTRUCTOR','TII','FLYEAGLE','MODENA'}, [1,2,3,4,5,6]);suzuka - free practise 1
 2025-08-13_autonoma_sim_02.mat;containers.Map({'TUM','KINETIZ','CONSTRUCTOR','TII','FLYEAGLE','MODENA'}, [1,2,3,4,5,6]);suzuka - free practise 2
 2025-08-13_autonoma_sim_03.mat;containers.Map({'TUM','KINETIZ','CONSTRUCTOR','TII','FLYEAGLE','MODENA'}, [1,2,3,4,5,6]);suzuka - grand final
+2025-09-02_autonoma_sim_00.mat;containers.Map({'TII','MODENA'}, [1,2]);yas north - practise part 1
+2025-09-02_autonoma_sim_01.mat;containers.Map({'TII','MODENA'}, [1,2]);yas north - practise part 2
+2025-09-02_autonoma_sim_02.mat;containers.Map({'TII','MODENA'}, [1,2]);yas north - practise part 3
