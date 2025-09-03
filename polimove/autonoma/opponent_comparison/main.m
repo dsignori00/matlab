@@ -108,6 +108,7 @@ if ~exist('ego.index', 'var')
     fprintf("Computing ego indexes ...")
     ego.index = NaN(size(ego.x));
     ego.index = compute_idx_sim(ego.x,ego.y, trajDatabase(10).X(:), trajDatabase(10).Y(:));
+    ego.s = trajDatabase(10).S(ego.index);
     fprintf(" done. \n")
 end
 
@@ -116,6 +117,7 @@ if ~exist('v2v.index', 'var')
     v2v.index = NaN(size(v2v.x));
     for i=1:size(v2v.x,2)
         v2v.index(:,i) = compute_idx_sim(v2v.x(:,i),v2v.y(:,i), trajDatabase(10).X(:), trajDatabase(10).Y(:));
+        v2v.s(:,i) = trajDatabase(10).S(v2v.index(:,i));
     end
     fprintf(" done. \n")
 end

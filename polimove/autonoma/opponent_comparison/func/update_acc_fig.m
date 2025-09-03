@@ -13,8 +13,8 @@ function update_acc_fig()
         laptimeO = shared.v2v.laptime.fulltime(lapO);
         idxE = shared.ego.laps == lapE;
         idxO = shared.v2v.laps == lapO;
-        ego.s = shared.trajDatabase(10).S(shared.ego.index(idxE));
-        ego2.s = shared.trajDatabase(10).S(shared.v2v.index(idxO));
+        ego.s = shared.ego.s(idxE);
+        ego2.s = shared.v2v.s(idxO);
         plot(axB, ego.s, shared.ego.ax(idxE), ...
             'Color', shared.colors(1,:), ...
             'DisplayName',sprintf('0 - POLIMOVE - Laptime: %s', laptime));

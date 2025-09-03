@@ -1,7 +1,7 @@
 function best_laps = fit_best_laps(v2v_data, ego, opp_file, multi_run)
 
     LOW_PASS_FREQ = 10; % [Hz]
-    LAP_TIME_MIN = 40; % [s]
+    LAP_TIME_MIN = 40;  % [s]
     LAP_TIME_MAX = 100; % [s]
     s = tf('s');
     lowpass_filt = 1 / (s/(2*pi*LOW_PASS_FREQ) + 1);

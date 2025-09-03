@@ -20,7 +20,7 @@ function update_speed_laps
 
     % Plot Ego Speed
     idxE = shared.ego.laps == lapE;
-    ego.s = shared.trajDatabase(10).S(shared.ego.index(idxE));
+    ego.s = shared.ego.s(idxE);
     plot(ax_speed, ego.s, shared.ego.vx(idxE), ...
         'Color', shared.colors(1,:), ...
         'DisplayName',sprintf('0 - POLIMOVE - Laptime: %s', laptime));
@@ -38,8 +38,7 @@ function update_speed_laps
         idxO = shared.v2v.laps(:, kk) == lapO;
         if ~any(idxO), continue; end
 
-        opp_index = double(shared.v2v.index(idxO, kk));
-        opp_s = shared.trajDatabase(10).S(opp_index);  
+        opp_s = double(shared.v2v.s(idxO, kk));
         opp_speed = shared.v2v.vx(idxO, kk);
         opp_lap_time = shared.v2v.laptime_prog(idxO, kk);
         opp_name = shared.name_map(kk);
