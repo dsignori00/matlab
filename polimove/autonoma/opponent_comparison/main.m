@@ -17,10 +17,8 @@ splitted_bag        = false;               % if true, discarded first and last l
 
 import casadi.*;
 
-addpath("../../common/utilities/")
-addpath("../../common/constants/")
-addpath("../../common/plot/")
 addpath("func")
+addpath('constants')
 addpath("opponents")
 bags = "../../bags/";
 
