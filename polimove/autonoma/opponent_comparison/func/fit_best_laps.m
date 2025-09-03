@@ -1,4 +1,4 @@
-function best_laps = fit_best_laps(v2v_data, ego, opp_file, multi_run)
+function best_laps = fit_best_laps(v2v_data, ego, opp_file, multi_run, splitted_bag)
 
     LOW_PASS_FREQ = 10; % [Hz]
     LAP_TIME_MIN = 40;  % [s]
@@ -42,7 +42,7 @@ function best_laps = fit_best_laps(v2v_data, ego, opp_file, multi_run)
     
         if ~isfile(filename)
             if i == 1
-                lap = extract_best_lap(ego, 1, LAP_TIME_MIN, LAP_TIME_MAX);
+                lap = extract_best_lap(ego, 1, LAP_TIME_MIN, LAP_TIME_MAX, splitted_bag);
 
                 if(~isnan(lap.x))
                     lap = filter_data(lap, lowpass_filt, derivative_filt, Ts_ego);
@@ -51,7 +51,7 @@ function best_laps = fit_best_laps(v2v_data, ego, opp_file, multi_run)
 
             else
 
-                lap = extract_best_lap(v2v_data, i - 1, LAP_TIME_MIN, LAP_TIME_MAX);
+                lap = extract_best_lap(v2v_data, i - 1, LAP_TIME_MIN, LAP_TIME_MAX, splitted_bag);
 
                 if(~isnan(lap.x))
                     lap = filter_data(lap, lowpass_filt, derivative_filt, Ts);
