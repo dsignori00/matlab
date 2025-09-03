@@ -1,6 +1,10 @@
-function best_lap = extract_best_lap(dataset, VEH_IDX, LAP_TIME_MIN, LAP_TIME_MAX)
+function best_lap = extract_best_lap(dataset, VEH_IDX, LAP_TIME_MIN, LAP_TIME_MAX, splitted_bag)
 
     lap_ids = unique(dataset.laps(:, VEH_IDX));
+    if(splitted_bag)
+        lap_ids(1) = [];
+        lap_ids(end) = [];
+    end
     lap_times = nan(numel(lap_ids), 1);
     
     k = 1;

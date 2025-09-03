@@ -11,6 +11,7 @@ clearvars -except log log_ego trajDatabase ego.index v2v.index opp_file turn_s
 multi_run           = false;               % if true, a different mat for ego and opponent will be loaded
 ego_vs_ego          = false;               % if true, ego vs ego will be plotted
 save_v2v            = false;               % if true, save the processed v2v data
+splitted_bag        = false;               % if true, discarded first and last lap in best lap computation
 
 %% Paths
 
@@ -165,12 +166,12 @@ if ~ego_vs_ego
     parts = split(name, "_");
     filename = fullfile("mat", parts{1} + "_" + parts{4} + "_best_laps.mat");
     if(~isfile(filename))
-        best_laps = fit_best_laps(v2v, ego, opp_file, false);
+        best_laps = fit_best_laps(v2v, ego, opp_file, false, splitted_bag);
     else
         load(filename);
     end
     if (multi_run)
-        best_laps{1,1} = fit_best_laps(v2v, ego, opp_file, true);
+        best_laps{1,1} = fit_best_laps(v2v, ego, opp_file, true, splitted_bag);
     end
 end
 
