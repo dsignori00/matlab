@@ -9,13 +9,13 @@ function laps = assign_lap(indices)
 
     % Find positions where the index drops
     diffs = diff(indices);
-    dec_indices = [false; diffs < 0];
+    dec_indices = [false; abs(diffs) > 30];
 
     % Check that the value before the drop is above the 90th percentile
-    high_prev = [false; indices(1:end-1) > threshold];
+    %high_prev = [false; indices(1:end-1) > threshold];
 
     % Combine both conditions with logical AND
-    drops = dec_indices & high_prev;
+    drops = dec_indices; %& high_prev;
 
     % Compute cumulative sum of lap changes
     laps = cumsum(drops) + 1;
