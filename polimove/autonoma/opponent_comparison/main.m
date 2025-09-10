@@ -114,9 +114,14 @@ end
 if ~exist('v2v.index', 'var')
     fprintf("Computing opponent indexes ...")
     v2v.index = NaN(size(v2v.x));
-    for i=1:size(v2v.x,2)
-        v2v.index(:,i) = compute_idx_sim(v2v.x(:,i),v2v.y(:,i), trajDatabase(10).X(:), trajDatabase(10).Y(:));
-        v2v.s(:,i) = trajDatabase(10).S(v2v.index(:,i));
+    v2v.s = v2v.index;
+    for i = 1:size(v2v.x,2)
+        v2v.index(:,i) = compute_idx_sim(v2v.x(:,i), v2v.y(:,i), trajDatabase(10).X(:), trajDatabase(10).Y(:));
+        idx = v2v.index(:,i);
+        nan_mask = isnan(idx);
+        idx(nan_mask) = 1;
+        v2v.s(:,i) = trajDatabase(10).S(idx);
+        v2v.s(nan_mask,i) = NaN;
     end
     fprintf(" done. \n")
 end
