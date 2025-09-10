@@ -6,6 +6,8 @@ function idxs = load_turns(db)
             idxs = [600,1090,1495,2000,2683,5102,5222,5610,7270,7990,8265,8525,8746,8969,9574,10020];
         case 'YasNorthSim'
             idxs = [600,1090,1495,2000,2683,5020,5375];
+        case 'YasNorthAutonoma'
+            idxs = [600,1090,1495,2000,2683,5020,5375];
         otherwise
             idxs = [];
             disp('Turns not defined for this database');
