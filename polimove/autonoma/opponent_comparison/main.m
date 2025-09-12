@@ -123,6 +123,7 @@ if ~exist('v2v.index', 'var')
         v2v.s(:,i) = trajDatabase(10).S(idx);
         v2v.s(nan_mask,i) = NaN;
     end
+    v2v = associate_tracks(v2v);
     fprintf(" done. \n")
 end
 
