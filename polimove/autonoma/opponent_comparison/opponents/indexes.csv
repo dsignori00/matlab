@@ -20,3 +20,5 @@ bag;map;comment
 2025-09-08_autonoma_sim_00.mat;containers.Map({'RAPTOR','MODENA','KINETIZ','TUM','TII'}, [1,2,3,4,5]);yas north - open session 1 - part 1
 2025-09-10_autonoma_sim_00.mat;containers.Map({'CONSTRUCTOR','KINETIZ','TGM','RAPSON'}, [1,2,3,4]);yas north - free practise
 2025-09-10_autonoma_sim_01.mat;containers.Map({'CONSTRUCTOR','KINETIZ','TGM','RAPSON'}, [1,2,3,4]);yas north - qualifying
+2025-09-11_autonoma_sim_00.mat;containers.Map({'KINETIZ','TUM'}, [1,2]);yas north - free practise
+2025-09-11_autonoma_sim_01.mat;containers.Map({'KINETIZ','TUM'}, [1,2]);yas north - sprint
