@@ -1,0 +1,29 @@
+clearvars -except log log_ref
+
+global use_ref;
+use_ref = false;
+
+% load track lines
+load('../../05_Scripts/Yas_Marina_DB/databases/Yas_South_apex_v0_new_pit/trajDatabase.mat');
+
+% load log
+if (~exist('log','var'))
+    [file,path] = uigetfile('*.mat','Load log');
+    load(fullfile(path,file));
+end
+
+% load log ref
+if (~exist('log_ref','var') && use_ref)
+    [file,path] = uigetfile('*.mat','Load log_ref');
+    tmp = load(fullfile(path,file));
+    log_ref = tmp.log;
+    clearvars tmp;
+end
+
+DateTime = datetime(log.time_offset_nsec,'ConvertFrom','epochtime','TicksPerSecond',1e9,'Format','dd-MMM-yyyy HH:mm:ss');
+
+%%
+% log_ref = 0;
+plot_data(log,log_ref,trajDatabase);
+
+

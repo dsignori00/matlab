@@ -1,0 +1,27 @@
+bag;map;comment
+2025-06-20_autonoma_sim_04.mat;containers.Map({'TUM','KINETIZ','CONSTRUCTOR','HUMDA','TII','MODENA'},[1,2,3,4,5,6]);yas marina - grand final
+2025-07-16_autonoma_sim_0x.mat;containers.Map({'KINETIZ','TII','FR4IAV','CODE19','FLYEAGLE'},[1,2,3,4,5]);autonodrome - qualifying
+2025-07-18_autonoma_sim_03.mat;containers.Map({'KINETIZ','TUM','CONSTRUCTOR','UNIMORE','TII'}, [1,2,3,4,5]);autonodrome - final
+2025-08-07_autonoma_sim_00.mat;containers.Map({'TUM','TII','UNIMORE','TGM','CODE19','KINETIZ'}, [1,2,3,4,5,6]);suzuka - open session 1
+2025-08-08_autonoma_sim_00.mat;containers.Map({'KINETIZ','FR4IAV','TUM','UNIMORE','TII','CONSTRUCTOR'}, [1,2,3,4,5,6]);suzuka - open session 2
+2025-08-08_autonoma_sim_01.mat;containers.Map({'KINETIZ','FR4IAV','TUM','UNIMORE','TII','CONSTRUCTOR'}, [1,2,3,4,5,6]);suzuka - open session 2
+2025-08-08_autonoma_sim_02.mat;containers.Map({'KINETIZ','FR4IAV','TUM','UNIMORE','TII','CONSTRUCTOR'}, [1,2,3,4,5,6]);suzuka - open session 2
+2025-08-11_autonoma_sim_00.mat;containers.Map({'FLYEAGLE','KINETIZ','TGM','TII'}, [1,2,3,4]);suzuka - qualifying practise
+2025-08-11_autonoma_sim_01.mat;containers.Map({'FLYEAGLE','KINETIZ','TGM','TII'}, [1,2,3,4]);suzuka - qualifying (flyeagle)
+2025-08-11_autonoma_sim_02.mat;containers.Map({'FLYEAGLE','KINETIZ','TGM','TII'}, [1,2,3,4]);suzuka - qualifying (other teams)
+2025-08-12_autonoma_sim_00.mat;containers.Map({'TII','FLYEAGLE'}, [1,2]);suzuka - sim sprint
+2025-08-13_autonoma_sim_00.mat;containers.Map({'TUM','KINETIZ','CONSTRUCTOR','TII','FLYEAGLE','MODENA'}, [1,2,3,4,5,6]);suzuka - free practise 0
+2025-08-13_autonoma_sim_01.mat;containers.Map({'TUM','KINETIZ','CONSTRUCTOR','TII','FLYEAGLE','MODENA'}, [1,2,3,4,5,6]);suzuka - free practise 1
+2025-08-13_autonoma_sim_02.mat;containers.Map({'TUM','KINETIZ','CONSTRUCTOR','TII','FLYEAGLE','MODENA'}, [1,2,3,4,5,6]);suzuka - free practise 2
+2025-08-13_autonoma_sim_03.mat;containers.Map({'TUM','KINETIZ','CONSTRUCTOR','TII','FLYEAGLE','MODENA'}, [1,2,3,4,5,6]);suzuka - grand final
+2025-09-02_autonoma_sim_00.mat;containers.Map({'TII','MODENA'}, [1,2]);yas north - practise part 1
+2025-09-02_autonoma_sim_01.mat;containers.Map({'TII','MODENA'}, [1,2]);yas north - practise part 2
+2025-09-02_autonoma_sim_02.mat;containers.Map({'TII','MODENA'}, [1,2]);yas north - practise part 3
+2025-09-08_autonoma_sim_00.mat;containers.Map({'RAPTOR','MODENA','KINETIZ','TUM','TII'}, [1,2,3,4,5]);yas north - open session 1 - part 1
+2025-09-10_autonoma_sim_00.mat;containers.Map({'CONSTRUCTOR','KINETIZ','TGM','RAPSON'}, [1,2,3,4]);yas north - free practise
+2025-09-10_autonoma_sim_01.mat;containers.Map({'CONSTRUCTOR','KINETIZ','TGM','RAPSON'}, [1,2,3,4]);yas north - qualifying
+2025-09-11_autonoma_sim_00.mat;containers.Map({'KINETIZ','TUM'}, [1,2]);yas north - free practise
+2025-09-11_autonoma_sim_01.mat;containers.Map({'KINETIZ','TUM'}, [1,2]);yas north - sprint
+2025-09-12_autonoma_sim_00.mat;containers.Map({'KINETIZ','TUM', 'CONSTRUCTOR', 'UNIMORE', 'TII'}, [1,2,3,4,5]);yas north - free practise
+2025-09-12_autonoma_sim_01.mat;containers.Map({'KINETIZ','TUM', 'CONSTRUCTOR', 'UNIMORE', 'TII'}, [1,2,3,4,5]);yas north - free practise
+2025-09-12_autonoma_sim_02.mat;containers.Map({'KINETIZ','TUM', 'CONSTRUCTOR', 'UNIMORE', 'TII'}, [1,2,3,4,5]);yas north - grand final
