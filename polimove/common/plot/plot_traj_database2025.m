@@ -1,4 +1,4 @@
-function phl = PlotTrajDatabase2025(traj_DB, legend_on, grayScaleOn)
+function phl = plot_traj_database2025(traj_DB, legend_on, grayScaleOn)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %         poliMove - IAC - plotTrajDatabaseV2                             %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -60,4 +60,5 @@ lineWidth       = 0.5;
         set(get(get(phl(1),'Annotation'),'LegendInformation'),'IconDisplayStyle','on');
         set(get(get(phl(end),'Annotation'),'LegendInformation'),'IconDisplayStyle','on');
     end
+    axis equal
 end
