@@ -13,13 +13,12 @@ compute_err_std  = false;
 
 %% Paths
 
-addpath("../../01_Tools/00_GlobalFunctions/utilities/")
-addpath("../../01_Tools/00_GlobalFunctions/constants/")
-addpath("../../01_Tools/00_GlobalFunctions/plot/")
-%% Load data
+addpath("../../common/utilities/")
+addpath("../../common/constants/")
+addpath("../../common/plot/")
+normal_path = "../../bags";
 
-normal_path = "/home/daniele/Documents/PoliMOVE/04_Bags/";
-normal_path = char(normal_path);
+%% Load data
 
 % Load log
 if ~exist('log', 'var')
