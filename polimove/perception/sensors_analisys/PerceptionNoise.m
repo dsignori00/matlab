@@ -11,21 +11,21 @@ drop_out_analyses = false;
 
 %% Paths
 
-addpath("../../01_Tools/00_GlobalFunctions/personal/")
-addpath("../../01_Tools/00_GlobalFunctions/utilities/")
-addpath("../../01_Tools/00_GlobalFunctions/constants/")
-addpath("../../01_Tools/00_GlobalFunctions/plot/")
-normal_path = "/home/daniele/Documents/PoliMOVE/04_Bags/";
+addpath("../../common/utilities/")
+addpath("../../common/constants/")
+addpath("../../common/plot/")
+normal_path = "../../bags";
 
 %% LOAD FILES
 
-load('../../04_Bags/00_Databases/Lvms.mat');
-%load('../../04_Bags/00_Databases/YasMarina.mat');
-
-% load log
-if (~exist('log','var'))
-    [file,path_dir] = uigetfile(fullfile(normal_path,'*.mat'),'Load ego mat');
-    load(fullfile(path_dir,file));
+%load database
+if(~exist('trajDatabase','var'))
+    trajDatabase = choose_database();
+    if(isempty(trajDatabase))
+        error('No database selected');
+    else
+        load(trajDatabase);
+    end
 end
 
 % load ref
