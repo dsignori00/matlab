@@ -1,0 +1,4 @@
+/polimove/bags/*
+/.vscode
+
+!polimove/bags/.gitkeep
