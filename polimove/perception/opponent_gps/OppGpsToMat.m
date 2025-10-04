@@ -6,12 +6,10 @@ clearvars -except ego opp_dir_path
 
 %% Paths
 
-addpath("../../01_Tools/00_GlobalFunctions/personal/")
-addpath("../../01_Tools/00_GlobalFunctions/utilities/")
-addpath("../../01_Tools/00_GlobalFunctions/constants/")
-addpath("../../01_Tools/00_GlobalFunctions/plot/")
-addpath("../../04_Bags/00_Databases/")
-normal_path = "/home/daniele/Documents/PoliMOVE/04_Bags/";
+addpath("../../common/utilities/")
+addpath("../../common/constants/")
+addpath("../../common/plot/")
+normal_path = "../../bags";
 
 %% Input
 
