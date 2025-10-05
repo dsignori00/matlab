@@ -5,7 +5,7 @@ if (~exist('log','var'))
     load(fullfile(path,file));
 end
 
-out.stamp = log.estimation.stamp__tot;
+out.stamp = log.estimation.stamp__tot + log.time_offset_nsec*10^-9;
 out.x_cog = log.estimation.x_cog;
 out.y_cog = log.estimation.y_cog;
 out.vx = log.estimation.vx;
