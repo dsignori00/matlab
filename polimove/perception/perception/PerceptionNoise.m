@@ -1,4 +1,3 @@
-
 clc
 close all
 clearvars -except log log_ref
