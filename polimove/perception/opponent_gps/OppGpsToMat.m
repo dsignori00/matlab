@@ -9,6 +9,7 @@ clearvars -except ego opp_dir_path
 addpath("../../common/utilities/")
 addpath("../../common/constants/")
 addpath("../../common/plot/")
+addpath("../utils/")
 normal_path = "../../bags";
 
 %% Input
@@ -316,9 +317,6 @@ log.x_map = x_map;
 log.y_map = y_map;
 opp_sz = length(x_map);
 
-
-
-
 %% Opponent and ego sync
 
 %[log.timestamp] = latency_removal(log.timestamp,log.gps);
@@ -561,74 +559,6 @@ fprintf("\nRemember to check if antenna's configuration has been changed!!!\n")
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%  USEFUL FUNCTIONS  %%%%%%%%%%%%%%%%%%%%%%%%%%%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-
-function out = importCsv(filename)
-
-    dataLines = [3, Inf];
-    
-    fid = fopen(filename, 'r');
-    fields_names = textscan(fid, '%[^\n]', 1); 
-    fields_names = split(fields_names{1}, ',');
-
-    topic_name = sprintf("%s", erase(filename, ".csv"));
-
-    % Modify CSV names for easier data analysys and to replace too long names
-    fields_names = strrep(fields_names, "#", "");
-    fields_names = strrep(fields_names, "//", "");
-    fields_names = strrep(fields_names, "/", "_");
-
-    stp_idx = strcmp(fields_names, 'stamp');
-    fields_names(stp_idx)= {topic_name + "_" + "stamp"};
-
-    fields_names = strip(fields_names);
-    fields_names = fields_names(strlength(fields_names) > 0);
-
-    
-    for i = 1:length(fields_names)
-        if length(fields_names{i}) > 63
-            %fprintf("Name: %s is too long - Truncated!\n", fields_names{i});
-            fields_names{i} = fields_names{i}(1:63);
-        end
-    end
-    fields_names = string(fields_names)';
-
-    % Set up the Import Options and import the data
-    opts = detectImportOptions(filename, 'Delimiter',',', 'NumVariables', length(fields_names));
-        
-    % Specify column names and types
-    opts.DataLines = dataLines;
-    opts.VariableNames = fields_names;
-    opts.SelectedVariableNames = fields_names;
-
-    % Import the data
-    out = readtable(filename, opts);
-
-end
-
-
-function [idx, opp_idx] = find_closest_stamp(timestamp, ego_timestamp)
-    % Preallocazione dei risultati
-    idx = zeros(length(timestamp), 1);
-    opp_idx = zeros(length(timestamp), 1);
-    % Itera su ogni elemento di timestamp, calcolando le differenze localmente
-    for i = 1:length(timestamp)
-        % Calcola le differenze solo per l'elemento corrente
-        diff = abs(ego_timestamp - timestamp(i));
-        
-        % Trova il minimo e l'indice corrispondente
-        [min_diff, closest_idx] = min(diff);
-
-        % Applica la soglia
-        if min_diff < 1e9
-            idx(i) = closest_idx;
-            opp_idx(i) = i;    
-        end
-    end
-    idx = idx(idx~=0);
-    opp_idx = opp_idx(opp_idx~=0);
-end
-
-
 function timestamp = latency_removal(timestamp,gps)
     for i=2:length(timestamp)
         ts = timestamp(i)-timestamp(i-1);
@@ -659,35 +589,6 @@ function timestamp = latency_removal2(timestamp,gps)
              end
         end
     end
-end
-
-
-function R = euler_to_rotation(phi, theta, psi)
-    % euler_to_rotation - Calcola la matrice di rotazione a partire dagli angoli di Eulero (ZYX)
-    % INPUT:
-    %   phi   - angolo di rotazione attorno all'asse X (roll)
-    %   theta - angolo di rotazione attorno all'asse Y (pitch)
-    %   psi   - angolo di rotazione attorno all'asse Z (yaw)
-    % OUTPUT:
-    %   R     - Matrice di rotazione 3x3 risultante
-
-    % Matrice di rotazione attorno all'asse X (roll)
-    Rx = [1    0           0;
-          0  cos(phi)  -sin(phi);
-          0  sin(phi)   cos(phi)];
-    
-    % Matrice di rotazione attorno all'asse Y (pitch)
-    Ry = [cos(theta)   0   sin(theta);
-          0            1   0;
-         -sin(theta)   0   cos(theta)];
-    
-    % Matrice di rotazione attorno all'asse Z (yaw)
-    Rz = [cos(psi)  -sin(psi)  0;
-          sin(psi)   cos(psi)  0;
-          0          0         1];
-
-    % Matrice di rotazione totale (ZYX)
-    R = Rz*Ry*Rx;
 end
 
 function yaw_out = correct_yaw(x_map,y_map, timestamp, avg_freq, yaw_in)
