@@ -1,8 +1,8 @@
-close all
-clearvars -except log log2 trajDatabase ego_idxs ego_idxs2 opp_yaw_matrix1 opp_yaw_matrix2
+    close all
+clearvars -except log log2 trajDatabase gt ego ego2 rad1 rad2
 
-ground_truth = false;
-compare = true;
+ground_truth = true;
+compare = false;
 
 NAME_1 = "Radar";
 NAME_2 = "Radar - 2";
@@ -15,7 +15,9 @@ NAME_2 = "Radar - 2";
 addpath("../../common/utilities/")
 addpath("../../common/constants/")
 addpath("../../common/plot/")
+addpath("../utils/")
 normal_path = "../../bags";
+opp_path = "../opponent_gps/mat";
 
 %% Load Data
 
@@ -37,10 +39,17 @@ end
 
 % load log2
 if (compare && ~exist('log2','var'))
-    clearvars opp_yaw_matrix2
     [file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load log 2');
     tmp = load(fullfile(path,file));
     log2 = tmp.log;
+end
+
+if(ground_truth)
+    if (~exist('gt','var'))
+        [file,path] = uigetfile(fullfile(opp_path,'*.mat'),'Load ground truth log');
+        tmp = load(fullfile(path,file));
+        gt = tmp.out;
+    end
 end
 
 DateTime = datetime(log.time_offset_nsec,'ConvertFrom','epochtime','TicksPerSecond',1e9,'Format','dd-MMM-yyyy HH:mm:ss');
@@ -55,9 +64,9 @@ set(0, 'DefaultLineLineWidth', 2);
 x_lim = [0 inf];
 
 %% NAMING
-col.radar = '#4DBEEE';
-col.radar2 = '#D95319';
-col.ref = '#EDB120';
+col.radar = '#0072BD';
+col.ref = '#D95319';
+col.radar2 = '#EDB120';
 sz=3; % Marker size
 f=1;
 
@@ -67,75 +76,73 @@ log.liveliness__state.nodes_states__current_rate(:,21);
 
 % RADAR CLUSTERING DETECTIONS
 rad1 = get_radar_fields(log);
-if(compare)
-    rad2 = get_radar_fields(log2);
-else
-    rad2 = nan_struct(rad1);
-    rad2.max_det = 0;
-end
-
+if(compare); rad2 = get_radar_fields(log2); end
 
 %% PROCESSING
-if (~exist('opp_yaw_matrix1','var'))
-    opp_yaw_matrix1 = NaN(size(rad1.x_map));
+
+if (~exist('rad1.idx','var'))
     for i = 1:rad1.max_det
         opp_pos = [rad1.x_map(:,i), rad1.y_map(:,i)];
-        opp_yaw = get_heading(opp_pos, trajDatabase);
-        opp_yaw_matrix1(:,i) = opp_yaw;
+        [opp_yaw, opp_idx] = get_heading(opp_pos, trajDatabase);
+        rad1.yaw_map(:,i) = opp_yaw;
+        rad1.idx(:,i) = opp_idx;
     end
 end
 
-ego_timestamp = (log.estimation.stamp__tot)*10^9+double(log.time_offset_nsec);
+ego.timestamp = (log.estimation.stamp__tot)*10^9+double(log.time_offset_nsec);
 rad1_stamp = rad1.sens_stamp*10^9 + double(log.time_offset_nsec);
 
-if (~exist('ego_idxs','var'))
-    [ego_idxs, ~] = find_closest_stamp(rad1_stamp,ego_timestamp);
+if (~exist('ego.clos_idx','var'))
+    [ego.clos_idxs, ~] = find_closest_stamp(rad1_stamp,ego.timestamp);
 end
-ego_pos(:,1) = log.estimation.x_cog(ego_idxs);
-ego_pos(:,2) = log.estimation.y_cog(ego_idxs);
-ego_yaw = log.estimation.heading(ego_idxs);
-ego_v(:,1) = log.estimation.vx(ego_idxs);
-ego_v(:,2) = log.estimation.vy(ego_idxs);
+
+ego.pos(:,1) = log.estimation.x_cog(ego.clos_idxs);
+ego.pos(:,2) = log.estimation.y_cog(ego.clos_idxs);
+ego.yaw = log.estimation.heading(ego.clos_idxs);
+ego.v(:,1) = log.estimation.vx(ego.clos_idxs);
+ego.v(:,2) = log.estimation.vy(ego.clos_idxs);
 
 for i = 1:rad1.max_det
-    opp_yaw = opp_yaw_matrix1(:,i);
-    rad1.vx(:,i) = compensate_ego_speed(ego_pos, ego_v, ego_yaw, opp_yaw, ...
+    opp_yaw = rad1.yaw_map(:,i);
+    rad1.vx(:,i) = compensate_ego_speed(ego.pos, ego.v, ego.yaw, opp_yaw, ...
                         rad1.rho_dot(:,i), rad1.x_map(:,i), rad1.y_map(:,i));
 end
 
-if (~exist('opp_yaw_matrix2','var'))
-    opp_yaw_matrix2 = NaN(size(rad2.x_map));
-    for i = 1:rad2.max_det
-        opp_pos = [rad2.x_map(:,i), rad2.y_map(:,i)];
-        opp_yaw = get_heading(opp_pos, trajDatabase);
-        opp_yaw_matrix2(:,i) = opp_yaw;
-    end
-end
+rad1.range = sqrt(rad1.x_rel.^2 + rad1.y_rel.^2);
 
 if(compare)
-    rad2_stamp = rad2.sens_stamp*10^9 + double(log2.time_offset_nsec);
-    if (~exist('ego_idxs2','var'))
-        [ego_idxs2, ~] = find_closest_stamp(rad2_stamp,ego_timestamp);
-        if (isempty(ego_idxs2))
-            error('Have you ');
+    if (~exist('rad2.idx','var'))
+        for i = 1:rad2.max_det
+            opp_pos = [rad2.x_map(:,i), rad2.y_map(:,i)];
+            [opp_yaw, opp_idx] = get_heading(opp_pos, trajDatabase);
+            rad2.yaw_map(:,i) = opp_yaw;
+            rad2.idx(:,i) = opp_idx;
         end
     end
-    clearvars ego_pos ego_yaw ego_v
-    ego_pos(:,1) = log.estimation.x_cog(ego_idxs2);
-    ego_pos(:,2) = log.estimation.y_cog(ego_idxs2);
-    ego_yaw = log.estimation.heading(ego_idxs2);
-    ego_v(:,1) = log.estimation.vx(ego_idxs2);
-    ego_v(:,2) = log.estimation.vy(ego_idxs2);
+    rad2_stamp = rad2.sens_stamp*10^9 + double(log2.time_offset_nsec);
+    if (~exist('ego2','var'))
+        [ego2.clos_idxs, ~] = find_closest_stamp(rad2_stamp,ego.timestamp);
+        if (isempty(ego2.clos_idxs))
+            error('No timestamp matched between ego and opp.');
+        end
+    end
+    ego2.pos(:,1) = log.estimation.x_cog(ego2.clos_idxs);
+    ego2.pos(:,2) = log.estimation.y_cog(ego2.clos_idxs);
+    ego2.yaw = log.estimation.heading(ego2.clos_idxs);
+    ego2.v(:,1) = log.estimation.vx(ego2.clos_idxs);
+    ego2.v(:,2) = log.estimation.vy(ego2.clos_idxs);
 
     for i = 1:max(rad2.max_det,1)
-        opp_yaw = opp_yaw_matrix2(:,i);
-        rad2.vx(:,i) = compensate_ego_speed(ego_pos, ego_v, ego_yaw, opp_yaw, ...
+        opp_yaw = rad2.yaw_map(:,i);
+        rad2.vx(:,i) = compensate_ego_speed(ego2.pos, ego2.v, ego2.yaw, opp_yaw, ...
                              rad2.rho_dot(:,i), rad2.x_map(:,i), rad2.y_map(:,i));
     end
+    rad2_sens_stamp = rad2.sens_stamp + double(log2.time_offset_nsec)*10^-9 - double(log.time_offset_nsec)*10^-9; 
+    rad2_stamp = rad2.stamp + double(log2.time_offset_nsec)*10^-9 - double(log.time_offset_nsec)*10^-9; 
+    rad2.range = sqrt(rad2.x_rel.^2 + rad2.y_rel.^2);
 end
 
-rad2.sens_stamp = rad2.sens_stamp + double(log2.time_offset_nsec)*10^-9 - double(log.time_offset_nsec)*10^-9; 
-rad2.stamp = rad2.stamp + double(log2.time_offset_nsec)*10^-9 - double(log.time_offset_nsec)*10^-9; 
+if(ground_truth); gt_timestamp = (gt.timestamp - double(log.time_offset_nsec))*10^-9; end
 %% LATENCY FIGURE
 figure('name','Latency')
 tiledlayout(3,1,'Padding','compact');
@@ -159,68 +166,156 @@ grid on; title('radar udp packages rate [s]'); legend; xlim(x_lim);
 axes(f) = nexttile; f=f+1;
 hold on;
 plot(rad1.stamp,rad1.stamp-rad1.sens_stamp, 'Color', col.radar,'DisplayName',NAME_1);
-plot(rad2.stamp,rad2.stamp-rad2.sens_stamp, 'Color', col.radar2,'DisplayName',NAME_2);
+if(compare); plot(rad2_stamp,rad2_stamp-rad2_sens_stamp, 'Color', col.radar2,'DisplayName',NAME_2); end
 grid on; title('radar clustering latency [s]'); legend; xlim(x_lim);
 
 
 %% STATE FIGURE COG
 figure('name','Detections - cog')
-tiledlayout(3,1,'Padding','compact');
+tiledlayout(4,1,'Padding','compact');
 
 % pos x
 axes(f) = nexttile([1,1]); f=f+1;
 hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.x_rel, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
-plot(rad2.sens_stamp, safe_cols(rad2.x_rel, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2);
+if(compare);plot(rad2_sens_stamp, safe_cols(rad2.x_rel, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
+if(ground_truth); plot(gt_timestamp, gt.x_rel, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
 grid on; title('x rel [m]'); legend; xlim(x_lim);
 
 % pos y
 axes(f) = nexttile([1,1]); f=f+1;
 hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.y_rel, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
-plot(rad2.sens_stamp, safe_cols(rad2.y_rel, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2);
+if(compare); plot(rad2_sens_stamp, safe_cols(rad2.y_rel, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
+if(ground_truth); plot(gt_timestamp, gt.y_rel, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
 grid on; title('y rel [m]'); legend; xlim(x_lim);
+
+% rho 
+axes(f) = nexttile([1,1]); f=f+1;
+hold on;
+plot(rad1.sens_stamp, safe_cols(rad1.range, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
+if(compare); plot(rad2_sens_stamp, safe_cols(rad2.range, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
+if(ground_truth); plot(gt_timestamp, gt.rho, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
+grid on; title('range [m]'); legend; xlim(x_lim);
 
 % rho dot
 axes(f) = nexttile([1,1]); f=f+1;
 hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.rho_dot, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
-plot(rad2.sens_stamp, safe_cols(rad2.rho_dot, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2);
+if(compare); plot(rad2_sens_stamp, safe_cols(rad2.rho_dot, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
+if(ground_truth); plot(gt_timestamp, gt.rho_dot, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
 grid on; title('rho dot [m/s]'); legend; xlim(x_lim);
 
 
 %% STATE FIGURE MAP
 figure('name','Detections - map')
-tiledlayout(3,1,'Padding','compact');
+tiledlayout(4,1,'Padding','compact');
 
 % pos X
 axes(f) = nexttile([1,1]); f=f+1;
 hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.x_map, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
-plot(rad2.sens_stamp, safe_cols(rad2.x_map, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2);
+if(compare); plot(rad2_sens_stamp, safe_cols(rad2.x_map, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
+if(ground_truth); plot(gt_timestamp, gt.x_map, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
 grid on; title('x map [m]'); legend; xlim(x_lim);
 
 % pos y
 axes(f) = nexttile([1,1]); f=f+1;
 hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.y_map, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
-plot(rad2.sens_stamp, safe_cols(rad2.y_map, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2);
+if(compare); plot(rad2_sens_stamp, safe_cols(rad2.y_map, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
+if(ground_truth); plot(gt_timestamp, gt.y_map, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
 grid on; title('y map [m]'); legend; xlim(x_lim);
 
 % vx
 axes(f) = nexttile([1,1]); f=f+1;
 hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.vx, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
-plot(rad2.sens_stamp, safe_cols(rad2.vx, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2);
+if(compare); plot(rad2_sens_stamp, safe_cols(rad2.vx, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
+if(ground_truth); plot(gt_timestamp, gt.speed, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
 grid on; title('vx [m/s]'); legend; xlim(x_lim);
 
-
-%% Detection count
-figure('name','Detection Count')
-f=f+1;
+% detections
+axes(f) = nexttile([1,1]); f=f+1;
 hold on;
 plot(rad1.sens_stamp,rad1.count,'Color',col.radar,'DisplayName',NAME_1);
-plot(rad2.sens_stamp,rad2.count,'Color',col.radar2,'DisplayName',NAME_2);
+if(compare); plot(rad2_sens_stamp,rad2.count,'Color',col.radar2,'DisplayName',NAME_2); end
 grid on; title('Detections [#]'); legend; xlim(x_lim);
 
 linkaxes(axes,'x');
+
+
+%% MAP GUI
+fig = figure('Name','MAP');
+
+lap_min = min(gt.lap);
+lap_max = max(gt.lap);
+
+c = uicontrol('Parent', fig, 'Style','pushbutton', ...
+    'String','Refresh', ...
+    'Units','normalized', ...
+    'Position',[0.05 0.02 0.08 0.04], ...
+    'Callback', @refreshTimeButtonPushed);
+
+s = uicontrol('Parent', fig, 'Style', 'slider', ...
+    'Units','normalized', ...
+    'Position', [0.2 0.025 0.4 0.03], ...
+    'Min', lap_min, ...
+    'Max', lap_max, ...
+    'Value', lap_min, ...
+    'SliderStep', [1/(lap_max - lap_min), 1/(lap_max - lap_min)], ...
+    'Callback', @sliderMoved);
+
+function sliderMoved(src, ~)
+    lap = round(src.Value);  
+    src.Value = lap;          
+    assignin('base', 'lap', lap); 
+    refreshTimeButtonPushed();           
+end
+
+
+function refreshTimeButtonPushed(src,event)
+    traj_db = evalin('base', 'trajDatabase');
+    ground_truth = evalin('base', 'ground_truth');
+    compare = evalin('base', 'compare');
+    col = evalin('base', 'col');
+    rad1 = evalin('base', 'rad1');
+    lap = evalin('base', 'lap');
+    if(ground_truth); gt=evalin('base','gt'); end
+    if(ground_truth); gt_timestamp = evalin('base','gt_timestamp'); end
+    if(compare); rad2.sens_stamp = evalin('base', 'rad2'); end
+    if (compare); rad2_sens_stamp = evalin('base', 'rad2_sens_stamp'); end
+    
+    if(ground_truth)
+        idx = find(gt.lap == lap);
+        t1_gt_ref = idx(1);
+        tend_gt_ref = idx(end);
+        t_lim = [gt_timestamp(t1_gt_ref), gt_timestamp(tend_gt_ref)];
+        t1_rad_clust = find(rad1.sens_stamp>t_lim(1),1);
+        tend_rad_clust = find(rad1.sens_stamp<t_lim(2),1,'last');
+        if(compare)
+            t1_rad_clust2 = find(rad2_sens_stamp>t_lim(1),1);
+            tend_rad_clust2 = find(rad2_sens_stamp<t_lim(2),1,'last');
+        end
+    end
+
+    subplot(1,1,1)
+    cla reset 
+    title('map')
+    hold on
+    grid on
+    xlabel('x[m]')
+    ylabel('y[m]')
+    axis 'equal'
+
+    % plot track lines
+    id_left = length(traj_db) - 2;
+    id_right = length(traj_db) - 1;
+    plot(traj_db(id_left).X, traj_db(id_left).Y, 'color', 'k', 'LineWidth', 1, 'HandleVisibility','off');
+    plot(traj_db(id_right).X, traj_db(id_right).Y, 'color', 'k', 'LineWidth', 1, 'HandleVisibility','off');
+
+    plot(rad1.x_map(t1_rad_clust:tend_rad_clust), rad1.y_map(t1_rad_clust:tend_rad_clust),'.','markersize',20,'Color',col.radar,'displayname','Rad Clust');
+    if(compare); plot(rad2.x_map(t1_rad_clust2:tend_rad_clust2), rad2.y_map(t1_rad_clust2:tend_rad_clust2),'.','markersize',20,'Color',col.radar,'displayname','Rad Clust'); end
+    if(ground_truth); plot(gt.x_map(t1_gt_ref:tend_gt_ref),gt.y_map(t1_gt_ref:tend_gt_ref),'Color',col.ref,'DisplayName','Grond Truth'); end
+    legend show
+end
