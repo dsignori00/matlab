@@ -24,16 +24,20 @@
 % calculated speed          % true if speed calculated from gps pos measures
 % rho                       % distance from opponent (range)
 % rho_dot                   % range rate (relative speed)
+% clos_idx                  % traj server closest idx
+% lap                       % lap counter
+
 
 %% TO DO
 % apply a low pass filter to filter out high frequency noise do to ego-opponent timestamp difference 
 
 %% Paths
-clc; close all; clearvars -except ego opp_log closest_idxs opp_idxs file_name
+clc; close all; clearvars -except ego opp_log closest_idxs opp_idxs file_name out
 
 addpath("../../common/utilities/")
 addpath("../../common/constants/")
 addpath("../../common/plot/")
+addpath("../../databases/")
 addpath("opp_data/")
 addpath("../utils/")
 normal_path = "../../bags";
@@ -103,18 +107,76 @@ while ~ismember(opp_id, lista_opponents)
     opp_id = input("Choose opponent identifier: ");
 end
 
-diff1 = opp_log.stamp(2:length(opp_log.stamp))-opp_log.stamp(1:length(opp_log.stamp)-1);
-valid_stamps = [true; abs(diff1 - 0.01) < 0.003];
 
 switch(opp_id)
     case 3
-        out.timestamp = opp_log.stamp(valid_stamps)*10^9;
-        out.x_map = opp_log.x_cog(valid_stamps);
-        out.y_map = opp_log.y_cog(valid_stamps);
-        out.yaw_map = unwrap(opp_log.heading((valid_stamps)));
-        out.speed = opp_log.vx(valid_stamps);
+        opp_lat0 = 24.471024;
+        opp_lon0 = 54.605536;
+        opp_alt0 = -29.96;
+        out.timestamp = opp_log.stamp*10^9;
+        out.x_map = opp_log.x_cog;
+        out.y_map = opp_log.y_cog;
+        out.yaw_map = unwrap(opp_log.heading());
+        out.speed = opp_log.vx;
 
 end
+
+%Select the track
+track_list = [0,1,2,3,4,5];
+track_id = -1;
+while ~ismember(track_id, track_list)
+    disp( "Choose track:" + newline + ...
+          " 1: KS " + newline + ...
+          " 2: IMS " + newline + ...
+          " 3: LVMS " + newline + ...
+          " 4: YasMarina " + newline + ...
+          " 5: YasNorth " + newline + ...
+          " 0: Quit");
+    track_id = input("Insert track identifier: ");
+end
+
+% Geodetic to Enu
+wgs84 = wgs84Ellipsoid;
+switch (track_id) 
+    case 1 
+        % KS
+        lat0    = 38.711552404047440;
+        lon0    = -84.916952255229230;
+        alt0    = 182.9;
+        % load("Ks.mat")
+    case 2
+        % IMS
+        lat0    =  39.793145808368780;	
+        lon0    = -86.236780583175840;
+        alt0    =  221.8500178;
+        load("Ims.mat")
+    case 3
+        % LVMS
+        lat0    =  36.272904305728540;
+        lon0    = -115.0110198639284+1e-5;
+        alt0    =  594.6250982;
+        load("Lvms.mat")
+    case 4
+        % YasMarina
+        lat0 = 24.470253250335873;
+        lon0 = 54.605170726971520;
+        alt0 = 182.9;
+        load("YasMarina.mat")
+     case 5
+        % YasNorth
+        lat0 = 24.470253250335873 - 2.3448e-5;
+        lon0 = 54.605170726971520;
+        alt0 = 182.9;
+        load("YasNorth.mat")
+    case 0
+        error("Quit");
+    otherwise
+        error("Error in track selection");  
+end
+
+[x0,y0,~] = geodetic2enu(opp_lat0,opp_lon0,opp_alt0,lat0,lon0,alt0,wgs84);
+out.x_map = opp_log.x_cog + x0;
+out.y_map = opp_log.y_cog + y0;
 
 opp_sz = length(out.timestamp);
 out.gps = NaN;
@@ -132,6 +194,15 @@ diff = out.timestamp(2:length(out.timestamp))-out.timestamp(1:length(out.timesta
 freq = 1./diff;
 avg_freq = mean(freq)*10^9;
 out.bag_avg_freq = avg_freq;
+
+%% Assign closest idx and lap
+
+if (~exist('out.clos_idx','var'))
+    opp_pos = [out.x_map, out.y_map];
+    [~, opp_idx] = get_heading(opp_pos, trajDatabase);
+    out.clos_idx = opp_idx;
+    out.lap = assign_lap(opp_idx);
+end
 
 %% Ego
 ego_bag_timestamp = (ego.estimation.bag_stamp)*10^9+double(ego.time_offset_nsec);
@@ -207,10 +278,9 @@ out.yaw_rel = tot_yaw_rel;
 %% Range and Range Rate
 
 range = NaN(opp_sz,1);
-v = [dx;dy];
-r = norm(v);
+r = sqrt(dx.^2 + dy.^2);
 range(opp_idxs) = r;
-out.range = range;
+out.rho = range;
 
 beta = atan2(dy,dx);
 valid_rho_dot = (out.speed(opp_idxs).*cos(out.yaw_map(opp_idxs))-ego_speed(closest_idxs).*cos(ego_yaw_map(closest_idxs))).*cos(beta)+ ...
@@ -225,7 +295,8 @@ out.rho_dot = rho_dot;
 
 try
     output_file = fullfile(output_path, file_name + ".mat");
-    save(output_file, 'opp_log', '-v7.3');
+    save(output_file, 'out', '-v7.3');
+    fprintf("File salvato correttamente: %s\n", output_file);
 catch e
     warning("WARNING: Could not save files");
     warning("Error type:  " + e.message);

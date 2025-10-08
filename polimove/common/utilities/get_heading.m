@@ -1,4 +1,4 @@
-function out = get_heading (pos, trajDatabase)
+function [heading, idxs] = get_heading (pos, trajDatabase)
     % given the position in map frame returns the traj database heading
     out = NaN(length(pos(:,1)),1);
     for j=1:length(pos(:,1))
@@ -18,5 +18,8 @@ function out = get_heading (pos, trajDatabase)
             end
         end
         out(j,1) = trajDatabase(traj).Heading(clos_idx);
+        out(j,2) = clos_idx;
     end
+    heading = out(:,1);
+    idxs = out(:,2);
 end
