@@ -1,4 +1,4 @@
-clc; clearvars -except log file
+clc; clearvars;
 
 if (~exist('log','var'))
     [file,path] = uigetfile('*.mat','Load log');
