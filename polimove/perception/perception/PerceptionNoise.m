@@ -6,6 +6,7 @@ src_corr = false;
 show_error_series = false;
 use_sim_ref = false;
 drop_out_analyses = false;
+use_ref = true;
 
 
 %% Paths
