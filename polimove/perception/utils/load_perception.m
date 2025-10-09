@@ -1,5 +1,6 @@
 % LIDAR CLUSTERING DETECTIONS
 lid_clust.sens_stamp = log.perception__lidar__clustering_detections.sensor_stamp__tot;
+lid_clust.stamp = log.perception__lidar__clustering_detections.stamp__tot;
 % relative
 lid_clust.x_rel = log.perception__lidar__clustering_detections.detections__x_rel;
 lid_clust.y_rel = log.perception__lidar__clustering_detections.detections__y_rel;
@@ -21,6 +22,7 @@ lid_clust.yaw_map(lid_clust.yaw_map==0)=nan;
 
 % RADAR CLUSTERING DETECTIONS
 rad_clust.sens_stamp = log.perception__radar__clustering_detections.sensor_stamp__tot;
+rad_clust.stamp = log.perception__radar__clustering_detections.stamp__tot;
 % relative
 rad_clust.x_rel = log.perception__radar__clustering_detections.detections__x_rel;
 rad_clust.y_rel = log.perception__radar__clustering_detections.detections__y_rel;
@@ -44,6 +46,7 @@ rad_clust.yaw_map(rad_clust.yaw_map==0)=nan;
 
 % CAMERA CLUSTERING DETECTIONS
 cam_yolo.sens_stamp = log.perception__camera__yolo_detections.sensor_stamp__tot;
+cam_yolo.stamp = log.perception__camera__yolo_detections.stamp__tot;
 % relative
 cam_yolo.x_rel = log.perception__camera__yolo_detections.detections__x_rel;
 cam_yolo.y_rel = log.perception__camera__yolo_detections.detections__y_rel;
@@ -64,6 +67,7 @@ cam_yolo.yaw_map(cam_yolo.yaw_map==0)=nan;
 
 % LIDAR POINTPILLARS DETECTIONS
 lid_pp.sens_stamp = log.perception__lidar__pointpillars_detections.sensor_stamp__tot;
+lid_pp.stamp = log.perception__lidar__pointpillars_detections.stamp__tot;
 % relative
 lid_pp.x_rel = log.perception__lidar__pointpillars_detections.detections__x_rel;
 lid_pp.y_rel = log.perception__lidar__pointpillars_detections.detections__y_rel;
@@ -99,7 +103,7 @@ if(use_sim_ref)
     gt.vx = log.sim_out.opponents__vx(:,1);
     gt.yaw_map = log.sim_out.opponents__psi(:,1);
     gt.yaw_map = deg2rad(unwrap(rad2deg(gt.yaw_map)));
-else
+elseif(use_ref)
     gt.stamp = (log_ref.timestamp - double(log.time_offset_nsec))*1e-9;
     % relative
     gt.x_rel = log_ref.x_rel;
