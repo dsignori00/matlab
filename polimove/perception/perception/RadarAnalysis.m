@@ -76,10 +76,6 @@ col.radar2 = '#EDB120';
 sz=3; % Marker size
 f=1;
 
-% LIVELINESS
-liveliness_stamp = log.liveliness__state.bag_stamp;
-log.liveliness__state.nodes_states__current_rate(:,21);
-
 % RADAR CLUSTERING DETECTIONS
 rad1 = get_radar_fields(log);
 if(compare); rad2 = get_radar_fields(log2); end
@@ -160,6 +156,10 @@ end
 rad1 = sum_radar_counts(rad1, 4);
 if(compare); rad2 = sum_radar_counts(rad2, 4); end
 
+% liveliness
+liv_idx = find_radar_indices(log);
+liveliness_stamp = log.liveliness__state.bag_stamp;
+
 
 %% LATENCY FIGURE
 figure('name','Latency')
@@ -167,18 +167,18 @@ tiledlayout(3,1,'Padding','compact');
 
 axes(f) = nexttile; f=f+1;
 hold on;
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,21), 'DisplayName','RR');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,23), 'DisplayName','RF');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,25), 'DisplayName','RL');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,27), 'DisplayName','RB');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(1)), 'DisplayName','RF');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(3)), 'DisplayName','RR');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(5)), 'DisplayName','RL');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(7)), 'DisplayName','RB');
 grid on; title('radar points rate [s]'); legend; xlim(x_lim);
 
 axes(f) = nexttile; f=f+1;
 hold on;
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,22), 'DisplayName','RR');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,24), 'DisplayName','RF');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,26), 'DisplayName','RL');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,28), 'DisplayName','RB');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(2)), 'DisplayName','RF');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(4)), 'DisplayName','RR');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(6)), 'DisplayName','RL');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(8)), 'DisplayName','RB');
 grid on; title('radar udp packages rate [s]'); legend; xlim(x_lim);
 
 axes(f) = nexttile; f=f+1;
@@ -230,7 +230,7 @@ grid on; title('Detections [#]'); legend; xlim(x_lim);
 
 %% STATE FIGURE MAP
 figure('name','Detections - Map')
-tiledlayout(4,1,'Padding','compact');
+tiledlayout(2,1,'Padding','compact');
 
 % pos X
 axes(f) = nexttile([1,1]); f=f+1;
