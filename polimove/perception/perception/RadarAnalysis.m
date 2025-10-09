@@ -274,57 +274,32 @@ linkaxes(axes,'x');
 %% MAP GUI
 fig = figure('Name','MAP');
 
-if(ground_truth)
-    lap_min = min(gt.lap);
-    lap_max = max(gt.lap);
-    
-    c = uicontrol('Parent', fig, 'Style','pushbutton', ...
-        'String','Refresh', ...
-        'Units','normalized', ...
-        'Position',[0.05 0.02 0.08 0.04], ...
-        'Callback', @refreshTimeButtonPushed);
-    
-    s = uicontrol('Parent', fig, 'Style', 'slider', ...
-        'Units','normalized', ...
-        'Position', [0.2 0.025 0.4 0.03], ...
-        'Min', lap_min, ...
-        'Max', lap_max, ...
-        'Value', lap_min, ...
-        'SliderStep', [1/(lap_max - lap_min), 1/(lap_max - lap_min)], ...
-        'Callback', @sliderMoved);
-end
-
-function sliderMoved(src, ~)
-    lap = round(src.Value);  
-    src.Value = lap;          
-    assignin('base', 'lap', lap); 
-    refreshTimeButtonPushed();           
-end
-
+c = uicontrol('Style','pushbutton');
+c.String = {'Refresh'};
+c.Callback = @refreshTimeButtonPushed;
 
 function refreshTimeButtonPushed(src,event)
+    axes = evalin('base', 'axes');
     traj_db = evalin('base', 'trajDatabase');
     ground_truth = evalin('base', 'ground_truth');
     compare = evalin('base', 'compare');
     col = evalin('base', 'col');
     rad1 = evalin('base', 'rad1');
-    lap = evalin('base', 'lap');
     if(ground_truth); gt=evalin('base','gt'); end
     if(ground_truth); gt_timestamp = evalin('base','gt_timestamp'); end
     if(compare); rad2.sens_stamp = evalin('base', 'rad2'); end
     if (compare); rad2_sens_stamp = evalin('base', 'rad2_sens_stamp'); end
     
+    t_lim=xlim(axes(1));
+    t1_rad_clust = find(rad1.sens_stamp>t_lim(1),1);
+    tend_rad_clust = find(rad1.sens_stamp<t_lim(2),1,'last');
+    if(compare)
+        t1_rad_clust2 = find(rad2_sens_stamp>t_lim(1),1);
+        tend_rad_clust2 = find(rad2_sens_stamp<t_lim(2),1,'last');
+    end
     if(ground_truth)
-        idx = find(gt.lap == lap);
-        t1_gt_ref = idx(1);
-        tend_gt_ref = idx(end);
-        t_lim = [gt_timestamp(t1_gt_ref), gt_timestamp(tend_gt_ref)];
-        t1_rad_clust = find(rad1.sens_stamp>t_lim(1),1);
-        tend_rad_clust = find(rad1.sens_stamp<t_lim(2),1,'last');
-        if(compare)
-            t1_rad_clust2 = find(rad2_sens_stamp>t_lim(1),1);
-            tend_rad_clust2 = find(rad2_sens_stamp<t_lim(2),1,'last');
-        end
+        t1_gt_ref = find(gt_timestamp>t_lim(1),1);
+        tend_gt_ref = find(gt_timestamp<t_lim(2),1,'last');
     end
 
     subplot(1,1,1)
