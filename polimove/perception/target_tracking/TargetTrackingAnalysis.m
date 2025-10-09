@@ -1,7 +1,7 @@
 close all
 clearvars -except log log_ref trajDatabase
 
-use_ref = false;
+use_ref = true;
 use_sim_ref = false;
 imm = false;
 
