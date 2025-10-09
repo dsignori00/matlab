@@ -10,12 +10,6 @@ NAME_2 = "Radar - 2";
 %#ok<*UNRCH>
 %#ok<*INUSD>
 
-% TO DO :
-% - fix detection count (max of the 4 radars)
-% - lap number in gui map
-% - fix heartbeats (parse string)
-% - map highlight selected time interval
-profile on  
 %% Paths
 
 addpath("../../common/utilities/")
@@ -322,4 +316,3 @@ function refreshTimeButtonPushed(src,event)
     if(ground_truth); plot(gt.x_map(t1_gt_ref:tend_gt_ref),gt.y_map(t1_gt_ref:tend_gt_ref),'Color',col.ref,'DisplayName','Grond Truth'); end
     legend show
 end
-profile off
