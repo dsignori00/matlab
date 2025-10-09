@@ -1,4 +1,4 @@
-function [heading, idxs] = get_heading (pos, trajDatabase)
+function [heading, idxs] = get_heading (pos, trajDatabase, traj)
     % given the position in map frame returns the traj database heading
     out = NaN(length(pos(:,1)),1);
     for j=1:length(pos(:,1))
@@ -8,13 +8,17 @@ function [heading, idxs] = get_heading (pos, trajDatabase)
             continue;
         end
         min_dist = inf;
-        traj = 0;
-        for i=1:length(trajDatabase)
-            [dist, idx] = compute_dist(x,y,trajDatabase(i).X,trajDatabase(i).Y);
-            if(dist<min_dist)
-                min_dist = dist;
-                clos_idx = idx;
-                traj = i;
+        if (traj~=-1)
+            [~, clos_idx] = compute_dist(x,y,trajDatabase(traj).X,trajDatabase(traj).Y);
+        else
+            traj = 0;
+            for i=1:length(trajDatabase)
+                [dist, idx] = compute_dist(x,y,trajDatabase(i).X,trajDatabase(i).Y);
+                if(dist<min_dist)
+                    min_dist = dist;
+                    clos_idx = idx;
+                    traj = i;
+                end
             end
         end
         out(j,1) = trajDatabase(traj).Heading(clos_idx);
