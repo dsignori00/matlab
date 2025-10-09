@@ -27,12 +27,10 @@
 % clos_idx                  % traj server closest idx
 % lap                       % lap counter
 
-
-%% TO DO
+% TO DO:
 % apply a low pass filter to filter out high frequency noise do to ego-opponent timestamp difference 
-
 %% Paths
-clc; close all; clearvars -except ego opp_log closest_idxs opp_idxs file_name out
+clc; close all; clearvars -except ego opp_log closest_idxs opp_idxs file_name out.clos_idx
 
 addpath("../../common/utilities/")
 addpath("../../common/constants/")
@@ -119,6 +117,15 @@ switch(opp_id)
         out.yaw_map = unwrap(opp_log.heading());
         out.speed = opp_log.vx;
 
+    case 6
+        opp_lat0 = 24.46477;
+        opp_lon0 = 54.60523;
+        opp_alt0 = 0.0;
+        out.timestamp = opp_log.x20251008_run1_unimore_loc_stamp;
+        out.x_map = opp_log.loc_vehicle_state_position_value0;
+        out.y_map = opp_log.loc_vehicle_state_position_value1;
+        out.yaw_map = unwrap(opp_log.loc_vehicle_state_orientation_value2);
+        out.speed = opp_log.loc_vehicle_state_linVel_value0;
 end
 
 %Select the track
@@ -175,8 +182,8 @@ switch (track_id)
 end
 
 [x0,y0,~] = geodetic2enu(opp_lat0,opp_lon0,opp_alt0,lat0,lon0,alt0,wgs84);
-out.x_map = opp_log.x_cog + x0;
-out.y_map = opp_log.y_cog + y0;
+out.x_map = out.x_map + x0;
+out.y_map = out.y_map + y0;
 
 opp_sz = length(out.timestamp);
 out.gps = NaN;
@@ -195,14 +202,6 @@ freq = 1./diff;
 avg_freq = mean(freq)*10^9;
 out.bag_avg_freq = avg_freq;
 
-%% Assign closest idx and lap
-
-if (~exist('out.clos_idx','var'))
-    opp_pos = [out.x_map, out.y_map];
-    [~, opp_idx] = get_heading(opp_pos, trajDatabase);
-    out.clos_idx = opp_idx;
-    out.lap = assign_lap(opp_idx);
-end
 
 %% Ego
 ego_bag_timestamp = (ego.estimation.bag_stamp)*10^9+double(ego.time_offset_nsec);
@@ -232,6 +231,15 @@ ego_bag_timestamp = ego_bag_timestamp(closest_idxs);
 time_diff_nsec = NaN(opp_sz,1); 
 time_diff_nsec(opp_idxs) = ego_timestamp(closest_idxs) - out.timestamp(opp_idxs);
 out.timestamp_diff = time_diff_nsec;
+
+%% Assign closest idx and lap
+
+if (~exist('out.clos_idx','var'))
+    opp_pos = [out.x_map, out.y_map];
+    [~, opp_idx] = get_heading(opp_pos, trajDatabase, 10);
+    out.clos_idx = opp_idx;
+    out.lap = assign_lap(opp_idx);
+end
 
 %% Relative metrics computation
 
