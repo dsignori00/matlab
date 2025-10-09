@@ -1,4 +1,4 @@
-    close all
+close all
 clearvars -except log log2 trajDatabase gt ego ego2 rad1 rad2
 
 ground_truth = true;
@@ -10,6 +10,12 @@ NAME_2 = "Radar - 2";
 %#ok<*UNRCH>
 %#ok<*INUSD>
 
+% TO DO :
+% - fix detection count (max of the 4 radars)
+% - lap number in gui map
+% - fix heartbeats (parse string)
+% - map highlight selected time interval
+profile on  
 %% Paths
 
 addpath("../../common/utilities/")
@@ -80,15 +86,29 @@ if(compare); rad2 = get_radar_fields(log2); end
 
 %% PROCESSING
 
+if(ground_truth); gt_timestamp = (gt.timestamp - double(log.time_offset_nsec))*10^-9; end
+
+% compute heading
 if (~exist('rad1.idx','var'))
     for i = 1:rad1.max_det
         opp_pos = [rad1.x_map(:,i), rad1.y_map(:,i)];
-        [opp_yaw, opp_idx] = get_heading(opp_pos, trajDatabase);
+        [opp_yaw, opp_idx] = get_heading(opp_pos, trajDatabase, -1);
         rad1.yaw_map(:,i) = opp_yaw;
         rad1.idx(:,i) = opp_idx;
     end
 end
+if(compare)
+    if (~exist('rad2.idx','var'))
+        for i = 1:rad2.max_det
+            opp_pos = [rad2.x_map(:,i), rad2.y_map(:,i)];
+            [opp_yaw, opp_idx] = get_heading(opp_pos, trajDatabase);
+            rad2.yaw_map(:,i) = opp_yaw;
+            rad2.idx(:,i) = opp_idx;
+        end
+    end
+end
 
+% match timestamp
 ego.timestamp = (log.estimation.stamp__tot)*10^9+double(log.time_offset_nsec);
 rad1_stamp = rad1.sens_stamp*10^9 + double(log.time_offset_nsec);
 
@@ -102,23 +122,7 @@ ego.yaw = log.estimation.heading(ego.clos_idxs);
 ego.v(:,1) = log.estimation.vx(ego.clos_idxs);
 ego.v(:,2) = log.estimation.vy(ego.clos_idxs);
 
-for i = 1:rad1.max_det
-    opp_yaw = rad1.yaw_map(:,i);
-    rad1.vx(:,i) = compensate_ego_speed(ego.pos, ego.v, ego.yaw, opp_yaw, ...
-                        rad1.rho_dot(:,i), rad1.x_map(:,i), rad1.y_map(:,i));
-end
-
-rad1.range = sqrt(rad1.x_rel.^2 + rad1.y_rel.^2);
-
 if(compare)
-    if (~exist('rad2.idx','var'))
-        for i = 1:rad2.max_det
-            opp_pos = [rad2.x_map(:,i), rad2.y_map(:,i)];
-            [opp_yaw, opp_idx] = get_heading(opp_pos, trajDatabase);
-            rad2.yaw_map(:,i) = opp_yaw;
-            rad2.idx(:,i) = opp_idx;
-        end
-    end
     rad2_stamp = rad2.sens_stamp*10^9 + double(log2.time_offset_nsec);
     if (~exist('ego2','var'))
         [ego2.clos_idxs, ~] = find_closest_stamp(rad2_stamp,ego.timestamp);
@@ -131,7 +135,17 @@ if(compare)
     ego2.yaw = log.estimation.heading(ego2.clos_idxs);
     ego2.v(:,1) = log.estimation.vx(ego2.clos_idxs);
     ego2.v(:,2) = log.estimation.vy(ego2.clos_idxs);
+end
 
+% compute opp speed
+for i = 1:rad1.max_det
+    opp_yaw = rad1.yaw_map(:,i);
+    rad1.vx(:,i) = compensate_ego_speed(ego.pos, ego.v, ego.yaw, opp_yaw, ...
+                        rad1.rho_dot(:,i), rad1.x_map(:,i), rad1.y_map(:,i));
+end
+rad1.range = sqrt(rad1.x_rel.^2 + rad1.y_rel.^2);
+
+if(compare)
     for i = 1:max(rad2.max_det,1)
         opp_yaw = rad2.yaw_map(:,i);
         rad2.vx(:,i) = compensate_ego_speed(ego2.pos, ego2.v, ego2.yaw, opp_yaw, ...
@@ -142,7 +156,11 @@ if(compare)
     rad2.range = sqrt(rad2.x_rel.^2 + rad2.y_rel.^2);
 end
 
-if(ground_truth); gt_timestamp = (gt.timestamp - double(log.time_offset_nsec))*10^-9; end
+% detection number
+rad1 = sum_radar_counts(rad1, 4);
+if(compare); rad2 = sum_radar_counts(rad2, 4); end
+
+
 %% LATENCY FIGURE
 figure('name','Latency')
 tiledlayout(3,1,'Padding','compact');
@@ -171,8 +189,8 @@ grid on; title('radar clustering latency [s]'); legend; xlim(x_lim);
 
 
 %% STATE FIGURE COG
-figure('name','Detections - cog')
-tiledlayout(4,1,'Padding','compact');
+figure('name','Detections - CoG')
+tiledlayout(2,1,'Padding','compact');
 
 % pos x
 axes(f) = nexttile([1,1]); f=f+1;
@@ -190,6 +208,10 @@ if(compare); plot(rad2_sens_stamp, safe_cols(rad2.y_rel, rad2.max_det), 'o', 'Ma
 if(ground_truth); plot(gt_timestamp, gt.y_rel, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
 grid on; title('y rel [m]'); legend; xlim(x_lim);
 
+%% STATE FIGURE COG
+figure('name','Detections - Range')
+tiledlayout(2,1,'Padding','compact');
+
 % rho 
 axes(f) = nexttile([1,1]); f=f+1;
 hold on;
@@ -198,17 +220,16 @@ if(compare); plot(rad2_sens_stamp, safe_cols(rad2.range, rad2.max_det), 'o', 'Ma
 if(ground_truth); plot(gt_timestamp, gt.rho, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
 grid on; title('range [m]'); legend; xlim(x_lim);
 
-% rho dot
+% detections
 axes(f) = nexttile([1,1]); f=f+1;
 hold on;
-plot(rad1.sens_stamp, safe_cols(rad1.rho_dot, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
-if(compare); plot(rad2_sens_stamp, safe_cols(rad2.rho_dot, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
-if(ground_truth); plot(gt_timestamp, gt.rho_dot, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
-grid on; title('rho dot [m/s]'); legend; xlim(x_lim);
+plot(rad1.sens_stamp,rad1.count,'Color',col.radar,'DisplayName',NAME_1);
+if(compare); plot(rad2_sens_stamp,rad2.count,'Color',col.radar2,'DisplayName',NAME_2); end
+grid on; title('Detections [#]'); legend; xlim(x_lim);
 
 
 %% STATE FIGURE MAP
-figure('name','Detections - map')
+figure('name','Detections - Map')
 tiledlayout(4,1,'Padding','compact');
 
 % pos X
@@ -227,6 +248,18 @@ if(compare); plot(rad2_sens_stamp, safe_cols(rad2.y_map, rad2.max_det), 'o', 'Ma
 if(ground_truth); plot(gt_timestamp, gt.y_map, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
 grid on; title('y map [m]'); legend; xlim(x_lim);
 
+%% STATE FIGURE COG
+figure('name','Detections - Speed')
+tiledlayout(2,1,'Padding','compact');
+
+% rho dot
+axes(f) = nexttile([1,1]); f=f+1;
+hold on;
+plot(rad1.sens_stamp, safe_cols(rad1.rho_dot, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
+if(compare); plot(rad2_sens_stamp, safe_cols(rad2.rho_dot, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
+if(ground_truth); plot(gt_timestamp, gt.rho_dot, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
+grid on; title('rho dot [m/s]'); legend; xlim(x_lim);
+
 % vx
 axes(f) = nexttile([1,1]); f=f+1;
 hold on;
@@ -235,36 +268,31 @@ if(compare); plot(rad2_sens_stamp, safe_cols(rad2.vx, rad2.max_det), 'o', 'Marke
 if(ground_truth); plot(gt_timestamp, gt.speed, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
 grid on; title('vx [m/s]'); legend; xlim(x_lim);
 
-% detections
-axes(f) = nexttile([1,1]); f=f+1;
-hold on;
-plot(rad1.sens_stamp,rad1.count,'Color',col.radar,'DisplayName',NAME_1);
-if(compare); plot(rad2_sens_stamp,rad2.count,'Color',col.radar2,'DisplayName',NAME_2); end
-grid on; title('Detections [#]'); legend; xlim(x_lim);
-
 linkaxes(axes,'x');
 
 
 %% MAP GUI
 fig = figure('Name','MAP');
 
-lap_min = min(gt.lap);
-lap_max = max(gt.lap);
-
-c = uicontrol('Parent', fig, 'Style','pushbutton', ...
-    'String','Refresh', ...
-    'Units','normalized', ...
-    'Position',[0.05 0.02 0.08 0.04], ...
-    'Callback', @refreshTimeButtonPushed);
-
-s = uicontrol('Parent', fig, 'Style', 'slider', ...
-    'Units','normalized', ...
-    'Position', [0.2 0.025 0.4 0.03], ...
-    'Min', lap_min, ...
-    'Max', lap_max, ...
-    'Value', lap_min, ...
-    'SliderStep', [1/(lap_max - lap_min), 1/(lap_max - lap_min)], ...
-    'Callback', @sliderMoved);
+if(ground_truth)
+    lap_min = min(gt.lap);
+    lap_max = max(gt.lap);
+    
+    c = uicontrol('Parent', fig, 'Style','pushbutton', ...
+        'String','Refresh', ...
+        'Units','normalized', ...
+        'Position',[0.05 0.02 0.08 0.04], ...
+        'Callback', @refreshTimeButtonPushed);
+    
+    s = uicontrol('Parent', fig, 'Style', 'slider', ...
+        'Units','normalized', ...
+        'Position', [0.2 0.025 0.4 0.03], ...
+        'Min', lap_min, ...
+        'Max', lap_max, ...
+        'Value', lap_min, ...
+        'SliderStep', [1/(lap_max - lap_min), 1/(lap_max - lap_min)], ...
+        'Callback', @sliderMoved);
+end
 
 function sliderMoved(src, ~)
     lap = round(src.Value);  
@@ -319,3 +347,4 @@ function refreshTimeButtonPushed(src,event)
     if(ground_truth); plot(gt.x_map(t1_gt_ref:tend_gt_ref),gt.y_map(t1_gt_ref:tend_gt_ref),'Color',col.ref,'DisplayName','Grond Truth'); end
     legend show
 end
+profile off

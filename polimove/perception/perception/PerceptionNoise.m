@@ -13,6 +13,7 @@ drop_out_analyses = false;
 addpath("../../common/utilities/")
 addpath("../../common/constants/")
 addpath("../../common/plot/")
+opp_dir = "../opponent_gps/mat/";
 normal_path = "../../bags";
 
 %% LOAD FILES
@@ -27,12 +28,19 @@ if(~exist('trajDatabase','var'))
     end
 end
 
+% load log
+if (~exist('log','var'))
+    [file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load log');
+    load(fullfile(path,file));
+end
+
 % load ref
 if(~use_sim_ref)
     if (~exist('log_ref','var'))
-    [file,path_dir] = uigetfile(fullfile(normal_path,'*.mat'),'Load ground truth mat');
+    [file,path_dir] = uigetfile(fullfile(opp_dir,'*.mat'),'Load ground truth mat');
     tmp = load(fullfile(path_dir,file));
-    log_ref = tmp.log;
+    fields = fieldnames(tmp);
+    log_ref = tmp.(fields{1});
     clearvars tmp;
     end
 end
@@ -271,9 +279,9 @@ lid_clust_x_map_err = lid_clust_x_map-lid_clust_x_map_gt;
 lid_clust_y_map_err = lid_clust_y_map-lid_clust_y_map_gt;
 lid_clust_x_rel_err = lid_clust_x_rel-lid_clust_x_rel_gt;
 lid_clust_y_rel_err = lid_clust_y_rel-lid_clust_y_rel_gt;
-lid_clust_yaw_map_gt = deg2rad(UnwrapPi(rad2deg(lid_clust_yaw_map_gt)));
+lid_clust_yaw_map_gt = deg2rad(unwrap(rad2deg(lid_clust_yaw_map_gt)));
 lid_clust_yaw_map_err = lid_clust_yaw_map-lid_clust_yaw_map_gt;
-lid_clust_yaw_map_err = deg2rad(UnwrapPi(rad2deg(lid_clust_yaw_map_err)));
+lid_clust_yaw_map_err = deg2rad(unwrap(rad2deg(lid_clust_yaw_map_err)));
 
 % RADAR CLUSTERING
 
@@ -287,9 +295,9 @@ rad_clust_x_map_err = rad_clust_x_map-rad_clust_x_map_gt;
 rad_clust_y_map_err = rad_clust_y_map-rad_clust_y_map_gt;
 rad_clust_x_rel_err = rad_clust_x_rel-rad_clust_x_rel_gt;
 rad_clust_y_rel_err = rad_clust_y_rel-rad_clust_y_rel_gt;
-rad_clust_yaw_map_gt = deg2rad(UnwrapPi(rad2deg(rad_clust_yaw_map_gt)));
+rad_clust_yaw_map_gt = deg2rad(unwrap(rad2deg(rad_clust_yaw_map_gt)));
 rad_clust_yaw_map_err = rad_clust_yaw_map-rad_clust_yaw_map_gt;
-rad_clust_yaw_map_err = deg2rad(UnwrapPi(rad2deg(rad_clust_yaw_map_err)));
+rad_clust_yaw_map_err = deg2rad(unwrap(rad2deg(rad_clust_yaw_map_err)));
 
 % LIDAR POINTPILLARS
 
@@ -303,9 +311,9 @@ lid_pp_x_map_err = lid_pp_x_map-lid_pp_x_map_gt;
 lid_pp_y_map_err = lid_pp_y_map-lid_pp_y_map_gt;
 lid_pp_x_rel_err = lid_pp_x_rel-lid_pp_x_rel_gt;
 lid_pp_y_rel_err = lid_pp_y_rel-lid_pp_y_rel_gt;
-lid_pp_yaw_map_gt = deg2rad(UnwrapPi(rad2deg(lid_pp_yaw_map_gt)));
+lid_pp_yaw_map_gt = deg2rad(unwrap(rad2deg(lid_pp_yaw_map_gt)));
 lid_pp_yaw_map_err = lid_pp_yaw_map-lid_pp_yaw_map_gt;
-lid_pp_yaw_map_err = deg2rad(UnwrapPi(rad2deg(lid_pp_yaw_map_err)));
+lid_pp_yaw_map_err = deg2rad(unwrap(rad2deg(lid_pp_yaw_map_err)));
 
 
 % CAM YOLO
@@ -320,9 +328,9 @@ cam_yolo_x_map_err = cam_yolo_x_map-cam_yolo_x_map_gt;
 cam_yolo_y_map_err = cam_yolo_y_map-cam_yolo_y_map_gt;
 cam_yolo_x_rel_err = cam_yolo_x_rel-cam_yolo_x_rel_gt;
 cam_yolo_y_rel_err = cam_yolo_y_rel-cam_yolo_y_rel_gt;
-cam_yolo_yaw_map_gt = deg2rad(UnwrapPi(rad2deg(cam_yolo_yaw_map_gt)));
+cam_yolo_yaw_map_gt = deg2rad(unwrap(rad2deg(cam_yolo_yaw_map_gt)));
 cam_yolo_yaw_map_err = cam_yolo_yaw_map-cam_yolo_yaw_map_gt;
-cam_yolo_yaw_map_err = deg2rad(UnwrapPi(rad2deg(cam_yolo_yaw_map_err)));
+cam_yolo_yaw_map_err = deg2rad(unwrap(rad2deg(cam_yolo_yaw_map_err)));
 
 % TARGET TRACKING
 
