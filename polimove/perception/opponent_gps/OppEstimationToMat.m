@@ -96,11 +96,12 @@ end
 
 %Select opponent and gps
 opp_id = -1;
-lista_opponents = [0,3,6];
+lista_opponents = [0,3,6,71];
 while ~ismember(opp_id, lista_opponents)
     disp( "Choose opponent:" + newline + ...
         " 3: Tum " + newline + ...
         " 6: Unimore " + newline + ...
+        "71: Tii " + newline + ...
         " 0: Quit");
     opp_id = input("Choose opponent identifier: ");
 end
@@ -126,6 +127,17 @@ switch(opp_id)
         out.y_map = opp_log.loc_vehicle_state_position_value1;
         out.yaw_map = unwrap(opp_log.loc_vehicle_state_orientation_value2);
         out.speed = opp_log.loc_vehicle_state_linVel_value0;
+
+    case 71
+        opp_lat0 = 24.46992202098782;
+        opp_lon0 = 54.60522506805341;
+        opp_alt0 = 0.0;
+        out.timestamp = opp_log.timestamp*10^9;
+        out.x_map = opp_log.posX;
+        out.y_map = opp_log.posY;
+        out.yaw_map = unwrap(opp_log.heading);
+        out.speed = opp_log.velX;
+
 end
 
 %Select the track
@@ -290,9 +302,10 @@ r = sqrt(dx.^2 + dy.^2);
 range(opp_idxs) = r;
 out.rho = range;
 
-beta = atan2(dy,dx);
-valid_rho_dot = (out.speed(opp_idxs).*cos(out.yaw_map(opp_idxs))-ego_speed(closest_idxs).*cos(ego_yaw_map(closest_idxs))).*cos(beta)+ ...
-                (out.speed(opp_idxs).*cos(out.yaw_map(opp_idxs))-ego_speed(closest_idxs).*cos(ego_yaw_map(closest_idxs))).*sin(beta);
+beta = atan2(dy, dx);
+v_rel_x = out.speed(opp_idxs).*cos(out.yaw_map(opp_idxs)) - ego_speed(closest_idxs).*cos(ego_yaw_map(closest_idxs));
+v_rel_y = out.speed(opp_idxs).*sin(out.yaw_map(opp_idxs)) - ego_speed(closest_idxs).*sin(ego_yaw_map(closest_idxs));
+valid_rho_dot = (dx .* v_rel_x + dy .* v_rel_y) ./ r;
 
 rho_dot = NaN(opp_sz,1);
 rho_dot(opp_idxs) = valid_rho_dot;
