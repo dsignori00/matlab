@@ -1,14 +1,14 @@
-function [angle_in] =  unwrapAngleSmart(angle_in,angle_ref)
-diff = angle_ref - angle_in;
+function angle_out = unwrap_angle_smart(angle_in, angle_ref)
+% UNWRAP_ANGLE_SMART  Robust, vectorized angle unwrapping relative to a reference.
+%
+%   angle_out = unwrap_angle_smart(angle_in, angle_ref)
+%
+% Ensures that (angle_ref - angle_out) ∈ (-pi, pi], even if
+% angle_in and angle_ref differ by more than 2π.
+% Works for vectors or matrices of equal size.
 
-while diff > pi
-	angle_in = angle_in + 2*pi;
-	diff = angle_ref - angle_in;
+    diff = angle_ref - angle_in;
+    diff_wrapped = mod(diff + pi, 2*pi) - pi;
+    angle_out = angle_ref - diff_wrapped;
 end
 
-while diff < -pi
-	angle_in =angle_in - 2*pi;
-	diff = angle_ref - angle_in;
-end
-
-end

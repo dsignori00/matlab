@@ -1,6 +1,35 @@
 % TO DO:
 % - rho_dot estimation (velocità radiale)
 
+%% Create Standard Mat
+% save the opponent most useful data in a standard mat struct
+
+% DATA:                     % DESCRIPTION:
+
+% gps                       % gps used to extract the data
+% primary_antenna           % primary antenna
+% bag_timestamp             % msg timestamp
+% timestamp                 % timestamp in epoch format (nanoseconds)
+% header_stamp              % header stamp from driver
+% latitude                  % latitude
+% longitude                 % longiude
+% bag_avg_frequency         % average publishing frequency
+% x_map                     % x in global reference frame (ENU)
+% y_map                     % y in global reference frame (ENU)
+% z_map                     % z in global reference frame (ENU)
+% yaw_map                   % heading in global reference frame 
+% timestamp_diff            % difference between ego and opp timestamp
+% x_rel                     % x in car reference frame 
+% y_rel                     % y in car reference frame 
+% z_rel                     % z in car reference frame 
+% yaw_rel                   % relative yaw between ego and opp car 
+% speed                     % opp speed
+% calculated speed          % true if speed calculated from gps pos measures
+% rho                       % distance from opponent (range)
+% rho_dot                   % range rate (relative speed)
+% clos_idx                  % traj server closest idx
+% lap                       % lap counter
+
 close all
 clearvars -except ego opp_dir_path 
 
@@ -494,7 +523,7 @@ range = NaN(opp_sz,1);
 v = [dx;dy;dz];
 r = norm(v);
 range(opp_idxs) = r;
-log.range = range;
+log.rho = range;
 
 % rho dot
 % dx = ego_x_map(closest_idxs)-x_map(opp_idxs);
@@ -513,32 +542,6 @@ log.gps(1:opp_sz,1) = log.gps(1);
 log.primary_antenna(1:opp_sz,1) = log.primary_antenna(1);
 log.bag_avg_freq(1:opp_sz,1) = log.bag_avg_freq(1);
 log.computed_speed(1:opp_sz,1) = log.computed_speed(1);
-
-%% Create Standard Mat
-% save the opponent most useful data in a standard mat struct
-
-% DATA:                     % DESCRIPTION:
-
-% gps                       % gps used to extract the data
-% primary_antenna           % primary antenna
-% bag_timestamp             % msg timestamp
-% timestamp                 % gps measure timestamp
-% latitude                  % latitude
-% longitude                 % longiude
-% bag_avg_frequency         % average publishing frequency
-% x_map                     % x in global reference frame (ENU)
-% y_map                     % y in global reference frame (ENU)
-% z_map                     % z in global reference frame (ENU)
-% yaw_map                   % heading in global reference frame 
-% timestamp diff            % difference between ego and opp timestamp
-% x_rel                     % x in car reference frame 
-% y_rel                     % y in car reference frame 
-% z_rel                     % z in car reference frame 
-% yaw_rel                   % relative yaw between ego and opp car 
-% speed                     % opp speed
-% calculated speed          % true if speed calculated from gps pos measures
-% rho                       % distance from opponent (range)
-% rho dot                   % range rate (relative speed)
 
 %%
 
@@ -612,28 +615,6 @@ function yaw_out = correct_yaw(x_map,y_map, timestamp, avg_freq, yaw_in)
 
 end
 
-
-function [correct_x_rel, correct_y_rel, correct_z_rel] = to_center_of_gravity(pos, x_offset, y_offset, z_offset)
-    
-    x = pos(1);
-    y = pos(2);
-    z = pos(3);
-    
-
-    % phi = angolo di rotazione attorno all'asse X (roll)
-    % theta = angolo di rotazione attorno all'asse Y (pitch)
-    % psi = angolo di rotazione attorno all'asse Z (yaw)
-    psi = pos(4);
-    phi = pos(5);
-    theta = pos(6);
-    
-
-
-    % Aggiornare i valori nella struttura 'row'
-    correct_x_rel = new_c(1);
-    correct_y_rel = new_c(2);
-    correct_z_rel= new_c(3);
-end
 
 function speed = compute_opp_speed(x_map,y_map, timestamp, avg_freq)
     
