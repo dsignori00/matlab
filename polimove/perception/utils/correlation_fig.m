@@ -12,7 +12,7 @@
 %          variables tend to increase together.
 
 
-if(src_corr)
+if(search_correlations)
     % Speed
     corr_stamp = gt.stamp;
     corr_value = abs(log_ref.rho);

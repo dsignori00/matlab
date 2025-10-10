@@ -27,8 +27,6 @@
 % clos_idx                  % traj server closest idx
 % lap                       % lap counter
 
-% TO DO:
-% apply a low pass filter to filter out high frequency noise do to ego-opponent timestamp difference 
 %% Paths
 clc; close all; clearvars -except ego opp_log closest_idxs opp_idxs file_name out.clos_idx
 

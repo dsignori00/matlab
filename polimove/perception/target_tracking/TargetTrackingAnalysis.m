@@ -100,9 +100,6 @@ rad_clust.range = sqrt(rad_clust.x_rel.^2 + rad_clust.y_rel.^2);
 cam_yolo.range = sqrt(cam_yolo.x_rel.^2 + cam_yolo.y_rel.^2);
 lid_pp.range = sqrt(lid_pp.x_rel.^2 + lid_pp.y_rel.^2);
 tt.range = sqrt(tt.x_rel.^2 + tt.y_rel.^2);
-if(use_ref || use_sim_ref)
-    gt.range = sqrt(gt.x_rel.^2 + gt.y_rel.^2);
-end
 
 %% INFO
 figure('Name','Info');
@@ -229,8 +226,8 @@ plot(rad_clust.sens_stamp,rad_clust.range(:,1:max_opp),'o','MarkerFaceColor',col
 plot(cam_yolo.sens_stamp,cam_yolo.range(:,1:max_opp),'o','MarkerFaceColor',col.camera,'MarkerEdgeColor',col.camera,'MarkerSize',sz,'DisplayName','Camera');
 plot(lid_pp.sens_stamp,lid_pp.range(:,1:max_opp),'o','MarkerFaceColor',col.pointpillars,'MarkerEdgeColor',col.pointpillars,'MarkerSize',sz,'DisplayName','Lid PP');
 plot(tt.stamp, tt.range(:,1:max_opp), 'Color',col.tt,'DisplayName','tt');
-if(use_ref || use_sim_ref); plot(gt.stamp, gt.range, 'Color',col.ref,'DisplayName','Ground Truth'); end
-grid on; title('rho dot [m/s]'); 
+if(use_ref || use_sim_ref); plot(gt.stamp, gt.rho, 'Color',col.ref,'DisplayName','Ground Truth'); end
+grid on; title('range [m]'); 
 
 % rho dot
 axes(f) = nexttile([1,1]); f=f+1; hold on;

@@ -1,6 +1,7 @@
 % LIDAR CLUSTERING
 valid_idxs = ~isnan(lid_clust.x_map);
 valid_idxs = valid_idxs(:,1);
+lid_clust.stamp = lid_clust.stamp(valid_idxs);
 lid_clust.sens_stamp = lid_clust.sens_stamp(valid_idxs);
 lid_clust.x_map = lid_clust.x_map(valid_idxs);
 lid_clust.y_map = lid_clust.y_map(valid_idxs);
@@ -16,6 +17,7 @@ lid_clust.yaw_rel = unwrap(rad2deg(lid_clust.yaw_rel));
 % RADAR CLUSTERING
 valid_idxs = ~isnan(rad_clust.x_map);
 valid_idxs = valid_idxs(:,1);
+rad_clust.stamp = rad_clust.stamp(valid_idxs);
 rad_clust.sens_stamp = rad_clust.sens_stamp(valid_idxs);
 rad_clust.x_map = rad_clust.x_map(valid_idxs);
 rad_clust.y_map = rad_clust.y_map(valid_idxs);
@@ -32,6 +34,7 @@ rad_clust.yaw_rel = unwrap(rad2deg(rad_clust.yaw_rel));
 % LIDAR POINTPILLARS    
 valid_idxs = ~isnan(lid_pp.x_map);
 valid_idxs = valid_idxs(:,1);
+lid_pp.stamp = lid_pp.stamp(valid_idxs);
 lid_pp.sens_stamp = lid_pp.sens_stamp(valid_idxs);
 lid_pp.x_map = lid_pp.x_map(valid_idxs);
 lid_pp.y_map = lid_pp.y_map(valid_idxs);
@@ -46,6 +49,7 @@ lid_pp.yaw_rel = unwrap(rad2deg(lid_pp.yaw_rel));
 % CAM YOLO   
 valid_idxs = ~isnan(cam_yolo.x_map);
 valid_idxs = valid_idxs(:,1);
+cam_yolo.stamp = cam_yolo.stamp(valid_idxs);
 cam_yolo.sens_stamp = cam_yolo.sens_stamp(valid_idxs);
 cam_yolo.x_map = cam_yolo.x_map(valid_idxs);
 cam_yolo.y_map = cam_yolo.y_map(valid_idxs);
