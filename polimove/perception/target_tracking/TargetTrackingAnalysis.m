@@ -103,12 +103,14 @@ tt.range = sqrt(tt.x_rel.^2 + tt.y_rel.^2);
 
 %% INFO
 figure('Name','Info');
-tiledlayout(2,1,'Padding','compact');
 
-% racetype
-axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot(log.planner_manager.stamp__tot, log.planner_manager.race_type,'Color',col.tt);
-ylim([-1 5]); grid on; title('RaceType');
+if(exist("log.planner_manager","var"))
+    % racetype
+    tiledlayout(2,1,'Padding','compact');
+    axes(f) = nexttile([1,1]); f=f+1; hold on;
+    plot(log.planner_manager.stamp__tot, log.planner_manager.race_type,'Color',col.tt);
+    ylim([-1 5]); grid on; title('RaceType');
+end
 
 % decision maker
 axes(f) = nexttile([1,1]); f=f+1; hold on;

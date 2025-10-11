@@ -7,8 +7,8 @@ clearvars -except log log_2 log_3 log_ref
 
 use_log2         = true;
 use_log3         = false;
+use_ref          = true;
 use_sim_ref      = false;
-use_ref          = false;
 compute_err_std  = false;
 
 %% Paths
@@ -30,7 +30,7 @@ if ~exist('log', 'var')
         load(fullfile(path, file));
     end
 end
-name1 = 'develop';
+name1 = 'old';
 
 
 % load log 2
@@ -45,7 +45,7 @@ if(use_log2)
         clearvars tmp;
         end
     end
-    name2 = 'imm disabled';
+    name2 = 'new';
 end
 
 
@@ -75,7 +75,7 @@ if(use_ref)
     if (~exist('log_ref','var'))
         [file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load ground truth');
         tmp = load(fullfile(path,file));
-        log_ref = tmp.log;
+        log_ref = tmp.out;
         clearvars tmp;
     end
 end
@@ -101,22 +101,22 @@ col.ref = 'black';
     % relative
     tt_x_rel = log.perception__opponents.opponents__x_rel;
     tt_y_rel = log.perception__opponents.opponents__y_rel;
+    tt_rho_dot = log.perception__opponents.opponents__rho_dot;
+    tt_yaw_rel = log.perception__opponents.opponents__psi_rel;
     tt_x_rel(tt_x_rel==0)=nan;
     tt_y_rel(tt_y_rel==0)=nan;
-    tt_rho_dot = log.perception__opponents.opponents__rho_dot;
     tt_rho_dot(tt_rho_dot==0)=nan;
-    tt_yaw_rel = log.perception__opponents.opponents__psi_rel;
     tt_yaw_rel(tt_yaw_rel==0)=nan;
     % map
     tt_x_map = log.perception__opponents.opponents__x_geom;
     tt_y_map = log.perception__opponents.opponents__y_geom;
+    tt_vx = log.perception__opponents.opponents__vx;
+    tt_ax = log.perception__opponents.opponents__ax;
+    tt_yaw_map = log.perception__opponents.opponents__psi;
     tt_x_map(tt_x_map==0)=nan;
     tt_y_map(tt_y_map==0)=nan;
-    tt_vx = log.perception__opponents.opponents__vx;
     tt_vx(tt_vx==0)=nan;
-    tt_ax = log.perception__opponents.opponents__ax;
     tt_ax(tt_ax==0)=nan;
-    tt_yaw_map = log.perception__opponents.opponents__psi;
     tt_yaw_map(tt_yaw_map==0)=nan;
     tt_count = log.perception__opponents.count;
     tt_losses = zeros(size(tt_count));
@@ -126,22 +126,22 @@ if(use_log2)
     % relative
     tt_x_rel2 = log_2.perception__opponents.opponents__x_rel;
     tt_y_rel2 = log_2.perception__opponents.opponents__y_rel;
+    tt_rho_dot2 = log_2.perception__opponents.opponents__rho_dot;
+    tt_yaw_rel2 = log_2.perception__opponents.opponents__psi_rel;
     tt_x_rel2(tt_x_rel2==0)=nan;
     tt_y_rel2(tt_y_rel2==0)=nan;
-    tt_rho_dot2 = log_2.perception__opponents.opponents__rho_dot;
     tt_rho_dot2(tt_rho_dot2==0)=nan;
-    tt_yaw_rel2 = log_2.perception__opponents.opponents__psi_rel;
     tt_yaw_rel2(tt_yaw_rel2==0)=nan;
     % map
     tt_x_map2 = log_2.perception__opponents.opponents__x_geom;
     tt_y_map2 = log_2.perception__opponents.opponents__y_geom;
+    tt_vx2 = log_2.perception__opponents.opponents__vx;
+    tt_ax2 = log_2.perception__opponents.opponents__ax;
+    tt_yaw_map2 = log_2.perception__opponents.opponents__psi;
     tt_x_map2(tt_x_map2==0)=nan;
     tt_y_map2(tt_y_map2==0)=nan;
-    tt_vx2 = log_2.perception__opponents.opponents__vx;
     tt_vx2(tt_vx2==0)=nan;
-    tt_ax2 = log_2.perception__opponents.opponents__ax;
     tt_ax2(tt_ax2==0)=nan;
-    tt_yaw_map2 = log_2.perception__opponents.opponents__psi;
     tt_yaw_map2(tt_yaw_map2==0)=nan;
     tt_count2 = log_2.perception__opponents.count;
     tt_losses2 = zeros(size(tt_count2));
@@ -152,22 +152,22 @@ if(use_log3)
     % relative
     tt_x_rel3 = log_3.perception__opponents.opponents__x_rel;
     tt_y_rel3 = log_3.perception__opponents.opponents__y_rel;
+    tt_rho_dot3 = log_3.perception__opponents.opponents__rho_dot;
+    tt_yaw_rel3 = log_3.perception__opponents.opponents__psi_rel;
     tt_x_rel3(tt_x_rel3==0)=nan;
     tt_y_rel3(tt_y_rel3==0)=nan;
-    tt_rho_dot3 = log_3.perception__opponents.opponents__rho_dot;
     tt_rho_dot3(tt_rho_dot3==0)=nan;
-    tt_yaw_rel3 = log_3.perception__opponents.opponents__psi_rel;
     tt_yaw_rel3(tt_yaw_rel3==0)=nan;
     % map
     tt_x_map3 = log_3.perception__opponents.opponents__x_geom;
     tt_y_map3 = log_3.perception__opponents.opponents__y_geom;
+    tt_vx3 = log_3.perception__opponents.opponents__vx;
+    tt_ax3 = log_3.perception__opponents.opponents__ax;
+    tt_yaw_map3 = log_3.perception__opponents.opponents__psi;
     tt_x_map3(tt_x_map3==0)=nan;
     tt_y_map3(tt_y_map3==0)=nan;
-    tt_vx3 = log_3.perception__opponents.opponents__vx;
     tt_vx3(tt_vx3==0)=nan;
-    tt_ax3 = log_3.perception__opponents.opponents__ax;
     tt_ax3(tt_ax3==0)=nan;
-    tt_yaw_map3 = log_3.perception__opponents.opponents__psi;
     tt_yaw_map3(tt_yaw_map3==0)=nan;
     tt_count3 = log_3.perception__opponents.count;
     tt_losses3 = zeros(size(tt_count3));
