@@ -4,11 +4,11 @@ clc
 
 %% Paths
 
-addpath("../../01_Tools/00_GlobalFunctions/personal/")
-addpath("../../01_Tools/00_GlobalFunctions/utilities/")
-addpath("../../01_Tools/00_GlobalFunctions/constants/")
-addpath("../../01_Tools/00_GlobalFunctions/plot/")
-normal_path = "/home/daniele/adehome_humble/code/bags";
+addpath("../../common/utilities/")
+addpath("../../common/constants/")
+addpath("../../common/plot/")
+addpath("../utils/")
+normal_path = "../../bags";
 
 %% Execute
 
@@ -17,7 +17,7 @@ if (~exist('log','var'))
     load(fullfile(path,file));
 end
 
-log = normalizeStamps(log);
+log = normalize_stamps(log);
 
 try
     output_path = fullfile(path,file);
