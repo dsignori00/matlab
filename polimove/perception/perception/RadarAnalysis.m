@@ -1,8 +1,8 @@
 close all
 clearvars -except log log2 trajDatabase gt ego ego2 rad1 rad2
 
-ground_truth = true;
-compare = false;
+ground_truth = false;
+compare      = false;
 
 NAME_1 = "Radar";
 NAME_2 = "Radar - 2";
@@ -91,7 +91,7 @@ if(compare)
     if (~exist('rad2.idx','var'))
         for i = 1:rad2.max_det
             opp_pos = [rad2.x_map(:,i), rad2.y_map(:,i)];
-            [opp_yaw, opp_idx] = get_heading(opp_pos, trajDatabase);
+            [opp_yaw, opp_idx] = get_heading(opp_pos, trajDatabase, -1);
             rad2.yaw_map(:,i) = opp_yaw;
             rad2.idx(:,i) = opp_idx;
         end
@@ -113,9 +113,9 @@ ego.v(:,1) = log.estimation.vx(ego.clos_idxs);
 ego.v(:,2) = log.estimation.vy(ego.clos_idxs);
 
 if(compare)
-    rad2_stamp = rad2.sens_stamp*10^9 + double(log2.time_offset_nsec);
+    rad2_epoch = rad2.sens_stamp*10^9 + double(log2.time_offset_nsec);
     if (~exist('ego2','var'))
-        [ego2.clos_idxs, ~] = find_closest_stamp(rad2_stamp,ego.timestamp);
+        [ego2.clos_idxs, ~] = find_closest_stamp(rad2_epoch,ego.timestamp);
         if (isempty(ego2.clos_idxs))
             error('No timestamp matched between ego and opp.');
         end
@@ -142,7 +142,6 @@ if(compare)
                              rad2.rho_dot(:,i), rad2.x_map(:,i), rad2.y_map(:,i));
     end
     rad2_sens_stamp = rad2.sens_stamp + double(log2.time_offset_nsec)*10^-9 - double(log.time_offset_nsec)*10^-9; 
-    rad2_stamp = rad2.stamp + double(log2.time_offset_nsec)*10^-9 - double(log.time_offset_nsec)*10^-9; 
     rad2.range = sqrt(rad2.x_rel.^2 + rad2.y_rel.^2);
 end
 
@@ -161,24 +160,23 @@ tiledlayout(3,1,'Padding','compact');
 
 axes(f) = nexttile; f=f+1;
 hold on;
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(1)), 'DisplayName','RF');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(3)), 'DisplayName','RR');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(5)), 'DisplayName','RL');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(7)), 'DisplayName','RB');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(1,:)), 'DisplayName','RF');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(3,:)), 'DisplayName','RR');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(5,:)), 'DisplayName','RL');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(7,:)), 'DisplayName','RB');
 grid on; title('radar points rate [s]'); legend; xlim(x_lim);
 
 axes(f) = nexttile; f=f+1;
 hold on;
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(2)), 'DisplayName','RF');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(4)), 'DisplayName','RR');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(6)), 'DisplayName','RL');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(8)), 'DisplayName','RB');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(2,:)), 'DisplayName','RF');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(4,:)), 'DisplayName','RR');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(6,:)), 'DisplayName','RL');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(8,:)), 'DisplayName','RB');
 grid on; title('radar udp packages rate [s]'); legend; xlim(x_lim);
 
 axes(f) = nexttile; f=f+1;
 hold on;
 plot(rad1.stamp,rad1.stamp-rad1.sens_stamp, 'Color', col.radar,'DisplayName',NAME_1);
-if(compare); plot(rad2_stamp,rad2_stamp-rad2_sens_stamp, 'Color', col.radar2,'DisplayName',NAME_2); end
 grid on; title('radar clustering latency [s]'); legend; xlim(x_lim);
 
 
@@ -192,7 +190,7 @@ hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.x_rel, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
 if(compare);plot(rad2_sens_stamp, safe_cols(rad2.x_rel, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
 if(ground_truth); plot(gt_timestamp, gt.x_rel, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
-grid on; title('x rel [m]'); legend; xlim(x_lim);
+grid on; title('x rel [m]'); xlim(x_lim); ylim([-200 200]);
 
 % pos y
 axes(f) = nexttile([1,1]); f=f+1;
@@ -200,9 +198,9 @@ hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.y_rel, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
 if(compare); plot(rad2_sens_stamp, safe_cols(rad2.y_rel, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
 if(ground_truth); plot(gt_timestamp, gt.y_rel, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
-grid on; title('y rel [m]'); legend; xlim(x_lim);
+grid on; title('y rel [m]'); xlim(x_lim); ylim([-100 100]);
 
-%% STATE FIGURE COG
+%% STATE FIGURE RANGE
 figure('name','Detections - Range')
 tiledlayout(2,1,'Padding','compact');
 
@@ -212,14 +210,14 @@ hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.range, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
 if(compare); plot(rad2_sens_stamp, safe_cols(rad2.range, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
 if(ground_truth); plot(gt_timestamp, gt.rho, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
-grid on; title('range [m]'); legend; xlim(x_lim);
+grid on; title('range [m]'); xlim(x_lim); ylim([0 200]);
 
 % detections
 axes(f) = nexttile([1,1]); f=f+1;
 hold on;
 plot(rad1.sens_stamp,rad1.count,'Color',col.radar,'DisplayName',NAME_1);
 if(compare); plot(rad2_sens_stamp,rad2.count,'Color',col.radar2,'DisplayName',NAME_2); end
-grid on; title('Detections [#]'); legend; xlim(x_lim);
+grid on; title('Detections [#]'); xlim(x_lim);
 
 
 %% STATE FIGURE MAP
@@ -229,10 +227,10 @@ tiledlayout(2,1,'Padding','compact');
 % pos X
 axes(f) = nexttile([1,1]); f=f+1;
 hold on;
-plot(rad1.sens_stamp, safe_cols(rad1.x_map, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
+plot(rad1.sens_stamp(:), safe_cols(rad1.x_map, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
 if(compare); plot(rad2_sens_stamp, safe_cols(rad2.x_map, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
 if(ground_truth); plot(gt_timestamp, gt.x_map, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
-grid on; title('x map [m]'); legend; xlim(x_lim);
+grid on; title('x map [m]'); xlim(x_lim);
 
 % pos y
 axes(f) = nexttile([1,1]); f=f+1;
@@ -240,9 +238,9 @@ hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.y_map, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
 if(compare); plot(rad2_sens_stamp, safe_cols(rad2.y_map, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
 if(ground_truth); plot(gt_timestamp, gt.y_map, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
-grid on; title('y map [m]'); legend; xlim(x_lim);
+grid on; title('y map [m]'); xlim(x_lim);
 
-%% STATE FIGURE COG
+%% STATE FIGURE SPEED
 figure('name','Detections - Speed')
 tiledlayout(2,1,'Padding','compact');
 
@@ -252,7 +250,7 @@ hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.rho_dot, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
 if(compare); plot(rad2_sens_stamp, safe_cols(rad2.rho_dot, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
 if(ground_truth); plot(gt_timestamp, gt.rho_dot, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
-grid on; title('rho dot [m/s]'); legend; xlim(x_lim);
+grid on; title('rho dot [m/s]'); xlim(x_lim);
 
 % vx
 axes(f) = nexttile([1,1]); f=f+1;
@@ -260,7 +258,7 @@ hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.vx, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
 if(compare); plot(rad2_sens_stamp, safe_cols(rad2.vx, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
 if(ground_truth); plot(gt_timestamp, gt.speed, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
-grid on; title('vx [m/s]'); legend; xlim(x_lim);
+grid on; title('vx [m/s]'); xlim(x_lim); ylim([0 inf]);
 
 linkaxes(axes,'x');
 
@@ -281,8 +279,8 @@ function refreshTimeButtonPushed(src,event)
     rad1 = evalin('base', 'rad1');
     if(ground_truth); gt=evalin('base','gt'); end
     if(ground_truth); gt_timestamp = evalin('base','gt_timestamp'); end
-    if(compare); rad2.sens_stamp = evalin('base', 'rad2'); end
-    if (compare); rad2_sens_stamp = evalin('base', 'rad2_sens_stamp'); end
+    if(compare); rad2 = evalin('base', 'rad2'); end
+    if(compare); rad2_sens_stamp = evalin('base', 'rad2_sens_stamp'); end
     
     t_lim=xlim(axes(1));
     t1_rad_clust = find(rad1.sens_stamp>t_lim(1),1);
@@ -312,7 +310,7 @@ function refreshTimeButtonPushed(src,event)
     plot(traj_db(id_right).X, traj_db(id_right).Y, 'color', 'k', 'LineWidth', 1, 'HandleVisibility','off');
 
     plot(rad1.x_map(t1_rad_clust:tend_rad_clust), rad1.y_map(t1_rad_clust:tend_rad_clust),'.','markersize',20,'Color',col.radar,'displayname','Rad Clust');
-    if(compare); plot(rad2.x_map(t1_rad_clust2:tend_rad_clust2), rad2.y_map(t1_rad_clust2:tend_rad_clust2),'.','markersize',20,'Color',col.radar,'displayname','Rad Clust'); end
+    if(compare); plot(rad2.x_map(t1_rad_clust2:tend_rad_clust2), rad2.y_map(t1_rad_clust2:tend_rad_clust2),'.','markersize',20,'Color',col.radar2,'displayname','Rad Clust'); end
     if(ground_truth); plot(gt.x_map(t1_gt_ref:tend_gt_ref),gt.y_map(t1_gt_ref:tend_gt_ref),'Color',col.ref,'DisplayName','Grond Truth'); end
     legend show
 end
