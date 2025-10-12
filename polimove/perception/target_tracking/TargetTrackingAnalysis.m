@@ -1,9 +1,10 @@
 close all
-clearvars -except log log_ref trajDatabase
+clearvars -except log log_2 log_ref trajDatabase
 
-use_ref = true;
+use_ref     = true;
 use_sim_ref = false;
-imm = false;
+imm         = false;
+compare     = true;
 
 %#ok<*UNRCH>
 %#ok<*INUSD>
@@ -35,6 +36,21 @@ if (~exist('log','var'))
     load(fullfile(path,file));
 end
 
+% load log 2
+if(compare)
+    if (~exist('log_2','var'))
+        [file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load log_2');
+        if isequal(file, 0)  
+        disp('User canceled file selection.');
+        else
+        tmp = load(fullfile(path,file));
+        log_2 = tmp.log;
+        clearvars tmp;
+        end
+    end
+    name2 = 'New TT';
+end
+
 % load log ref
 if(use_ref)
     if  (~exist('log_ref','var'))
@@ -57,6 +73,7 @@ set(0, 'DefaultLineLineWidth', 2);
 
 %% NAMING
 col.tt = '#0072BD';
+col.tt2 = '#7E2F8E';
 col.lidar = '#77AC30';
 col.radar = '#4DBEEE';
 col.camera = '#EDB120';
@@ -67,32 +84,13 @@ f=1;
 x_lim = [0 inf];
 
 load_perception;
-cam_yolo.sens_stamp(cam_yolo.sens_stamp < 0) = NaN;
+tt = load_target_tracking(log);
+if(compare) 
+    tt2 = load_target_tracking(log_2); 
+    tt2.stamp = tt2.stamp - double(log.time_offset_nsec-log_2.time_offset_nsec)*1e-9;
+end
 
-% TARGET TRACKING MAIN
-tt.stamp = log.perception__opponents.stamp__tot;
-% relative
-tt.x_rel = log.perception__opponents.opponents__x_rel;
-tt.y_rel = log.perception__opponents.opponents__y_rel;
-tt.x_rel(tt.x_rel==0)=nan;
-tt.y_rel(tt.y_rel==0)=nan;
-tt.rho_dot = log.perception__opponents.opponents__rho_dot;
-tt.rho_dot(tt.rho_dot==0)=nan;
-tt.yaw_rel = log.perception__opponents.opponents__psi_rel;
-tt.yaw_rel(tt.yaw_rel==0)=nan;
-% map
-tt.x_map = log.perception__opponents.opponents__x_geom;
-tt.y_map = log.perception__opponents.opponents__y_geom;
-tt.x_map(tt.x_map==0)=nan;
-tt.y_map(tt.y_map==0)=nan;
-tt.vx = log.perception__opponents.opponents__vx;
-tt.vx(tt.vx==0)=nan;
-tt.ax = log.perception__opponents.opponents__ax;
-tt.ax(tt.ax==0)=nan;
-tt.yaw_map = log.perception__opponents.opponents__psi;
-tt.yaw_map(tt.yaw_map==0)=nan;
-tt.count = log.perception__opponents.count;
-max_opp = max(tt.count);
+cam_yolo.sens_stamp(cam_yolo.sens_stamp < 0) = NaN;
 
 % Range Computation
 lid_clust.range = sqrt(lid_clust.x_rel.^2 + lid_clust.y_rel.^2);
@@ -100,6 +98,7 @@ rad_clust.range = sqrt(rad_clust.x_rel.^2 + rad_clust.y_rel.^2);
 cam_yolo.range = sqrt(cam_yolo.x_rel.^2 + cam_yolo.y_rel.^2);
 lid_pp.range = sqrt(lid_pp.x_rel.^2 + lid_pp.y_rel.^2);
 tt.range = sqrt(tt.x_rel.^2 + tt.y_rel.^2);
+if(compare); tt2.range = sqrt(tt2.x_rel.^2 + tt2.y_rel.^2); end
 
 %% INFO
 figure('Name','Info');
@@ -146,21 +145,23 @@ tiledlayout(2,1,'Padding','compact');
 
 % pos x
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot(lid_clust.sens_stamp,lid_clust.x_map(:,1:max_opp),'o','MarkerFaceColor',col.lidar,'MarkerEdgeColor',col.lidar,'MarkerSize',sz,'DisplayName','Lid Clust');
-plot(rad_clust.sens_stamp,rad_clust.x_map(:,1:max_opp),'o','MarkerFaceColor',col.radar,'MarkerEdgeColor',col.radar,'MarkerSize',sz,'DisplayName','Rad Clust');
-plot(cam_yolo.sens_stamp,cam_yolo.x_map(:,1:max_opp),'o','MarkerFaceColor',col.camera,'MarkerEdgeColor',col.camera,'MarkerSize',sz,'DisplayName','Camera');
-plot(lid_pp.sens_stamp,lid_pp.x_map(:,1:max_opp),'o','MarkerFaceColor',col.pointpillars,'MarkerEdgeColor',col.pointpillars,'MarkerSize',sz,'DisplayName','Lid PP');
-plot(tt.stamp,tt.x_map(:,1:max_opp),'Color',col.tt,'DisplayName','tt');
+plot(lid_clust.sens_stamp,lid_clust.x_map(:,1:tt.max_opp),'o','MarkerFaceColor',col.lidar,'MarkerEdgeColor',col.lidar,'MarkerSize',sz,'DisplayName','Lid Clust');
+plot(rad_clust.sens_stamp,rad_clust.x_map(:,1:tt.max_opp),'o','MarkerFaceColor',col.radar,'MarkerEdgeColor',col.radar,'MarkerSize',sz,'DisplayName','Rad Clust');
+plot(cam_yolo.sens_stamp,cam_yolo.x_map(:,1:tt.max_opp),'o','MarkerFaceColor',col.camera,'MarkerEdgeColor',col.camera,'MarkerSize',sz,'DisplayName','Camera');
+plot(lid_pp.sens_stamp,lid_pp.x_map(:,1:tt.max_opp),'o','MarkerFaceColor',col.pointpillars,'MarkerEdgeColor',col.pointpillars,'MarkerSize',sz,'DisplayName','Lid PP');
+plot(tt.stamp,tt.x_map(:,1:tt.max_opp),'Color',col.tt,'DisplayName','tt');
+if(compare); plot(tt2.stamp,tt2.x_map(:,1:tt2.max_opp),'Color',col.tt2,'DisplayName',name2); end
 if(use_ref || use_sim_ref); plot(gt.stamp,gt.x_map,'Color',col.ref,'DisplayName','Ground Truth'); end
 grid on; title('x map [m]'); 
 
 % pos y
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot(lid_clust.sens_stamp,lid_clust.y_map(:,1:max_opp),'o','MarkerFaceColor',col.lidar,'MarkerEdgeColor',col.lidar,'MarkerSize',sz,'DisplayName','Lid Clust');
-plot(rad_clust.sens_stamp,rad_clust.y_map(:,1:max_opp),'o','MarkerFaceColor',col.radar,'MarkerEdgeColor',col.radar,'MarkerSize',sz,'DisplayName','Rad Clust');
-plot(cam_yolo.sens_stamp,cam_yolo.y_map(:,1:max_opp),'o','MarkerFaceColor',col.camera,'MarkerEdgeColor',col.camera,'MarkerSize',sz,'DisplayName','Camera');
-plot(lid_pp.sens_stamp,lid_pp.y_map(:,1:max_opp),'o','MarkerFaceColor',col.pointpillars,'MarkerEdgeColor',col.pointpillars,'MarkerSize',sz,'DisplayName','Lid PP');
-plot(tt.stamp,tt.y_map(:,1:max_opp),'Color',col.tt,'DisplayName','tt');
+plot(lid_clust.sens_stamp,lid_clust.y_map(:,1:tt.max_opp),'o','MarkerFaceColor',col.lidar,'MarkerEdgeColor',col.lidar,'MarkerSize',sz,'DisplayName','Lid Clust');
+plot(rad_clust.sens_stamp,rad_clust.y_map(:,1:tt.max_opp),'o','MarkerFaceColor',col.radar,'MarkerEdgeColor',col.radar,'MarkerSize',sz,'DisplayName','Rad Clust');
+plot(cam_yolo.sens_stamp,cam_yolo.y_map(:,1:tt.max_opp),'o','MarkerFaceColor',col.camera,'MarkerEdgeColor',col.camera,'MarkerSize',sz,'DisplayName','Camera');
+plot(lid_pp.sens_stamp,lid_pp.y_map(:,1:tt.max_opp),'o','MarkerFaceColor',col.pointpillars,'MarkerEdgeColor',col.pointpillars,'MarkerSize',sz,'DisplayName','Lid PP');
+plot(tt.stamp,tt.y_map(:,1:tt.max_opp),'Color',col.tt,'DisplayName','tt');
+if(compare); plot(tt2.stamp,tt2.y_map(:,1:tt2.max_opp),'Color',col.tt2,'DisplayName',name2); end
 if(use_ref || use_sim_ref); plot(gt.stamp,gt.y_map,'Color',col.ref,'DisplayName','Ground Truth'); end
 grid on; title('y map [m]'); 
 
@@ -168,18 +169,20 @@ grid on; title('y map [m]');
 figure('name', 'Filter - Yaw');
 
 % yaw
-tt.yaw_map = mod(tt.yaw_map,2*pi);
 lid_clust.yaw_map = mod(lid_clust.yaw_map,2*pi);
 cam_yolo.yaw_map = mod(cam_yolo.yaw_map,2*pi);
 rad_clust.yaw_map = mod(rad_clust.yaw_map,2*pi);
 lid_pp.yaw_map = mod(lid_pp.yaw_map,2*pi);
+tt.yaw_map = mod(tt.yaw_map,2*pi);
+if(compare); tt2.yaw_map = mod(tt2.yaw_map,2*pi); end
 
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot(lid_clust.sens_stamp,lid_clust.yaw_map(:,1:max_opp),'o','MarkerFaceColor',col.lidar,'MarkerEdgeColor',col.lidar,'MarkerSize',sz,'DisplayName','Lid Clust');
-plot(rad_clust.sens_stamp,rad_clust.yaw_map(:,1:max_opp),'o','MarkerFaceColor',col.radar,'MarkerEdgeColor',col.radar,'MarkerSize',sz,'DisplayName','Rad Clust');
-plot(cam_yolo.sens_stamp,cam_yolo.yaw_map(:,1:max_opp),'o','MarkerFaceColor',col.camera,'MarkerEdgeColor',col.camera,'MarkerSize',sz,'DisplayName','Camera');
-plot(lid_pp.sens_stamp,lid_pp.yaw_map(:,1:max_opp),'o','MarkerFaceColor',col.pointpillars,'MarkerEdgeColor',col.pointpillars,'MarkerSize',sz,'DisplayName','Lidar PP');
-plot(tt.stamp,tt.yaw_map(:,1:max_opp),'Color',col.tt,'DisplayName','tt');
+plot(lid_clust.sens_stamp,lid_clust.yaw_map(:,1:tt.max_opp),'o','MarkerFaceColor',col.lidar,'MarkerEdgeColor',col.lidar,'MarkerSize',sz,'DisplayName','Lid Clust');
+plot(rad_clust.sens_stamp,rad_clust.yaw_map(:,1:tt.max_opp),'o','MarkerFaceColor',col.radar,'MarkerEdgeColor',col.radar,'MarkerSize',sz,'DisplayName','Rad Clust');
+plot(cam_yolo.sens_stamp,cam_yolo.yaw_map(:,1:tt.max_opp),'o','MarkerFaceColor',col.camera,'MarkerEdgeColor',col.camera,'MarkerSize',sz,'DisplayName','Camera');
+plot(lid_pp.sens_stamp,lid_pp.yaw_map(:,1:tt.max_opp),'o','MarkerFaceColor',col.pointpillars,'MarkerEdgeColor',col.pointpillars,'MarkerSize',sz,'DisplayName','Lidar PP');
+plot(tt.stamp,tt.yaw_map(:,1:tt.max_opp),'Color',col.tt,'DisplayName','tt');
+if(compare); plot(tt2.stamp,tt2.yaw_map(:,1:tt2.max_opp),'Color',col.tt2,'DisplayName','tt'); end
 if(use_ref || use_sim_ref)
     gt.yaw_map = mod(gt.yaw_map,2*pi);
     plot(gt.stamp,gt.yaw_map,'Color',col.ref,'DisplayName','Ground Truth');
@@ -192,28 +195,31 @@ tiledlayout(3,1,'Padding','compact');
 
 % pos x
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot(lid_clust.sens_stamp,lid_clust.x_rel(:,1:max_opp),'o','MarkerFaceColor',col.lidar,'MarkerEdgeColor',col.lidar,'MarkerSize',sz,'DisplayName','Lid Clust');
-plot(rad_clust.sens_stamp,rad_clust.x_rel(:,1:max_opp),'o','MarkerFaceColor',col.radar,'MarkerEdgeColor',col.radar,'MarkerSize',sz,'DisplayName','Rad Clust');
-plot(cam_yolo.sens_stamp,cam_yolo.x_rel(:,1:max_opp),'o','MarkerFaceColor',col.camera,'MarkerEdgeColor',col.camera,'MarkerSize',sz,'DisplayName','Camera');
-plot(lid_pp.sens_stamp,lid_pp.x_rel(:,1:max_opp),'o','MarkerFaceColor',col.pointpillars,'MarkerEdgeColor',col.pointpillars,'MarkerSize',sz,'DisplayName','Lid PP');
-plot(tt.stamp, tt.x_rel(:,1:max_opp), 'Color',col.tt,'DisplayName','tt');
+plot(lid_clust.sens_stamp,lid_clust.x_rel(:,1:tt.max_opp),'o','MarkerFaceColor',col.lidar,'MarkerEdgeColor',col.lidar,'MarkerSize',sz,'DisplayName','Lid Clust');
+plot(rad_clust.sens_stamp,rad_clust.x_rel(:,1:tt.max_opp),'o','MarkerFaceColor',col.radar,'MarkerEdgeColor',col.radar,'MarkerSize',sz,'DisplayName','Rad Clust');
+plot(cam_yolo.sens_stamp,cam_yolo.x_rel(:,1:tt.max_opp),'o','MarkerFaceColor',col.camera,'MarkerEdgeColor',col.camera,'MarkerSize',sz,'DisplayName','Camera');
+plot(lid_pp.sens_stamp,lid_pp.x_rel(:,1:tt.max_opp),'o','MarkerFaceColor',col.pointpillars,'MarkerEdgeColor',col.pointpillars,'MarkerSize',sz,'DisplayName','Lid PP');
+plot(tt.stamp, tt.x_rel(:,1:tt.max_opp), 'Color',col.tt,'DisplayName','tt');
+if(compare); plot(tt2.stamp, tt2.x_rel(:,1:tt2.max_opp), 'Color',col.tt2,'DisplayName',name2); end
 if(use_ref || use_sim_ref); plot(gt.stamp, gt.x_rel, 'Color',col.ref,'DisplayName','Ground Truth'); end
 grid on; title('x rel [m]'); 
 
 % pos y
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot(lid_clust.sens_stamp,lid_clust.y_rel(:,1:max_opp),'o','MarkerFaceColor',col.lidar,'MarkerEdgeColor',col.lidar,'MarkerSize',sz,'DisplayName','Lid Clust');
-plot(rad_clust.sens_stamp,rad_clust.y_rel(:,1:max_opp),'o','MarkerFaceColor',col.radar,'MarkerEdgeColor',col.radar,'MarkerSize',sz,'DisplayName','Rad Clust');
-plot(cam_yolo.sens_stamp,cam_yolo.y_rel(:,1:max_opp),'o','MarkerFaceColor',col.camera,'MarkerEdgeColor',col.camera,'MarkerSize',sz,'DisplayName','Camera');
-plot(lid_pp.sens_stamp,lid_pp.y_rel(:,1:max_opp),'o','MarkerFaceColor',col.pointpillars,'MarkerEdgeColor',col.pointpillars,'MarkerSize',sz,'DisplayName','Lid PP');
-plot(tt.stamp, tt.y_rel(:,1:max_opp), 'Color',col.tt,'DisplayName','tt');
+plot(lid_clust.sens_stamp,lid_clust.y_rel(:,1:tt.max_opp),'o','MarkerFaceColor',col.lidar,'MarkerEdgeColor',col.lidar,'MarkerSize',sz,'DisplayName','Lid Clust');
+plot(rad_clust.sens_stamp,rad_clust.y_rel(:,1:tt.max_opp),'o','MarkerFaceColor',col.radar,'MarkerEdgeColor',col.radar,'MarkerSize',sz,'DisplayName','Rad Clust');
+plot(cam_yolo.sens_stamp,cam_yolo.y_rel(:,1:tt.max_opp),'o','MarkerFaceColor',col.camera,'MarkerEdgeColor',col.camera,'MarkerSize',sz,'DisplayName','Camera');
+plot(lid_pp.sens_stamp,lid_pp.y_rel(:,1:tt.max_opp),'o','MarkerFaceColor',col.pointpillars,'MarkerEdgeColor',col.pointpillars,'MarkerSize',sz,'DisplayName','Lid PP');
+plot(tt.stamp, tt.y_rel(:,1:tt.max_opp), 'Color',col.tt,'DisplayName','tt');
+if(compare); plot(tt2.stamp, tt2.y_rel(:,1:tt2.max_opp), 'Color',col.tt2,'DisplayName',name2); end
 if(use_ref || use_sim_ref); plot(gt.stamp, gt.y_rel, 'Color',col.ref,'DisplayName','Ground Truth'); end
 grid on; title('y rel [m]'); 
 
 % rho dot
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot(rad_clust.sens_stamp,rad_clust.rho_dot(:,1:max_opp),'o','MarkerFaceColor',col.radar,'MarkerEdgeColor',col.radar,'MarkerSize',sz,'DisplayName','Rad Clust');
-plot(tt.stamp, tt.rho_dot(:,1:max_opp), 'Color',col.tt,'DisplayName','tt');
+plot(rad_clust.sens_stamp,rad_clust.rho_dot(:,1:tt.max_opp),'o','MarkerFaceColor',col.radar,'MarkerEdgeColor',col.radar,'MarkerSize',sz,'DisplayName','Rad Clust');
+plot(tt.stamp, tt.rho_dot(:,1:tt.max_opp), 'Color',col.tt,'DisplayName','tt');
+if(compare); plot(tt2.stamp, tt2.rho_dot(:,1:tt2.max_opp), 'Color',col.tt2,'DisplayName',name2); end
 if(use_ref || use_sim_ref); plot(gt.stamp, gt.rho_dot, 'Color',col.ref,'DisplayName','Ground Truth'); end
 grid on; title('rho dot [m/s]'); 
 
@@ -223,27 +229,29 @@ tiledlayout(3,1,'Padding','compact');
 
 % rho 
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot(lid_clust.sens_stamp,lid_clust.range(:,1:max_opp),'o','MarkerFaceColor',col.lidar,'MarkerEdgeColor',col.lidar,'MarkerSize',sz,'DisplayName','Lid Clust');
-plot(rad_clust.sens_stamp,rad_clust.range(:,1:max_opp),'o','MarkerFaceColor',col.radar,'MarkerEdgeColor',col.radar,'MarkerSize',sz,'DisplayName','Rad Clust');
-plot(cam_yolo.sens_stamp,cam_yolo.range(:,1:max_opp),'o','MarkerFaceColor',col.camera,'MarkerEdgeColor',col.camera,'MarkerSize',sz,'DisplayName','Camera');
-plot(lid_pp.sens_stamp,lid_pp.range(:,1:max_opp),'o','MarkerFaceColor',col.pointpillars,'MarkerEdgeColor',col.pointpillars,'MarkerSize',sz,'DisplayName','Lid PP');
-plot(tt.stamp, tt.range(:,1:max_opp), 'Color',col.tt,'DisplayName','tt');
+plot(lid_clust.sens_stamp,lid_clust.range(:,1:tt.max_opp),'o','MarkerFaceColor',col.lidar,'MarkerEdgeColor',col.lidar,'MarkerSize',sz,'DisplayName','Lid Clust');
+plot(rad_clust.sens_stamp,rad_clust.range(:,1:tt.max_opp),'o','MarkerFaceColor',col.radar,'MarkerEdgeColor',col.radar,'MarkerSize',sz,'DisplayName','Rad Clust');
+plot(cam_yolo.sens_stamp,cam_yolo.range(:,1:tt.max_opp),'o','MarkerFaceColor',col.camera,'MarkerEdgeColor',col.camera,'MarkerSize',sz,'DisplayName','Camera');
+plot(lid_pp.sens_stamp,lid_pp.range(:,1:tt.max_opp),'o','MarkerFaceColor',col.pointpillars,'MarkerEdgeColor',col.pointpillars,'MarkerSize',sz,'DisplayName','Lid PP');
+plot(tt.stamp, tt.range(:,1:tt.max_opp), 'Color',col.tt,'DisplayName','tt');
+if(compare); plot(tt2.stamp, tt2.range(:,1:tt2.max_opp), 'Color',col.tt2,'DisplayName',name2); end
 if(use_ref || use_sim_ref); plot(gt.stamp, gt.rho, 'Color',col.ref,'DisplayName','Ground Truth'); end
-grid on; title('range [m]'); 
+grid on; title('range [m]'); ylim([0 200]);
 
 % rho dot
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot(rad_clust.sens_stamp,rad_clust.rho_dot(:,1:max_opp),'o','MarkerFaceColor',col.radar,'MarkerEdgeColor',col.radar,'MarkerSize',sz,'DisplayName','Rad Clust');
-plot(tt.stamp, tt.rho_dot(:,1:max_opp), 'Color',col.tt,'DisplayName','tt');
+plot(rad_clust.sens_stamp,rad_clust.rho_dot(:,1:tt.max_opp),'o','MarkerFaceColor',col.radar,'MarkerEdgeColor',col.radar,'MarkerSize',sz,'DisplayName','Rad Clust');
+plot(tt.stamp, tt.rho_dot(:,1:tt.max_opp), 'Color',col.tt,'DisplayName','tt');
+if(compare); plot(tt2.stamp, tt2.rho_dot(:,1:tt2.max_opp), 'Color',col.tt2,'DisplayName',name2); end
 if(use_ref || use_sim_ref); plot(gt.stamp, gt.rho_dot, 'Color',col.ref,'DisplayName','Ground Truth'); end
 grid on; title('rho dot [m/s]'); 
 
 % count
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-area(tt.stamp,log.perception__opponents.opponents__rad_clust_meas(:,1:max_opp),'FaceColor',col.radar,'EdgeColor',col.radar,'DisplayName','Rad Clust');
-area(tt.stamp,log.perception__opponents.opponents__lid_pp_meas(:,1:max_opp),'FaceColor',col.pointpillars,'EdgeColor',col.pointpillars,'DisplayName','Lid PP');
-area(tt.stamp,log.perception__opponents.opponents__lid_clust_meas(:,1:max_opp),'FaceColor',col.lidar,'EdgeColor',col.lidar,'DisplayName','Lid Clust');
-area(tt.stamp,log.perception__opponents.opponents__cam_yolo_meas(:,1:max_opp),'FaceColor',col.camera,'EdgeColor',col.camera,'DisplayName','Camera');
+area(tt.stamp,log.perception__opponents.opponents__rad_clust_meas(:,1:tt.max_opp),'FaceColor',col.radar,'EdgeColor',col.radar,'DisplayName','Rad Clust');
+area(tt.stamp,log.perception__opponents.opponents__lid_pp_meas(:,1:tt.max_opp),'FaceColor',col.pointpillars,'EdgeColor',col.pointpillars,'DisplayName','Lid PP');
+area(tt.stamp,log.perception__opponents.opponents__lid_clust_meas(:,1:tt.max_opp),'FaceColor',col.lidar,'EdgeColor',col.lidar,'DisplayName','Lid Clust');
+area(tt.stamp,log.perception__opponents.opponents__cam_yolo_meas(:,1:tt.max_opp),'FaceColor',col.camera,'EdgeColor',col.camera,'DisplayName','Camera');
 grid on; title('Count'); 
 
 %% SPEED AND ACC
@@ -252,13 +260,15 @@ tiledlayout(2,1,'Padding','compact');
 
 % vx
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot(tt.stamp,tt.vx(:,1:max_opp),'Color',col.tt,'DisplayName','tt');
+plot(tt.stamp,tt.vx(:,1:tt.max_opp),'Color',col.tt,'DisplayName','tt');
+if(compare); plot(tt2.stamp,tt2.vx(:,1:tt2.max_opp),'Color',col.tt2,'DisplayName',name2); end
 if(use_ref || use_sim_ref); plot(gt.stamp,gt.vx,'Color',col.ref,'DisplayName','Ground Truth'); end
-grid on; title('vx [m/s]'); 
+grid on; title('vx [m/s]'); ylim([0 inf]);
 
 % ax
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot(tt.stamp,tt.ax(:,1:max_opp),'Color',col.tt,'DisplayName','tt');
+plot(tt.stamp,tt.ax(:,1:tt.max_opp),'Color',col.tt,'DisplayName','tt');
+if(compare); plot(tt2.stamp,tt2.ax(:,1:tt2.max_opp),'Color',col.tt2,'DisplayName','tt'); end
 if(use_sim_ref); plot(gt.stamp,gt.ax,'Color',col.ref,'DisplayName','Ground Truth'); end
 grid on; title('ax [m/s^2]'); 
 
@@ -277,13 +287,16 @@ function refreshTimeButtonPushed(src,event)
     axes = evalin('base', 'axes');
     traj_db = evalin('base', 'trajDatabase');
     use_ref = evalin('base', 'use_ref');
+    compare = evalin('base', 'compare');
     use_sim_ref = evalin('base', 'use_sim_ref');
     col = evalin('base', 'col');
     lid_clust = evalin('base', 'lid_clust');
     rad_clust = evalin('base', 'rad_clust');
     cam_yolo = evalin('base', 'cam_yolo');
     lid_pp = evalin('base', 'lid_pp');
-    tt=evalin('base','tt');
+    tt = evalin('base','tt');
+    if(compare); tt2 = evalin('base','tt2'); end
+    if(compare); name2 = evalin('base','name2'); end
     if(use_ref || use_sim_ref); gt =evalin('base','gt'); end
 
     t_lim=xlim(axes(1));
@@ -297,6 +310,10 @@ function refreshTimeButtonPushed(src,event)
     tend_lid_pp = find(lid_pp.sens_stamp<t_lim(2),1,'last');
     t1_tt = find(tt.stamp>t_lim(1),1);
     tend_tt = find(tt.stamp<t_lim(2),1,'last');
+    if(compare)
+        t1_tt2 = find(tt2.stamp>t_lim(1),1);
+        tend_tt2 = find(tt2.stamp<t_lim(2),1,'last');
+    end
     if(use_ref || use_sim_ref)
         t1_tt_ref = find(gt.stamp>t_lim(1),1);
         tend_tt_ref = find(gt.stamp<t_lim(2),1,'last');
@@ -323,6 +340,7 @@ function refreshTimeButtonPushed(src,event)
     plot(cam_yolo.x_map(t1_cam_yolo:tend_cam_yolo), cam_yolo.y_map(t1_cam_yolo:tend_cam_yolo),'.','markersize',20,'Color',col.camera,'displayname','Camera');
     plot(lid_pp.x_map(t1_lid_pp:tend_lid_pp), lid_pp.y_map(t1_lid_pp:tend_lid_pp),'.','markersize',20,'Color',col.pointpillars,'displayname','Lid PP');
     plot(tt.x_map(t1_tt:tend_tt),tt.y_map(t1_tt:tend_tt),'Color',col.tt,'DisplayName','tt');
+    if(compare); plot(tt2.x_map(t1_tt2:tend_tt2),tt2.y_map(t1_tt2:tend_tt2),'Color',col.tt2,'DisplayName',name2); end
     if(use_ref || use_sim_ref)
         plot(gt.x_map(t1_tt_ref:tend_tt_ref),gt.y_map(t1_tt_ref:tend_tt_ref),'Color',col.ref,'DisplayName','Grond Truth');
     end

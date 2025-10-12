@@ -160,18 +160,18 @@ tiledlayout(3,1,'Padding','compact');
 
 axes(f) = nexttile; f=f+1;
 hold on;
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(1,:)), 'DisplayName','RF');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(3,:)), 'DisplayName','RR');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(5,:)), 'DisplayName','RL');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(7,:)), 'DisplayName','RB');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(1)), 'DisplayName','RF');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(3)), 'DisplayName','RR');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(5)), 'DisplayName','RL');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(7)), 'DisplayName','RB');
 grid on; title('radar points rate [s]'); legend; xlim(x_lim);
 
 axes(f) = nexttile; f=f+1;
 hold on;
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(2,:)), 'DisplayName','RF');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(4,:)), 'DisplayName','RR');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(6,:)), 'DisplayName','RL');
-plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(8,:)), 'DisplayName','RB');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(2)), 'DisplayName','RF');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(4)), 'DisplayName','RR');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(6)), 'DisplayName','RL');
+plot(liveliness_stamp, log.liveliness__state.nodes_states__current_rate(:,liv_idx(8)), 'DisplayName','RB');
 grid on; title('radar udp packages rate [s]'); legend; xlim(x_lim);
 
 axes(f) = nexttile; f=f+1;
