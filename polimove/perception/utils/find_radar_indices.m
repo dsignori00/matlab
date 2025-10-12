@@ -12,7 +12,7 @@ function indices = find_radar_indices(log)
 
     % Dividi in celle
     inputStr = log.liveliness__state.nodes_states__node_name(1,:);
-    nodes = strsplit(inputStr);
+    nodes = strsplit(strtrim(regexprep(inputStr, '\s+', ' ')));
     
     % Rimuovi celle vuote
     nodes = nodes(~cellfun('isempty', nodes));
