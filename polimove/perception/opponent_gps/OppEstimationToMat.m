@@ -120,11 +120,11 @@ switch(opp_id)
         opp_lat0 = 24.46477;
         opp_lon0 = 54.60523;
         opp_alt0 = 0.0;
-        out.timestamp = opp_log.x20251008_run1_unimore_loc_stamp;
-        out.x_map = opp_log.loc_vehicle_state_position_value0;
-        out.y_map = opp_log.loc_vehicle_state_position_value1;
-        out.yaw_map = unwrap(opp_log.loc_vehicle_state_orientation_value2);
-        out.speed = opp_log.loc_vehicle_state_linVel_value0;
+        out.timestamp = opp_log.x__loc_vehicle_state_head_stamp;
+        out.x_map = opp_log.x__loc_vehicle_state_position_value0;
+        out.y_map = opp_log.x__loc_vehicle_state_position_value1;
+        out.yaw_map = unwrap(opp_log.x__loc_vehicle_state_orientation_value2);
+        out.speed = opp_log.x__loc_vehicle_state_linVel_value0;
 
     case 71
         opp_lat0 = 24.46992202098782;
