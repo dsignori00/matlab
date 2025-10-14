@@ -77,7 +77,7 @@ col.tt2 = '#7E2F8E';
 col.lidar = '#77AC30';
 col.radar = '#4DBEEE';
 col.camera = '#EDB120';
-col.pointpillars = '#D95319';
+col.pointpillars = '#006400';
 col.ref = '#000000';
 sz=3; % Marker size
 f=1;
@@ -87,7 +87,7 @@ load_perception;
 tt = load_target_tracking(log);
 if(compare) 
     tt2 = load_target_tracking(log_2); 
-    tt2.stamp = tt2.stamp - double(log.time_offset_nsec-log_2.time_offset_nsec)*1e-9;
+    tt2.stamp = tt2.stamp + double(log_2.time_offset_nsec-log.time_offset_nsec)*1e-9;
 end
 
 cam_yolo.sens_stamp(cam_yolo.sens_stamp < 0) = NaN;
@@ -103,12 +103,14 @@ if(compare); tt2.range = sqrt(tt2.x_rel.^2 + tt2.y_rel.^2); end
 %% INFO
 figure('Name','Info');
 
-if(exist("log.planner_manager","var"))
+if(~exist("log.planner_manager","var"))
     % racetype
-    tiledlayout(2,1,'Padding','compact');
+    tiledlayout(3,1,'Padding','compact');
     axes(f) = nexttile([1,1]); f=f+1; hold on;
     plot(log.planner_manager.stamp__tot, log.planner_manager.race_type,'Color',col.tt);
     ylim([-1 5]); grid on; title('RaceType');
+else 
+    tiledlayout(2,1,'Padding','compact');
 end
 
 % decision maker
@@ -117,6 +119,12 @@ plot(log.decision_maker.stamp__tot, log.decision_maker.current_state__type, 'Col
 yticks(0:4);
 yticklabels({'RACING','TAILGATING','OVERTAKE','ABORT','CRITICAL'});
 ylim([-1 5]); grid on; title('Decision Maker state');
+
+% opponent count
+axes(f) = nexttile([1,1]); f=f+1; hold on;
+plot(tt.stamp, tt.count, 'Color',col.tt);
+if(compare); plot(tt2.stamp, tt2.count, 'Color', col.tt2); end
+grid on; title('Opponent count');
 
 
 %% LATENCY FIGURE
