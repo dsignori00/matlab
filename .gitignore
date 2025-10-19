@@ -1,4 +1,5 @@
 /polimove/bags/*
+/polimove/scripts/csv_to_share/*
 /.vscode
 
 !polimove/bags/.gitkeep
