@@ -1,7 +1,9 @@
 clc; clearvars;
 
+bag_folder = "../bags";
+
 if (~exist('log','var'))
-    [file,path] = uigetfile('*.mat','Load log');
+    [file,path] = uigetfile(fullfile(bag_folder,'*.mat'),'Load log');
     load(fullfile(path,file));
 end
 
