@@ -131,10 +131,10 @@ switch(opp_id)
         opp_lon0 = 54.60522506805341;
         opp_alt0 = 0.0;
         out.timestamp = opp_log.timestamp*10^9;
-        out.x_map = opp_log.posX;
-        out.y_map = opp_log.posY;
-        out.yaw_map = unwrap(opp_log.heading);
-        out.speed = opp_log.velX;
+        out.x_map = opp_log.position_x;
+        out.y_map = opp_log.position_y;
+        out.yaw_map = unwrap(opp_log.yaw);
+        out.speed = opp_log.vel_x;
 
 end
 
