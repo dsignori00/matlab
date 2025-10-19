@@ -195,7 +195,7 @@ if(use_ref || use_sim_ref)
     gt.yaw_map = mod(gt.yaw_map,2*pi);
     plot(gt.stamp,gt.yaw_map,'Color',col.ref,'DisplayName','Ground Truth');
 end
-grid on; title('yaw [deg]'); 
+grid on; title('yaw [rad]'); 
 
 %% STATE FIGURE REL
 figure('name', 'Filter - CoG');
@@ -347,8 +347,8 @@ function refreshTimeButtonPushed(src,event)
     plot(rad_clust.x_map(t1_rad_clust:tend_rad_clust), rad_clust.y_map(t1_rad_clust:tend_rad_clust),'.','markersize',20,'Color',col.radar,'displayname','Rad Clust');
     plot(cam_yolo.x_map(t1_cam_yolo:tend_cam_yolo), cam_yolo.y_map(t1_cam_yolo:tend_cam_yolo),'.','markersize',20,'Color',col.camera,'displayname','Camera');
     plot(lid_pp.x_map(t1_lid_pp:tend_lid_pp), lid_pp.y_map(t1_lid_pp:tend_lid_pp),'.','markersize',20,'Color',col.pointpillars,'displayname','Lid PP');
-    plot(tt.x_map(t1_tt:tend_tt),tt.y_map(t1_tt:tend_tt),'Color',col.tt,'DisplayName','tt');
-    if(compare); plot(tt2.x_map(t1_tt2:tend_tt2),tt2.y_map(t1_tt2:tend_tt2),'Color',col.tt2,'DisplayName',name2); end
+    plot(tt.x_map(t1_tt:tend_tt,1:tt.max_opp),tt.y_map(t1_tt:tend_tt,1:tt.max_opp),'Color',col.tt,'DisplayName','tt');
+    if(compare); plot(tt2.x_map(t1_tt2:tend_tt2,1:tt2.max_opp),tt2.y_map(t1_tt2:tend_tt2,1:tt2.max_opp),'Color',col.tt2,'DisplayName',name2); end
     if(use_ref || use_sim_ref)
         plot(gt.x_map(t1_tt_ref:tend_tt_ref),gt.y_map(t1_tt_ref:tend_tt_ref),'Color',col.ref,'DisplayName','Grond Truth');
     end
