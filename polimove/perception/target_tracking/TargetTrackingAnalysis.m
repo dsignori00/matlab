@@ -1,10 +1,10 @@
 close all
 clearvars -except log log_2 log_ref trajDatabase
 
-use_ref     = true;
+use_ref     = false;
 use_sim_ref = false;
 imm         = false;
-compare     = true;
+compare     = false;
 
 %#ok<*UNRCH>
 %#ok<*INUSD>
