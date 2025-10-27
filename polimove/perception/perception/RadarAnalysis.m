@@ -65,8 +65,8 @@ x_lim = [0 inf];
 
 %% NAMING
 col.radar = '#0072BD';
-col.ref = '#D95319';
-col.radar2 = '#EDB120';
+col.radar2 = '#FF0000';
+col.ref = '#000000';
 sz=3; % Marker size
 f=1;
 
