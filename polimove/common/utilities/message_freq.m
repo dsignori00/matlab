@@ -1,4 +1,4 @@
-function freq = messageFreq(sens_stamp)
+function freq = message_freq(sens_stamp)
     % Supponiamo che sens_stamp sia un vettore colonna
     % Assicurati che sia un vettore colonna
     sens_stamp = sens_stamp(:);

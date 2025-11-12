@@ -1,4 +1,4 @@
-function outStruct = normalizeStamps(inStruct)
+function outStruct = normalize_stamps(inStruct)
     % Fase 1: Estrai tutti i valori dei campi che contengono 'stamp'
     values = collectStampValues(inStruct);
     values = values(values~=0);

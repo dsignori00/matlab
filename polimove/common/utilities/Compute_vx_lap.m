@@ -1,4 +1,4 @@
-function [vx_lap_ref] = Compute_vx_lap(rho_lap, mux_acc_lap, mux_dec_lap, muy_lap, vx_max_lap, x_lap, y_lap, n_lap)
+function [vx_lap_ref] = compute_vx_lap(rho_lap, mux_acc_lap, mux_dec_lap, muy_lap, vx_max_lap, x_lap, y_lap, n_lap)
 
 lap_len = length(x_lap);
 

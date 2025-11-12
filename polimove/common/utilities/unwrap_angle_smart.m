@@ -1,4 +1,4 @@
-function [angle_in] =  unwrapAngleSmart(angle_in,angle_ref)
+function [angle_in] =  unwrap_angle_smart(angle_in,angle_ref)
 diff = angle_ref - angle_in;
 
 while diff > pi
