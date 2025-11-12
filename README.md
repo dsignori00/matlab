@@ -1,11 +1,13 @@
 <h1 align="center">Welcome to matlab 👋</h1>
-<p>
-  <a href="https://www.npmjs.com/package/matlab" target="_blank">
-    <img alt="Version" src="https://img.shields.io/npm/v/matlab.svg">
-  </a>
-</p>
+![Matlab](https://img.shields.io/badge/Matlab-Matlab-blue)](https://img.shields.io/badge/Matlab-R2025a-blue)
 
-> All kinf of matlab scripts for data analysis
+> All kind of matlab scripts for data analysis
+
+## 🚀 Usage
+
+* Make sure you have [MatLab]([https://www.npmjs.com/package/npx](https://it.mathworks.com/help/install/ug/install-products-with-internet-connection.html)) installed. * You don't need a specified version, just install based on your preference.
+* You may be asked to install some add-on based on the script you need.
+* Upload your .mat data in the "bags" folders to quickly access them from the UI.
 
 ### 🏠 [Homepage](https://github.com/dsignori00/matlab)
 
@@ -18,11 +20,8 @@
 
 ## 🤝 Contributing
 
-Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/dsignori00/matlab/issues). You can also take a look at the [contributing guide](https://github.com/dsignori00/matlab/issues).
+Contributions, issues and feature requests are welcome!<br />Feel free to check [issues page](https://github.com/dsignori00/matlab/issues).
 
 ## Show your support
 
 Give a ⭐️ if this project helped you!
-
-***
-_This README was generated with ❤️ by [readme-md-generator](https://github.com/kefranabg/readme-md-generator)_
