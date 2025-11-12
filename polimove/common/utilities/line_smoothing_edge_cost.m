@@ -1,4 +1,4 @@
-function new_line = LineSmoothingEdgeCost(line, dn_max, der_cost, edge_cost,max_iter, opt_tol, func_tol)
+function new_line = line_smoothing_edge_cost(line, dn_max, der_cost, edge_cost,max_iter, opt_tol, func_tol)
 
     line_closed = CloseLine(line);
 

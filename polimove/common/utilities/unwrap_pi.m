@@ -1,4 +1,4 @@
-function [out] = UnwrapPi(in)
+function [out] = unwrap_pi(in)
 %UNTITLED2 Unwrap angle between 180 and -180
    out = NaN(size(in));
    for i = 1:size(in, 1)
