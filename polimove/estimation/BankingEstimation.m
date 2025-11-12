@@ -1,0 +1,70 @@
+clearvars -except log log_ref
+
+% load track lines
+load('../../05_Scripts/Yas_Marina_DB/databases/Yas_South_apex_v0_new_pit/trajDatabase.mat');
+
+% load log
+if (~exist('log','var'))
+    [file,path] = uigetfile('*.mat','Load log');
+    load(fullfile(path,file));
+end
+
+% compute closest idx for each roll data
+roll_closest_idx = [];
+for i=1:length(log.vectornav__raw__common__yawpitchroll__z)
+    [c index] = min(abs(log.traj_server__bag_timestamp-log.vectornav__raw__common__bag_timestamp(i)));
+    roll_closest_idx(i) = log.traj_server__closest_idx_ref(index);
+end
+figure;
+scatter(roll_closest_idx,log.vectornav__raw__common__yawpitchroll__z,10,'filled');
+
+
+
+% mean roll for each idx
+roll = [];
+for i=0:max(log.traj_server__closest_idx_ref)
+    roll(i+1)=trimmean(log.vectornav__raw__common__yawpitchroll__z(roll_closest_idx==i),3);
+end
+figure;
+plot(roll);
+
+% smooth roll
+roll_smoothed = smoothdata(roll,"movmean",[100,100]);
+figure;
+hold on;
+scatter(roll_closest_idx,log.vectornav__raw__common__yawpitchroll__z,10,'filled');
+plot(roll_smoothed);
+
+%% 
+t1=1:271;
+b1=(1.3-(-1.55))/(t1(1)-t1(end))*(t1-t1(end))-1.55;
+
+t2=272:1861;
+b2=-1.55*ones(size(t2));
+
+t3=1862:2001;
+b3=(-1.55-(-2.8))/(t3(1)-t3(end))*(t3-t3(end))-2.8;
+
+t4=2002:2241;
+b4=-2.8*ones(size(t4));
+
+t5=2242:2521;
+b5=(-2.8-1.3)/(t5(1)-t5(end))*(t5-t5(end))+1.3;
+
+t6=2522:4319;
+b6=1.3*ones(size(t6));
+
+t=[t1,t2,t3,t4,t5,t6];
+b=[b1,b2,b3,b4,b5,b6];
+ttt=[t,t,t];
+bbb=[b,b,b];
+bbb_smoothed=smoothdata(bbb,"movmean",[50,50]);
+
+figure;
+hold on;
+scatter(roll_closest_idx,log.vectornav__raw__common__yawpitchroll__z,10,'filled');
+plot(b);
+plot(bbb_smoothed(4320:8639));
+
+banking=deg2rad(bbb_smoothed(4320:8639));
+
