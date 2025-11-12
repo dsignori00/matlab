@@ -1,7 +1,9 @@
-<h1 align="center">Welcome to matlab 👋</h1>
-![Matlab](https://img.shields.io/badge/Matlab-Matlab-blue)](https://img.shields.io/badge/Matlab-R2025a-blue)
+<h1 align="center">Welcome to Matlab 👋</h1>
 
-> All kind of matlab scripts for data analysis
+[![MatLab R2025b](https://img.shields.io/badge/MatLab-R2025b-blue?style=flat-square)](https://www.mathworks.com/products/matlab.html)
+
+> All kinds of Matlab scripts for data analysis
+
 
 ## 🚀 Usage
 
