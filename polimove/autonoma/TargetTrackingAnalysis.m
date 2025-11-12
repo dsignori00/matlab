@@ -157,7 +157,7 @@ grid on;
 title('Decision Maker state')
 
 % v2v frequency
-v2v_frequency = MessageFreq(v2v_sens_stamp);
+v2v_frequency = message_freq(v2v_sens_stamp);
 axes(f) = nexttile([1,1]);
 f=f+1;
 hold on;
