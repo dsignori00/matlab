@@ -1,4 +1,4 @@
-function track_frame = getTrackFrame2D(s_hat,track)
+function track_frame = get_track_frame2D(s_hat,track)
 
 while s_hat > track.Sref(end)
     s_hat=s_hat-track.Sref(end);

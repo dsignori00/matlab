@@ -1,4 +1,4 @@
-function value = getNestedField(structure, fieldPath)
+function value = get_nested_field(structure, fieldPath)
     % Split the path into parts
     parts = strsplit(fieldPath, '.');
     

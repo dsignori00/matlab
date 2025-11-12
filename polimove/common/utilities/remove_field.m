@@ -1,4 +1,4 @@
-function s = removeField(s, expandedFieldName)
+function s = remove_field(s, expandedFieldName)
     % Split the expanded field name into parts
     parts = strsplit(expandedFieldName, '.');
     

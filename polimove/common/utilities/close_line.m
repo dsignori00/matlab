@@ -1,4 +1,4 @@
-function line = CloseLine(line)
+function line = close_line(line)
 
     if ~isfield(line, 'closed')
         line.closed = line.x(1) == line.x(end) && line.y(1) == line.y(end);

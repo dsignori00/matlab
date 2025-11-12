@@ -1,4 +1,4 @@
-function trajectory = GenSpeedProfile(trajectory, mu_vec)
+function trajectory = gen_speed_profile(trajectory, mu_vec)
 
     mux_acc_lap = mu_vec(:, 1);
     mux_dec_lap = mu_vec(:, 2);
