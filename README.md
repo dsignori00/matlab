@@ -1,17 +1,16 @@
-<h1 align="center">Welcome to Matlab 👋</h1>
+<h1 align="center">Welcome to matlab 👋</h1>
 
-[![MatLab R2025b](https://img.shields.io/badge/MatLab-R2025b-blue?style=flat-square)](https://www.mathworks.com/products/matlab.html)
+![Repo version](https://img.shields.io/badge/version-1.0.0-blue?style=flat-square)
 
 > All kinds of Matlab scripts for data analysis
 
+### 🏠 [Homepage](https://github.com/dsignori00/matlab)
 
 ## 🚀 Usage
 
 * Make sure you have [MatLab]([https://www.npmjs.com/package/npx](https://it.mathworks.com/help/install/ug/install-products-with-internet-connection.html)) installed. * You don't need a specified version, just install based on your preference.
 * You may be asked to install some add-on based on the script you need.
 * Upload your .mat data in the "bags" folders to quickly access them from the UI.
-
-### 🏠 [Homepage](https://github.com/dsignori00/matlab)
 
 ## Author
 
