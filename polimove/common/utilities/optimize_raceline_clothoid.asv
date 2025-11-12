@@ -1,0 +1,114 @@
+function raceline = optimize_raceline_clothoid(track_bspline, AX_MAX, AY_MAX)
+
+    points = track_bspline.points;
+    d_knot_vec = track_bspline.d_knots;
+    nl_vec = track_bspline.nl_vec;
+    nr_vec = track_bspline.nr_vec;
+
+    N_points = size(points, 1);
+
+    points_padded = [points; points(1:3, :)];
+
+    du_vec = d_knot_vec(3:end); d_knot_vec(1)
+
+    knot_points = compute_knot_points(points, d_knot_vec);
+    normal_vec = compute_normals(points, d_knot_vec);
+
+    Nf_tens = generate_bspline_prime_endpoints(d_knot_vec);
+    Ns_tens = generate_bspline_second_endpoints(d_knot_vec);
+
+    rho_vec = nan(N_points, 1);
+    ds_vec = nan(N_points, 1);
+
+    for i=1:N_points
+        curr_first_der = squeeze(Nf_tens(:, :, i)) * points_padded(i:(i+3), :);
+        curr_second_der = squeeze(Ns_tens(:, :, i)) * points_padded(i:(i+3), :);
+
+        rho_vec(i) = (curr_first_der(1).*curr_second_der(2) - curr_first_der(2).*curr_second_der(1)) ./ ...
+                     ((curr_first_der(1).^2+curr_first_der(2).^2).^(3/2));
+
+    end
+
+    import casadi.*
+
+    v_vec = MX.sym('v_vec', 5*N_points + 3, 1);
+
+    n_vec = v_vec(1:(N_points+1));
+    xi_vec = v_vec((N_points+2):(2*N_points+2));
+    vel_vec = v_vec((2*N_points+3):(3*N_points+3));
+
+    ay_vec = v_vec((3*N_points+4):(4*N_points+3));
+    ax_vec = v_vec((4*N_points+4):(5*N_points+3));
+
+    dtds_vec = (1 - rho_vec .* n_vec(1:N_points)) ./ ...
+               (vel_vec(1:N_points) .* cos(xi_vec(1:N_points)));
+
+    n_dot_vec = vel_vec(1:N_points).*sin(xi_vec(1:N_points));
+    xi_dot_vec = ay_vec ./ vel_vec(1:N_points) - rho_vec ./ dtds_vec;
+    vel_dot_vec = ax_vec;
+
+    g_vec = MX(4*N_points+3, 1);
+
+    g_vec(1:(N_points)) = n_vec(2:end) - n_vec(1:(end-1)) - n_dot_vec .* dtds_vec .* ds_vec;
+    g_vec(N_points+1) = n_vec(end) - n_vec(1);
+    g_vec((N_points+2):(2*N_points+1)) = xi_vec(2:end) - xi_vec(1:(end-1)) - xi_dot_vec .* dtds_vec .* ds_vec;
+    g_vec(2*N_points+2) = xi_vec(end) - xi_vec(1);
+    g_vec((2*N_points+3):(3*N_points+2)) = vel_vec(2:end) - vel_vec(1:(end-1)) - vel_dot_vec .* dtds_vec .* ds_vec;
+    g_vec(3*N_points+3) = vel_vec(end) - vel_vec(1);
+    g_vec((3*N_points+4):(4*N_points+3)) = ax_vec.^2 + ay_vec.^2;
+
+    cost = sum(dtds_vec .* ds_vec);
+
+    lbg = nan(4*N_points+3, 1);
+    ubg = nan(4*N_points+3, 1);
+
+    lbg(1:(3*N_points+3)) = 0;
+    lbg((3*N_points+4):(4*N_points+3)) = 0;
+
+    ubg(1:(3*N_points+3)) = 0;
+    ubg((3*N_points+4):(4*N_points+3)) = AY_MAX.^2;
+
+    lbx = nan(5*N_points+3, 1);
+    ubx = nan(5*N_points+3, 1);
+
+    lbx(1:(N_points+1)) = [nr_vec; nr_vec(1)];
+    lbx((N_points+2):(2*N_points+2)) = -5/11*pi;
+    lbx((2*N_points+3):(3*N_points+3)) = 10;
+    lbx((3*N_points+4):(4*N_points+3)) = -AY_MAX;
+    lbx((4*N_points+4):(5*N_points+3)) = -AX_MAX;
+
+    ubx(1:(N_points+1)) = [nl_vec; nl_vec(1)];
+    ubx((N_points+2):(2*N_points+2)) = 5/11*pi;
+    ubx((2*N_points+3):(3*N_points+3)) = 200;
+    ubx((3*N_points+4):(4*N_points+3)) = AY_MAX;
+    ubx((4*N_points+4):(5*N_points+3)) = AX_MAX;
+
+    x_guess = nan(5*N_points+3, 1);
+
+    x_guess(1:(N_points+1)) = 0;
+    x_guess((N_points+2):(2*N_points+2)) = 0;
+    x_guess((2*N_points+3):(3*N_points+3)) = 10;
+    x_guess((3*N_points+4):(4*N_points+3)) = 0;
+    x_guess((4*N_points+4):(5*N_points+3)) = 0;
+
+    nlp = struct('x', v_vec, 'f', cost, 'g', g_vec);
+
+    solver = nlpsol('solver', 'ipopt', nlp);
+
+    sol = solver('x0', x_guess, 'lbx', lbx, 'ubx', ubx, 'lbg', lbg, 'ubg', ubg);
+
+    v_vec_sol = full(sol.x);
+
+    n_vec_sol = v_vec_sol(1:(N_points+1));
+    xi_vec_sol = v_vec_sol((N_points+2):(2*N_points+2));
+    vel_vec_sol = v_vec_sol((2*N_points+3):(3*N_points+3));
+
+    ay_vec_sol = v_vec_sol((3*N_points+4):(4*N_points+3));
+    ax_vec_sol = v_vec_sol((4*N_points+4):(5*N_points+3));
+
+    raceline.points = knot_points + normal_vec .* n_vec_sol(1:N_points);
+    raceline.n = n_vec_sol;
+    raceline.v = vel_vec_sol;
+    raceline.ax = ax_vec_sol;
+
+end

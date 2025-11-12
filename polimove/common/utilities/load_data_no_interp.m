@@ -1,0 +1,91 @@
+function [varargout] = load_data_no_interp(log,rename_var,Ts,t_start,t_stop)
+
+
+%% load logged data
+
+
+[~,~,rename_variable_cell] = xlsread(rename_var);
+
+
+if t_stop==inf
+    %     t_stop=double(log.vehicle_fbk__bag_timestamp(end)-log.vehicle_fbk__bag_timestamp(1))-1;
+    t_stop=double(log.estimation__bag_timestamp(end)-log.estimation__bag_timestamp(1))-1;
+    
+end
+
+time=(t_start:Ts:t_stop)';
+
+
+%% preprocessing
+
+% 1. renaming, [NO 2. resmplaing], 3. gain+offset correction
+
+[n_row,~] = size(rename_variable_cell);
+
+i_var = 1;
+for i_var_list = 2:n_row
+    time_zero=0;
+    for j_var_list = 2:n_row
+        try
+            
+            signal_time_name = rename_variable_cell{j_var_list,7};
+            signal_time = log.(signal_time_name);
+            
+            
+            if signal_time(1)>time_zero
+                time_zero=signal_time(1);
+            end
+        end
+        
+    end
+    
+    
+    signal_name_old = rename_variable_cell{i_var_list,1};
+    signal_name_new = rename_variable_cell{i_var_list,2};
+    gain = rename_variable_cell{i_var_list,3};
+    offset = rename_variable_cell{i_var_list,4};
+    signal_time_name = rename_variable_cell{i_var_list,7};
+    
+    try
+        signal =double(log.(signal_name_old));
+        signal_time = double(log.(signal_time_name)-time_zero);
+        
+        
+        signal = gain*signal+offset;
+        
+        if strcmp(rename_variable_cell{i_var_list,6},'[rad]')
+            signal=unwrap(signal);
+        end
+        
+        dataset_out.(signal_name_new) = [signal_time, signal];
+    catch e
+        dataset_out.(signal_name_new)=[time, nan(size(time))];
+        disp(['error:  ',signal_name_old, '     Exception:   ',e.identifier])
+        
+    end
+    
+    
+    save_list{i_var,1} = signal_name_new;
+    i_var = i_var+1;
+    
+    
+    % clear signal_name_new signal_name_old signal gain offset signal_time_name
+end
+
+check_saved_all = setdiff(unique(rename_variable_cell(:,2)),save_list);
+
+if not(isempty(check_saved_all))
+    flag_message = 'unsaved variables';
+else
+    flag_message = 'OK';
+end
+
+
+%%
+
+varargout{1} = dataset_out;
+varargout{2} = flag_message;
+
+
+end
+
