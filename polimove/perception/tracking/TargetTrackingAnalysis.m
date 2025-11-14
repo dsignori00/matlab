@@ -73,6 +73,7 @@ col.radar        = '#4DBEEE';
 col.camera       = colors.yellow{2};
 col.pointpillars = colors.orange{2};
 col.tt           = colors.blue{2};
+col.tt2          = colors.blue{1};
 col.ref          = colors.black;
 sz=3; % Marker size
 f=1;
@@ -244,7 +245,10 @@ plot(cam_yolo.sens_stamp,cam_yolo.range(:,1:cam_yolo.max_det),'o','MarkerFaceCol
 plot(lid_pp.sens_stamp,lid_pp.range(:,1:lid_pp.max_det),'o','MarkerFaceColor',col.pointpillars,'MarkerEdgeColor',col.pointpillars,'MarkerSize',sz,'DisplayName','Lid PP');
 plot(tt.stamp, tt.range(:,1:tt.max_opp), 'Color',col.tt,'DisplayName','tt');
 if(compare); plot(tt2.stamp, tt2.range(:,1:tt2.max_opp), 'Color',col.tt2,'DisplayName',name2); end
-if(use_ref || use_sim_ref); plot(gt.stamp, gt.rho, 'Color',col.ref,'DisplayName','Ground Truth'); end
+if(use_ref || use_sim_ref); 
+    if(use_sim_ref); gt.rho = sqrt(gt.x_rel.^2 + gt.y_rel.^2); end
+    plot(gt.stamp, gt.rho, 'Color',col.ref,'DisplayName','Ground Truth'); 
+end
 grid on; ylabel('range [m]'); ylim([0 200]);
 
 % rho dot
