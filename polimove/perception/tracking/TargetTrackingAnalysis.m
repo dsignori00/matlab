@@ -59,6 +59,8 @@ if(use_ref)
         log_ref = tmp.out;
         clearvars tmp;
     end
+else
+    log_ref = [];
 end
 
 DateTime = datetime(log.time_offset_nsec,'ConvertFrom','epochtime','TicksPerSecond',1e9,'Format','dd-MMM-yyyy HH:mm:ss');
@@ -83,7 +85,7 @@ sz=3; % Marker size
 f=1;
 x_lim = [0 inf];
 
-load_perception;
+[lid_clust, rad_clust, cam_yolo, lid_pp, gt] = load_perception(log, use_sim_ref, use_ref, log_ref);
 tt = load_target_tracking(log);
 if(compare) 
     tt2 = load_target_tracking(log_2); 
