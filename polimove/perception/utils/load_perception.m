@@ -142,6 +142,7 @@ if exist("use_sim_ref",'var') && use_sim_ref
     gt.x_map   = log.sim_out.opponents__x_geom(:,1);
     gt.y_map   = log.sim_out.opponents__y_geom(:,1);
     gt.vx      = log.sim_out.opponents__vx(:,1);
+    gt.ax      = log.sim_out.opponents__ax(:,1);
 
     gt.yaw_map = unwrap(log.sim_out.opponents__psi(:,1));
 
