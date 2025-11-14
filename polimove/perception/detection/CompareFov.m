@@ -68,7 +68,6 @@ col.camera       = colors.yellow{1};
 col.camera2      = colors.yellow{2};
 col.pointpillars = colors.orange{1};
 col.pointpillars2= colors.orange{2};
-
 col.ref          = colors.black;
 
 sz=3; % Marker size

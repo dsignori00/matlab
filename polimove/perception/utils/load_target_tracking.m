@@ -1,5 +1,5 @@
 function tt = load_target_tracking(log)
-    if exist("log.perception__opponents",'var')
+    if isfield(log, "perception__opponents")
         tt.stamp = log.perception__opponents.stamp__tot;
         % relative
         tt.x_rel = log.perception__opponents.opponents__x_rel;
