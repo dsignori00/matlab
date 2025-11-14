@@ -44,8 +44,11 @@ if isfield(log,'perception__lidar__clustering_detections')
     lid_clust.y_map   = replaceZeroWithNaN(d.detections__y_map);
     lid_clust.z_map   = replaceZeroWithNaN(d.detections__z_map);
     lid_clust.yaw_map = replaceZeroWithNaN(d.detections__yaw_map);
+
+    lid_clust.max_det = max(sum(~isnan(lid_clust.x_rel')));
 else
     lid_clust = emptyDetectionStruct;
+    lid_clust.max_det = 1;
 end
 
 
@@ -67,8 +70,11 @@ if isfield(log,'perception__radar__clustering_detections')
     rad_clust.y_map   = replaceZeroWithNaN(d.detections__y_map);
     rad_clust.z_map   = replaceZeroWithNaN(d.detections__z_map);
     rad_clust.yaw_map = replaceZeroWithNaN(d.detections__yaw_map);
+
+    rad_clust.max_det = max(sum(~isnan(rad_clust.x_rel')));
 else
     rad_clust = emptyRadarStruct;
+    rad_clust.max_det = 1;
 end
 
 
@@ -89,8 +95,11 @@ if isfield(log,'perception__camera__yolo_detections')
     cam_yolo.y_map   = replaceZeroWithNaN(d.detections__y_map);
     cam_yolo.z_map   = replaceZeroWithNaN(d.detections__z_map);
     cam_yolo.yaw_map = replaceZeroWithNaN(d.detections__yaw_map);
+
+    cam_yolo.max_det = max(sum(~isnan(cam_yolo.x_rel')));
 else
     cam_yolo = emptyDetectionStruct;
+    cam_yolo.max_det = 1;
 end
 
 
@@ -111,8 +120,11 @@ if isfield(log,'perception__lidar__pointpillars_detections')
     lid_pp.y_map   = replaceZeroWithNaN(d.detections__y_map);
     lid_pp.z_map   = replaceZeroWithNaN(d.detections__z_map);
     lid_pp.yaw_map = replaceZeroWithNaN(d.detections__yaw_map);
+
+    lid_pp.max_det = max(sum(~isnan(lid_pp.x_rel')));
 else
     lid_pp = emptyDetectionStruct;
+    lid_pp.max_det = 1;
 end
 
 
