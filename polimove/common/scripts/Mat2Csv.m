@@ -13,7 +13,7 @@ end
 fields = fieldnames(log);
 lengths = cellfun(@(f) length(log.(f)), fields);
 if ~all(lengths == lengths(1))
-    error('Tutti i campi della struct devono avere la stessa lunghezza.');
+    error('All fields in the log must have the same length');
 end
 
 tabella = struct2table(log);
