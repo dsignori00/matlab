@@ -1,4 +1,4 @@
-function fields = extractAllFields(s)
+function fields = extract_all_fields(s)
     %EXTRACTALLFIELDS Summary of this function goes here
     %   Detailed explanation goes here
     fields = {};  % Initialize an empty cell array to store field information
