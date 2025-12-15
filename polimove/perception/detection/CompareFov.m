@@ -2,7 +2,7 @@ clc
 close all
 clearvars -except log log2 log_ref trajDatabase
 
-compare = true;
+compare      = true;
 ground_truth = true;
 
 NAME_1 = "modified clustering";
