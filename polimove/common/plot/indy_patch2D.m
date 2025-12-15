@@ -1,4 +1,4 @@
-function [Xpatch,Ypatch]=IndyPatch2D(X,Y,Yaw,flag)
+function [Xpatch,Ypatch]=indy_patch2D(X,Y,Yaw,flag)
 % From vehicle position and orientation compute bounding rectangle
 % X                 [m] Vehicle position X (geometric center or base frame)
 % Y                 [m] Vehicle position Y (geometric center or base frame)

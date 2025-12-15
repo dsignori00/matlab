@@ -1,6 +1,6 @@
 clearvars -except output_path log 
 
-mats_path = "/home/dano00/Documents/PoliMOVE/04_Bags/";
+mats_path = "/../../bags";
 
 % load ego log
 if (~exist('log','var'))

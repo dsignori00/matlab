@@ -1,4 +1,4 @@
-function [Xpatch,Ypatch]=vehiclePatch2D(X,Y,Yaw,flag_geometric)
+function [Xpatch,Ypatch]=vehicle_patch2D(X,Y,Yaw,flag_geometric)
 % From vehicle position and orientation compute bounding rectangle
 % X                 [m] Vehicle position X (geometric center or base frame)
 % Y                 [m] Vehicle position Y (geometric center or base frame)
