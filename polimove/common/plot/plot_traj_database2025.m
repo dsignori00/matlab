@@ -1,15 +1,4 @@
 function phl = plot_traj_database2025(traj_DB, legend_on, grayScaleOn)
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%         poliMove - IAC - plotTrajDatabaseV2                             %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Revision: 1                                                             %
-% Author: Eugenio Favuzzi                                                 %
-% Date: 2021.04.15                                                        %
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%
-%   PlotTrajDatabase: Plots all the trajectories in a poliMOVE IAC database
-%   where db is a poliMOVE IAC trajectory database, and f is
-%   a valid handle to an axis
 
 %% VISUALIZATION SETTINGS
 figure;       

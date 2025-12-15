@@ -93,22 +93,18 @@ function tiles = plot_patches(time, enable, tiles, patch_properties)
     drawnow;
     for i = 1:N_plots
         % Get current y-limits of the axis
-        %curr_ylims = tiles(i).YLim;
-        ax = gca();
-        curr_ylims = ax.YLim;
+        curr_ylims = tiles(i).YLim;
         
         % Define y coordinates for patches
-        y_data(1, :) = curr_ylims(1)*ones(size(start_times))*100000;
-        y_data(2, :) = curr_ylims(1)*ones(size(start_times))*100000;
-        y_data(3, :) = curr_ylims(2)*ones(size(start_times))*100000;
-        y_data(4, :) = curr_ylims(2)*ones(size(start_times))*100000;
+        y_data(1, :) = curr_ylims(1) - abs(diff(curr_ylims))*10000*ones(size(start_times));
+        y_data(2, :) = curr_ylims(1) - abs(diff(curr_ylims))*10000*ones(size(start_times));
+        y_data(3, :) = curr_ylims(2) + abs(diff(curr_ylims))*10000*ones(size(start_times));
+        y_data(4, :) = curr_ylims(2) + abs(diff(curr_ylims))*10000*ones(size(start_times));
         
         % Draw patches
-        %mypatch = patch(tiles(i), 'XData', x_data, 'YData', y_data, patch_properties{:});
-        mypatch = patch(ax, 'XData', x_data, 'YData', y_data, patch_properties{:});
+        mypatch = patch(tiles(i), 'XData', x_data, 'YData', y_data, patch_properties{:});
         uistack(mypatch, 'bottom');
-        %tiles(i).YLim = curr_ylims;
-        ax.YLim = curr_ylims;
+        tiles(i).YLim = curr_ylims;
     end
     
 end
