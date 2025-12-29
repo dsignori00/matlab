@@ -2,27 +2,22 @@ clearvars -except bag1 bag2
 close all
 clc
 
-paths.utils_path =  "utils";
-%%% Replace bag_path with desired path
-paths.bag_path = fullfile("/home","alessandro","adehome_merlo","cingo_code","bags");
-paths.graphic_tools = fullfile("..","..","common","graphic_tools");
+log_row_eq = true;
 
-addpath(genpath(paths.bag_path));
-addpath(genpath(paths.graphic_tools));
-addpath(genpath(paths.utils_path));
+%% paths
+
+addpath("bags");
+addpath("func");
+addpath("..","..","common","graphic_tools");
 
 graphics_options;
-
 patch_properties = {'FaceColor', colors.orange{1}, 'FaceAlpha', 0.3, 'EdgeColor', 'none', 'HandleVisibility', 'off'};
 R2D = 57.2958;
 ax = gobjects(0); f=1;
 
-log_row_eq = true;
 
-%% load structs
+%% load data
 load_structs;
-
-%% load log
 
 if (~exist('bag1','var'))
     [file,path] = uigetfile(fullfile(paths.bag_path,'*.mat'),'Load log');

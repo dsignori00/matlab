@@ -36,7 +36,7 @@ clearvars -except ego opp_dir_path
 %% Paths
 
 addpath("../../common/utilities/")
-addpath("../../common/constants/")
+addpath("../../../common/constants/")
 addpath("../../common/plot/")
 addpath("../utils/")
 normal_path = "../../bags";

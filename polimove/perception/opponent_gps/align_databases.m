@@ -2,7 +2,7 @@ clc; close all; clearvars -except log_ref traj_db
 %% Paths
 
 addpath("../../common/utilities/")
-addpath("../../common/constants/")
+addpath("../../../common/constants/")
 addpath("../../common/plot/")
 addpath("../utils/")
 opp_dir = "../opponent_gps/mat/";

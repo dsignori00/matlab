@@ -31,7 +31,7 @@
 clc; close all; clearvars -except ego opp_log closest_idxs opp_idxs file_name out.clos_idx
 
 addpath("../../common/utilities/")
-addpath("../../common/constants/")
+addpath("../../../common/constants/")
 addpath("../../common/plot/")
 addpath("../../databases/")
 addpath("opp_data/")

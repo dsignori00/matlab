@@ -13,7 +13,7 @@ NAME_2 = "Radar - 2";
 %% Paths
 
 addpath("../../common/utilities/")
-addpath("../../common/constants/")
+addpath("../../../common/constants/")
 addpath("../../common/plot/")
 addpath("../utils/")
 normal_path = "../../bags";
