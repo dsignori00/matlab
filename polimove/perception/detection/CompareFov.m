@@ -14,7 +14,7 @@ NAME_2 = "old";
 %% Paths
 
 addpath("../../common/utilities/")
-addpath("../../common/constants/")
+addpath("../../../common/constants/")
 addpath("../../common/plot/")
 addpath("../utils/")
 addpath("../../../common/graphic_tools/")

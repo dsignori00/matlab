@@ -11,7 +11,7 @@ drop_out_analyses   = false;
 %% Paths
 
 addpath("../../common/utilities/")
-addpath("../../common/constants/")
+addpath("../../../common/constants/")
 addpath("../../common/plot/")
 addpath("../utils/")
 opp_dir = "../opponent_gps/mat/";

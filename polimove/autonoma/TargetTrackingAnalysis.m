@@ -11,7 +11,7 @@ compare     = false;
 %% Paths
 
 addpath("../common/utilities/")
-addpath("../common/constants/")
+addpath("../../common/constants/")
 addpath("../common/plot/")
 addpath("../../common/graphic_tools/")
 addpath("../perception/utils/")

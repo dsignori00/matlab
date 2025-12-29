@@ -16,7 +16,7 @@ opponent            = containers.Map({'TUM','TII','UNIMORE','TGM','CODE19','KINE
 %% Paths
 
 addpath("../../common/utilities/")
-addpath("../../common/constants/")
+addpath("../../../common/constants/")
 addpath("../../common/plot/")
 addpath("func")
 bags = "../../bags/";
