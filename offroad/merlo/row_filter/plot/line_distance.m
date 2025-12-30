@@ -5,7 +5,6 @@ ax(f) = nexttile([1,1]); f=f+1;hold on; grid on
 plot(bag1.perc_time, bag1.state.dist_left_row, 'DisplayName','L');
 plot(bag1.perc_time, bag1.state.dist_right_row, 'DisplayName','R');
 plot_patches(bag1.perc_time, ~bag1.inrow, ax(f-1), patch_properties);
-xlabel("timestamp [s]")
 ylabel("distance [m]")
 legend show
 

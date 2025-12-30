@@ -7,7 +7,7 @@ fig = figure('Name','COG Visualization');
 set(fig,'KeyPressFcn',@keyPressed);   % <-- enable arrows
 
 % Axes for map (left side)
-axMap = axes('Parent',fig,'Units','normalized','Position',[0.06 0.10 0.50 0.85]);
+axMap = axes('Parent',fig,'Units','normalized','Position',[0.06 0.15 0.50 0.75]);
 title(axMap,'map');
 
 % --- Two tables on the right, stacked (each half height) ---
