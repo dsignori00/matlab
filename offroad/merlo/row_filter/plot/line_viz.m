@@ -42,10 +42,10 @@ guidata(fig,S);
 
 function refreshTimeButtonPushed(~,~)
     % Pull needed vars
-    fig        = evalin('base','fig');
+    fig        = evalin('base', 'fig');
     ax         = evalin('base', 'ax');
     bag1       = evalin('base', 'bag1');
-    FOOTPRINT  = evalin('base','FOOTPRINT');
+    FOOTPRINT  = evalin('base', 'FOOTPRINT');
 
     % Determine range from x-limits
     t_lim = xlim(ax(1));

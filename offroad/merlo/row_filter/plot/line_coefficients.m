@@ -42,6 +42,8 @@ hSlider = uicontrol('Parent', gcf, 'Style', 'slider', ...
     'Callback', @(src,~) update_2D(round(src.Value)));
 
 assignin('base', 'hSlider', hSlider);  % store slider handle too
+hXline = xline(0,'--','HandleVisibility','off');  
+hYline = yline(0,'--','HandleVisibility','off'); 
 
 % --- Funzione annidata per aggiornare il grafico 2D ---
 function update_2D(idx)
