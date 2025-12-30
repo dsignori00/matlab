@@ -41,7 +41,7 @@ end
 
 h = gobjects(num_lines, 1);
 for i = 1:num_lines
-    h(i) = plot(bag1.lines.stamp, bag1.lines.p1(:, i) * RAD2DEG, 'Color', line_colors{i});
+    h(i) = plot(bag1.lines.stamp, bag1.lines.p1(:, i) * RAD2DEG, 'Color', colors.matlab{i});
 end
 
 plot_patches(bag1.perc_time, ~bag1.inrow, ax(f-1), patch_properties);
@@ -89,7 +89,7 @@ end
 
 h = gobjects(num_lines, 1);
 for i = 1:num_lines
-    h(i) = plot(bag1.lines.stamp, bag1.lines.p2(:, i), 'Color', line_colors{i});
+    h(i) = plot(bag1.lines.stamp, bag1.lines.p2(:, i), 'Color', colors.matlab{i});
 end
 
 plot_patches(bag1.perc_time, ~bag1.inrow, ax(f-1), patch_properties);
