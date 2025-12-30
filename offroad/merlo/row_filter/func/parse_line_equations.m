@@ -1,4 +1,4 @@
-function line_eq = parseLineEquations(log, topic)
+function line_eq = parse_line_equations(log, topic)
 %PARSELINEEQUATIONS Summary of this function goes here
 %   Detailed explanation goes here
     line_eq = struct();

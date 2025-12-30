@@ -1,4 +1,4 @@
-function row_filt_msg = parseRowFilterMsg(log)
+function row_filt_msg = parse_row_filter_msg(log)
 %PARSELINEEQUATIONS Summary of this function goes here
 %   Detailed explanation goes here
     row_filt_msg = struct();

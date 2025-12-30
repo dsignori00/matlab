@@ -1,4 +1,4 @@
-function [p1_out, p2_out, form_out] = convertLineForm(coeff, form_in, to_form, LINEFORM, p1_in, p2_in)
+function [p1_out, p2_out, form_out] = convert_line_form(coeff, form_in, to_form, LINEFORM, p1_in, p2_in)
 %CONVERTLINEFORM Convert between NORMAL and EXPLICIT line forms.
 % Gracefully handles degenerate direction (dx,dy) ~ (0,0) by returning NaNs.
 
