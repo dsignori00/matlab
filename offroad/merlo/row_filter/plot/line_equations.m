@@ -14,7 +14,6 @@ end
 h = plot(bag1.lines.stamp, bag1.lines.p1(:, 1:num_lines) * RAD2DEG);
 if(log_row_eq) scatter(bag1.rows.stamp, bag1.rows.p1(:, 1:num_lines) * RAD2DEG); end
 plot_patches(bag1.perc_time, ~bag1.inrow, ax(f-1), patch_properties);
-xlabel("timestamp [s]")
 ylabel(p1_label)
 labels = "Line " + string(1:1:num_lines);    % e.g. "Line 1", "Line 3", ...
 legend(h, labels, 'Location','northeast');

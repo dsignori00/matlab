@@ -9,8 +9,7 @@ if (ismember(strategies,INROWDETSTR.AUTOMATIC))
     plot(bag1.perc_time(inrowdet_idx), x_length(:,1), 'DisplayName', bag1.log_name + " L");
     plot(bag1.perc_time(inrowdet_idx), x_length(:,2), 'DisplayName',bag1.log_name+  " R");
     plot_patches(bag1.perc_time(inrowdet_idx), ~bag1.inrow(inrowdet_idx), ax(f-1), patch_properties);
-    xlabel("time [s]")
-    title("x length")
+    ylabel("x length")
     legend show
     
     ax(f) = nexttile([1,2]); f=f+1;
@@ -20,8 +19,7 @@ if (ismember(strategies,INROWDETSTR.AUTOMATIC))
     plot(bag1.perc_time(inrowdet_idx), y_length(inrowdet_idx,1), 'DisplayName', bag1.log_name + " L");
     plot(bag1.perc_time(inrowdet_idx), y_length(inrowdet_idx,2), 'DisplayName',bag1.log_name+  " R");
     plot_patches(bag1.perc_time(inrowdet_idx), ~bag1.inrow(inrowdet_idx), ax(f-1), patch_properties);
-    xlabel("time [s]")
-    title("y length")
+    ylabel("y length")
     legend show
     
     ax(f) = nexttile([1,1]); f=f+1;

@@ -12,7 +12,6 @@ if (ismember(strategies, INROWDETSTR.AUTOMATIC))
     plot(bag1.perc_time(inrowdet_idx), bag1.log.perception__row_filter__debug__info.chunks__end_row_detection_len(inrowdet_idx,1), 'DisplayName', bag1.log_name + " L");
     plot(bag1.perc_time(inrowdet_idx), bag1.log.perception__row_filter__debug__info.chunks__end_row_detection_len(inrowdet_idx,2), 'DisplayName',bag1.log_name+  " R");
     plot_patches(bag1.perc_time(inrowdet_idx), ~bag1.inrow(inrowdet_idx), ax(f-1), patch_properties);
-    xlabel("time [s]")
     ylabel("chunk length")
     legend show
     
@@ -22,7 +21,6 @@ if (ismember(strategies, INROWDETSTR.AUTOMATIC))
     plot(bag1.perc_time(inrowdet_idx), bag1.log.perception__row_filter__debug__info.chunks__density(inrowdet_idx,1), 'DisplayName', bag1.log_name + " L");
     plot(bag1.perc_time(inrowdet_idx), bag1.log.perception__row_filter__debug__info.chunks__density(inrowdet_idx,2), 'DisplayName',bag1.log_name +" R");
     plot_patches(bag1.perc_time(inrowdet_idx), ~bag1.inrow(inrowdet_idx), ax(f-1), patch_properties);
-    xlabel("timestamp [s]")
     ylabel("density chunk ")
     legend show
     
