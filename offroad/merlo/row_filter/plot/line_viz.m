@@ -114,8 +114,8 @@ function drawCurrentSample()
     plot(-y, x, 'DisplayName','Lines','LineWidth',2.0);
 
     if log_row_eq
-        rows_x = [S.bag1.rows.x_min(i,:) ; S.bag1.rows.x_max(i,:)];
-        rows_y = [S.bag1.rows.y_min(i,:) ; S.bag1.rows.y_max(i,:)];
+        rows_x = [S.bag1.measures.x_min(i,:) ; S.bag1.measures.x_max(i,:)];
+        rows_y = [S.bag1.measures.y_min(i,:) ; S.bag1.measures.y_max(i,:)];
         plot(-rows_y, rows_x, 'LineStyle','--','LineWidth',0.3, 'DisplayName','Rows');
     end
 
@@ -150,14 +150,14 @@ function drawCurrentSample()
 
     % --------- TABLE 2: ROWS ----------
     if log_row_eq
-        p1r  = S.bag1.rows.p1(i,:);
-        p2r  = S.bag1.rows.p2(i,:);
-        rhor = S.bag1.rows.rho(i,:);
-        associatedr = S.bag1.rows.associated(i,:);
-        x0r  = S.bag1.rows.coeff(i,:,1);
-        y0r  = S.bag1.rows.coeff(i,:,2);
-        dxr  = S.bag1.rows.coeff(i,:,4);
-        dyr  = S.bag1.rows.coeff(i,:,5);
+        p1r  = S.bag1.measures.p1(i,:);
+        p2r  = S.bag1.measures.p2(i,:);
+        rhor = S.bag1.measures.rho(i,:);
+        associatedr = S.bag1.measures.associated(i,:);
+        x0r  = S.bag1.measures.coeff(i,:,1);
+        y0r  = S.bag1.measures.coeff(i,:,2);
+        dxr  = S.bag1.measures.coeff(i,:,4);
+        dyr  = S.bag1.measures.coeff(i,:,5);
 
         nR = numel(rhor);
         dataRows = cell(nR, 8);

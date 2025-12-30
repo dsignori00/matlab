@@ -49,8 +49,8 @@ if (~exist('bag1','var'))
     bag1.info = log.perception__row_filter__debug__info;
 
     if (log_row_eq) 
-        bag1.rows = parse_line_equations(log,'perception__row_filter__debug__rows_equations'); 
-        bag1.rows = convert_lines(bag1.rows, OUTPUT_LINE_FORM, LINEFORM); 
+        bag1.measures = parse_line_equations(log,'perception__row_filter__debug__rows_equations'); 
+        bag1.measures = convert_lines(bag1.measures, OUTPUT_LINE_FORM, LINEFORM); 
     end
 
     if isfield(log, 'supervisor__vehicle_status')
@@ -80,8 +80,8 @@ end
 in_row_state;
 in_row_det_chunks;
 in_row_det_rows;
-line_distance;
 line_equations;
+line_distance;
 line_coefficients;
 line_viz;
 
