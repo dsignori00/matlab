@@ -1,25 +1,45 @@
-% Create figure
 figure('Name','Row State');
+tiledlayout(1,1);
 
-% Create axes (no need for tiledlayout since it's only one plot)
-ax(f) = axes; f=f+1;
-hold(ax, 'on');
-
-% Plot in-row state over time
-stairs(ax, bag1.perc_time, bag1.inrow, 'LineWidth', 1.5, 'DisplayName', in_row_label);
-
-% Set y-axis limits and label
-ylim(ax, [-0.1 1.1]);
-ylabel(ax, 'In-Row State');
-
-% Plot supervisor trajectory if available
-if isfield(bag1.log, 'supervisor__vehicle_status')
-    plot(ax, bag1.sup_time, bag1.inrow_sup, 'LineWidth', 1.5, 'DisplayName', 'Traj In-Row');
+%% VEHICLE STATUS
+if isfield(bag1, 'supervisor')
+    tiledlayout(2,1);
+    ax(f) = nexttile; f = f+1; hold on;
+    plot(bag1.supervisor.stamp, double(bag1.supervisor.state),'DisplayName','Trajectory');
+    yticks(double([VEH_STATUS.IDLE, ...
+                   VEH_STATUS.PAUSED, ...
+                   VEH_STATUS.FINISH, ...
+                   VEH_STATUS.IN_ROW, ...
+                   VEH_STATUS.OUT_ROW, ...
+                   VEH_STATUS.EXITING, ...
+                   VEH_STATUS.ENTERING, ...
+                   VEH_STATUS.OBSTACLE_INSIDE, ...
+                   VEH_STATUS.ERROR, ...
+                   VEH_STATUS.MANUAL]));
+    
+    yticklabels({'IDLE', ...
+                 'PAUSED', ...
+                 'FINISH', ...
+                 'IN\_ROW', ...
+                 'OUT\_ROW', ...
+                 'EXITING', ...
+                 'ENTERING', ...
+                 'OBSTACLE', ...
+                 'ERROR', ...
+                 'MANUAL'});
+    legend('Location','northwest')
 end
 
-% Add x-axis label and grid
-xlabel(ax, 'timestamp [s]');
-grid(ax, 'on');
+%% In Row State
+ax(f) = nexttile; f=f+1; hold on; grid on;
+plot(ax(f-1), bag1.perc_time, bag1.inrow, 'LineWidth', 1.5, 'DisplayName', in_row_label);
 
-% Show legend
-legend(ax, 'show');
+% Plot supervisor trajectory if available
+if isfield(bag1, 'supervisor')
+    plot(ax(f-1), bag1.supervisor.stamp, bag1.supervisor.in_row, 'LineWidth', 1.5, 'DisplayName', 'Supervisor');
+end
+ylim([-0.1 1.1]);
+ylabel('In-Row State');
+xlabel('timestamp [s]');
+legend('Location','northwest')
+
