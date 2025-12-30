@@ -14,10 +14,26 @@ line_colors = color_tints_and_shades(colors.matlab{1}, double(num_lines), 0.7);
 
 if log_row_eq
     for i = 1:num_lines
-        scatter(bag1.rows.stamp, bag1.rows.rho(:, i), ...
-                'Marker', 'o', ...                 
-                'MarkerFaceColor', 'none', ...     
-                'MarkerEdgeColor', line_colors{i}); 
+        % Definizione colori: verde scuro = [0 0.6 0], rosso = [1 0 0]
+        colors_points = zeros(length(bag1.measures.associated), 3);
+        associated = logical(bag1.measures.associated(:, i));
+
+        % Rosso per non associato
+        colors_points(~associated, 1) = 1;   % R
+        colors_points(~associated, 2) = 0;   % G
+        colors_points(~associated, 3) = 0;   % B
+
+        % Verde scuro per associato
+        colors_points(associated, 1) = 0;    
+        colors_points(associated, 2) = 0.6;  % G scuro
+        colors_points(associated, 3) = 0;    
+
+        h = scatter(bag1.measures.stamp, bag1.measures.rho(:, i), ...
+                    36, colors_points);
+
+        % Imposta trasparenza
+        h.MarkerFaceAlpha = 1.0;   
+        h.MarkerEdgeAlpha = 1.0;   
     end
 end
 
