@@ -83,6 +83,7 @@ in_row_det_rows;
 line_equations;
 line_distance;
 line_coefficients;
+rows_angle;
 line_viz;
 
 linkaxes(ax,'x');
