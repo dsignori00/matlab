@@ -109,13 +109,13 @@ function drawCurrentSample()
                           S.FOOTPRINT.width S.FOOTPRINT.length], ...
               'EdgeColor','k','LineWidth',2);
 
-    x = [S.bag1.lines.x_min(i,:) ; S.bag1.lines.x_max(i,:)];
-    y = [S.bag1.lines.y_min(i,:) ; S.bag1.lines.y_max(i,:)];
+    x = [S.bag1.lines.start_pt(i,:,1) ; S.bag1.lines.end_pt(i,:,1)];
+    y = [S.bag1.lines.start_pt(i,:,2) ; S.bag1.lines.end_pt(i,:,2)];
     plot(-y, x, 'DisplayName','Lines','LineWidth',2.0);
 
     if log_row_eq
-        rows_x = [S.bag1.measures.x_min(i,:) ; S.bag1.measures.x_max(i,:)];
-        rows_y = [S.bag1.measures.y_min(i,:) ; S.bag1.measures.y_max(i,:)];
+        rows_x = [S.bag1.measures.start_pt(i,:,1) ; S.bag1.measures.end_pt(i,:,1)];
+        rows_y = [S.bag1.measures.start_pt(i,:,2) ; S.bag1.measures.end_pt(i,:,2)];
         plot(-rows_y, rows_x, 'LineStyle','--','LineWidth',0.3, 'DisplayName','Rows');
     end
 

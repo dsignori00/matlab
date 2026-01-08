@@ -84,11 +84,10 @@ for k = 1:numel(ax)
     fprintf('ax(%d): [%g %g]\n', k, ax(k).XLim);
 end
 
-% linkaxes
-t0 = 0;                              
-t1 = max(bag1.state.stamp);          
+t0 = 0;                              % start at 0
+t1 = max(bag1.state.stamp);          % or largest timestamp across all data
 for k = 1:numel(ax)
     ax(k).XLim = [t0 t1];
-    ax(k).XLimMode = 'manual';      
+    ax(k).XLimMode = 'manual';      % prevents MATLAB auto-scaling
 end
 linkaxes(ax,'x');
