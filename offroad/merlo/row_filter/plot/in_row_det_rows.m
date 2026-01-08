@@ -4,38 +4,38 @@ if (ismember(strategies,INROWDETSTR.AUTOMATIC))
     tiledlayout(3,2, "TileSpacing","compact")
     ax(f) = nexttile([1,2]); f=f+1;
     grid on; hold on;
-    x_length(:,1) = abs(bag1.info.closest_lines__x_min(inrowdet_idx,1) - bag1.info.closest_lines__x_max(inrowdet_idx,1)); 
-    x_length(:,2) = abs(bag1.info.closest_lines__x_min(inrowdet_idx,2) - bag1.info.closest_lines__x_max(inrowdet_idx,2)); 
-    plot(bag1.perc_time(inrowdet_idx), x_length(:,1), 'DisplayName', bag1.log_name + " L");
-    plot(bag1.perc_time(inrowdet_idx), x_length(:,2), 'DisplayName',bag1.log_name+  " R");
-    plot_patches(bag1.perc_time(inrowdet_idx), ~bag1.inrow(inrowdet_idx), ax(f-1), patch_properties);
+    x_length(:,1) = abs(bag1.debug.closest_lines.start_pt(inrowdet_idx,1,1) - bag1.debug.closest_lines.end_pt(inrowdet_idx,1,1)); 
+    x_length(:,2) = abs(bag1.debug.closest_lines.start_pt(inrowdet_idx,2,1) - bag1.debug.closest_lines.end_pt(inrowdet_idx,2,1)); 
+    plot(bag1.debug.stamp(inrowdet_idx), x_length(:,1), 'DisplayName', bag1.log_name + " L");
+    plot(bag1.debug.stamp(inrowdet_idx), x_length(:,2), 'DisplayName',bag1.log_name+  " R");
+    plot_patches(bag1.state.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);
     ylabel("x length")
     legend show
     
     ax(f) = nexttile([1,2]); f=f+1;
     grid on; hold on;
-    y_length(:, 1) = abs(bag1.info.closest_lines__y_min(inrowdet_idx,1) - bag1.info.closest_lines__y_max(inrowdet_idx,1)); 
-    y_length(:, 2) = abs(bag1.info.closest_lines__y_min(inrowdet_idx,2) - bag1.info.closest_lines__y_max(inrowdet_idx,2)); 
-    plot(bag1.perc_time(inrowdet_idx), y_length(inrowdet_idx,1), 'DisplayName', bag1.log_name + " L");
-    plot(bag1.perc_time(inrowdet_idx), y_length(inrowdet_idx,2), 'DisplayName',bag1.log_name+  " R");
-    plot_patches(bag1.perc_time(inrowdet_idx), ~bag1.inrow(inrowdet_idx), ax(f-1), patch_properties);
+    y_length(:, 1) = abs(bag1.debug.closest_lines.start_pt(inrowdet_idx,1,2) - bag1.debug.closest_lines.end_pt(inrowdet_idx,1,2)); 
+    y_length(:, 2) = abs(bag1.debug.closest_lines.start_pt(inrowdet_idx,2,2) - bag1.debug.closest_lines.end_pt(inrowdet_idx,2,2)); 
+    plot(bag1.debug.stamp(inrowdet_idx), y_length(inrowdet_idx,1), 'DisplayName', bag1.log_name + " L");
+    plot(bag1.debug.stamp(inrowdet_idx), y_length(inrowdet_idx,2), 'DisplayName',bag1.log_name+  " R");
+    plot_patches(bag1.state.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);
     ylabel("y length")
     legend show
     
     ax(f) = nexttile([1,1]); f=f+1;
     grid on; hold on;
-    plot(bag1.perc_time(inrowdet_idx), bag1.info.closest_lines__p1(inrowdet_idx,1), 'DisplayName', bag1.log_name + " L");
-    plot(bag1.perc_time(inrowdet_idx), bag1.info.closest_lines__p1(inrowdet_idx,2), 'DisplayName',bag1.log_name+  " R");
-    plot_patches(bag1.perc_time(inrowdet_idx), ~bag1.inrow(inrowdet_idx), ax(f-1), patch_properties);
+    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p1(inrowdet_idx,1), 'DisplayName', bag1.log_name + " L");
+    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p1(inrowdet_idx,2), 'DisplayName',bag1.log_name+  " R");
+    plot_patches(bag1.debug.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);
     xlabel("time [s]")
     ylabel("Slope (m)")
     legend show
     
     ax(f) = nexttile([1,1]); f=f+1;
     grid on; hold on;
-    plot(bag1.perc_time(inrowdet_idx), bag1.info.closest_lines__p2(inrowdet_idx,1), 'DisplayName', bag1.log_name + " L");
-    plot(bag1.perc_time(inrowdet_idx), bag1.info.closest_lines__p2(inrowdet_idx,2), 'DisplayName',bag1.log_name+  " R");
-    plot_patches(bag1.perc_time(inrowdet_idx), ~bag1.inrow(inrowdet_idx), ax(f-1), patch_properties);
+    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p2(inrowdet_idx,1), 'DisplayName', bag1.log_name + " L");
+    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p2(inrowdet_idx,2), 'DisplayName',bag1.log_name+  " R");
+    plot_patches(bag1.state.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);
     xlabel("time [s]")
     ylabel("Intercept (q)")
     legend show

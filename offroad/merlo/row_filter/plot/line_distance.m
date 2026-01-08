@@ -2,14 +2,14 @@ figure('Name','Line distance')
 tiledlayout(2,1)
 
 ax(f) = nexttile([1,1]); f=f+1;hold on; grid on
-plot(bag1.perc_time, bag1.state.dist_left_row, 'DisplayName','L');
-plot(bag1.perc_time, bag1.state.dist_right_row, 'DisplayName','R');
-plot_patches(bag1.perc_time, ~bag1.inrow, ax(f-1), patch_properties);
+plot(bag1.state.stamp, bag1.state.dist_left_row, 'DisplayName','L');
+plot(bag1.state.stamp, bag1.state.dist_right_row, 'DisplayName','R');
+plot_patches(bag1.state.stamp, ~bag1.state.in_row, ax(f-1), patch_properties);
 ylabel("distance [m]")
 legend show
 
 ax(f) = nexttile([1,1]); f=f+1;hold on; grid on
-num_lines = max(bag1.lines.num_fitted_lines);
+num_lines = max(bag1.lines.num_lines);
 line_colors = color_tints_and_shades(colors.matlab{1}, double(num_lines), 0.7);
 
 if log_row_eq
@@ -42,7 +42,7 @@ for i = 1:num_lines
     h(i) = plot(bag1.lines.stamp, bag1.lines.rho(:, i), 'Color', colors.matlab{i});
 end
 
-plot_patches(bag1.perc_time, ~bag1.inrow, ax(f-1), patch_properties);
+plot_patches(bag1.state.stamp, ~bag1.state.in_row, ax(f-1), patch_properties);
 xlabel("timestamp [s]")
 ylabel("signed dist")
 labels = "Line " + string(1:1:num_lines);    % e.g. "Line 1", "Line 3", ...

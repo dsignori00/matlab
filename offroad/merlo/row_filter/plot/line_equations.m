@@ -1,7 +1,7 @@
 figure('Name','Line Equations')
 tiledlayout(2,1)
 ax(f) = nexttile([1,1]); f=f+1;hold on; grid on
-num_lines = max(bag1.lines.num_fitted_lines);
+num_lines = max(bag1.lines.num_lines);
 line_colors = color_tints_and_shades(colors.matlab{1}, double(num_lines), 0.7);
 
 if (OUTPUT_LINE_FORM == LINEFORM.EXPLICIT)
@@ -44,7 +44,7 @@ for i = 1:num_lines
     h(i) = plot(bag1.lines.stamp, bag1.lines.p1(:, i) * RAD2DEG, 'Color', colors.matlab{i});
 end
 
-plot_patches(bag1.perc_time, ~bag1.inrow, ax(f-1), patch_properties);
+plot_patches(bag1.state.stamp, ~bag1.state.in_row, ax(f-1), patch_properties);
 ylabel(p1_label)
 labels = "Line " + string(1:1:num_lines);    % e.g. "Line 1", "Line 3", ...
 legend(h, labels, 'Location','northeast');
@@ -53,7 +53,7 @@ legend show
 %% p2
 
 ax(f) = nexttile([1,1]); f=f+1;hold on; grid on
-num_lines = max(bag1.lines.num_fitted_lines);
+num_lines = max(bag1.lines.num_lines);
 if (OUTPUT_LINE_FORM == LINEFORM.EXPLICIT)
     p2_label = "Q [-]";
 elseif (OUTPUT_LINE_FORM == LINEFORM.NORMAL)
@@ -92,7 +92,7 @@ for i = 1:num_lines
     h(i) = plot(bag1.lines.stamp, bag1.lines.p2(:, i), 'Color', colors.matlab{i});
 end
 
-plot_patches(bag1.perc_time, ~bag1.inrow, ax(f-1), patch_properties);
+plot_patches(bag1.state.stamp, ~bag1.state.in_row, ax(f-1), patch_properties);
 xlabel("timestamp [s]")
 ylabel(p2_label)
 labels = "Line " + string(1:1:num_lines);    % e.g. "Line 1", "Line 3", ...

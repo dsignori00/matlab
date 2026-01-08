@@ -32,7 +32,7 @@ end
 
 %% In Row State
 ax(f) = nexttile; f=f+1; hold on; grid on;
-plot(ax(f-1), bag1.perc_time, bag1.inrow, 'LineWidth', 1.5, 'DisplayName', in_row_label);
+plot(ax(f-1), bag1.state.stamp, bag1.state.in_row, 'LineWidth', 1.5, 'DisplayName', in_row_label);
 
 % Plot supervisor trajectory if available
 if isfield(bag1, 'supervisor')
