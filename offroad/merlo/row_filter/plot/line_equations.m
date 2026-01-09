@@ -1,5 +1,5 @@
 figure('Name','Line Equations')
-tiledlayout(2,1)
+tiledlayout(3,1)
 ax(f) = nexttile([1,1]); f=f+1;hold on; grid on
 num_lines = max(bag1.lines.num_lines);
 line_colors = color_tints_and_shades(colors.matlab{1}, double(num_lines), 0.7);
@@ -46,9 +46,8 @@ end
 
 plot_patches(bag1.state.stamp, ~bag1.state.in_row, ax(f-1), patch_properties);
 ylabel(p1_label)
-labels = "Line " + string(1:1:num_lines);    % e.g. "Line 1", "Line 3", ...
-legend(h, labels, 'Location','northeast');
-legend show
+labels = "Line " + string(1:1:num_lines);    
+% legend(h, labels, 'Location','northeast');
 
 %% p2
 
@@ -93,8 +92,15 @@ for i = 1:num_lines
 end
 
 plot_patches(bag1.state.stamp, ~bag1.state.in_row, ax(f-1), patch_properties);
-xlabel("timestamp [s]")
 ylabel(p2_label)
 labels = "Line " + string(1:1:num_lines);    % e.g. "Line 1", "Line 3", ...
-legend(h, labels, 'Location','northeast');
+% legend(h, labels, 'Location','northeast');
+
+%% num lines
+ax(f) = nexttile; f=f+1; hold on; grid on;
+plot(bag1.debug.stamp, bag1.debug.line.tracks,"Color",colors.matlab{1},"DisplayName","tracks");
+plot(bag1.debug.stamp, bag1.debug.line.measures,"Color",colors.matlab{2},"DisplayName","measures");
+plot_patches(bag1.state.stamp, ~bag1.state.in_row, ax(f-1), patch_properties);
+ylabel("num lines");
+xlabel("timestamp [s]")
 legend show
