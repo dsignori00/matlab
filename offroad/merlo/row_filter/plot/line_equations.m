@@ -46,7 +46,7 @@ end
 
 plot_patches(bag1.state.stamp, ~bag1.state.in_row, ax(f-1), patch_properties);
 ylabel(p1_label)
-labels = "Line " + string(1:1:num_lines);    
+% labels = "Line " + string(1:1:num_lines);    
 % legend(h, labels, 'Location','northeast');
 
 %% p2

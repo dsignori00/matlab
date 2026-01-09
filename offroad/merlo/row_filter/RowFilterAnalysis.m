@@ -80,10 +80,6 @@ line_coefficients;
 rows_angle;
 line_viz;
 
-for k = 1:numel(ax)
-    fprintf('ax(%d): [%g %g]\n', k, ax(k).XLim);
-end
-
 % linkaxes
 t0 = 0;                              
 t1 = max(bag1.state.stamp);          
