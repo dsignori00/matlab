@@ -10,10 +10,8 @@ function line_eq = parse_line_equations(log, topic, name)
     line_eq.p2    = log.(topic).(sprintf('%s__p2', name));
     line_eq.rho   = log.(topic).(sprintf('%s__rho', name));
     line_eq.form  = double(log.(topic).(sprintf('%s__form', name)));
-    assoc_field = sprintf('%s__associated', name);
-    if isfield(log.(topic), assoc_field)
-        line_eq.associated = log.(topic).(assoc_field);
-    end
+    line_eq.associated_line = log.(topic).(sprintf('%s__associated_line', name));
+    line_eq.associated_angle = log.(topic).(sprintf('%s__associated_angle', name));
     line_eq.start_pt = log.(topic).(sprintf('%s__start_pt', name));
     line_eq.end_pt   = log.(topic).(sprintf('%s__end_pt', name));
 
@@ -27,8 +25,8 @@ function line_eq = parse_line_equations(log, topic, name)
             line_eq.p2(i,cols)   = NaN;
             line_eq.rho(i,cols)  = NaN;
             line_eq.form(i,cols) = NaN;
-            if isfield(line_eq,'associated')
-                line_eq.associated(i,cols) = NaN;
+            if isfield(line_eq,'associated_line')
+                line_eq.associated_line(i,cols) = NaN;
             end
             line_eq.coeff(i,cols,:)    = NaN;
             line_eq.start_pt(i,cols,:) = NaN;
