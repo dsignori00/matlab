@@ -153,7 +153,7 @@ function drawCurrentSample()
         p1r  = S.bag1.measures.p1(i,:);
         p2r  = S.bag1.measures.p2(i,:);
         rhor = S.bag1.measures.rho(i,:);
-        associatedr = S.bag1.measures.associated(i,:);
+        associatedr = S.bag1.measures.associated_line(i,:);
         x0r  = S.bag1.measures.coeff(i,:,1);
         y0r  = S.bag1.measures.coeff(i,:,2);
         dxr  = S.bag1.measures.coeff(i,:,4);
