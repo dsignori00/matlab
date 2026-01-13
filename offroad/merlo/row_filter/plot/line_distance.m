@@ -17,8 +17,7 @@ ax(f) = nexttile([1,1]); f=f+1;hold on; grid on
 num_lines = max(bag1.lines.num_lines);
 line_colors = color_tints_and_shades(colors.matlab{1}, double(num_lines), 0.7);
 
-if log_row_eq
-    for i = 1:num_lines
+for i = 1:num_lines
         % Definizione colori: verde scuro = [0 0.6 0], rosso = [1 0 0]
         colors_points = zeros(length(bag1.measures.associated_line), 3);
         associated_line = logical(bag1.measures.associated_line(:, i));
@@ -39,7 +38,6 @@ if log_row_eq
         % Imposta trasparenza
         h.MarkerFaceAlpha = 1.0;   
         h.MarkerEdgeAlpha = 1.0;   
-    end
 end
 
 if compare

@@ -94,7 +94,6 @@ end
 
 function drawCurrentSample()
     fig = evalin('base','fig');
-    log_row_eq = evalin('base','log_row_eq');
     S = guidata(fig);
     i = S.iCur;
 
@@ -113,11 +112,9 @@ function drawCurrentSample()
     y = [S.bag1.lines.start_pt(i,:,2) ; S.bag1.lines.end_pt(i,:,2)];
     plot(-y, x, 'DisplayName','Lines','LineWidth',2.0);
 
-    if log_row_eq
-        rows_x = [S.bag1.measures.start_pt(i,:,1) ; S.bag1.measures.end_pt(i,:,1)];
-        rows_y = [S.bag1.measures.start_pt(i,:,2) ; S.bag1.measures.end_pt(i,:,2)];
-        plot(-rows_y, rows_x, 'LineStyle','--','LineWidth',0.3, 'DisplayName','Rows');
-    end
+    rows_x = [S.bag1.measures.start_pt(i,:,1) ; S.bag1.measures.end_pt(i,:,1)];
+    rows_y = [S.bag1.measures.start_pt(i,:,2) ; S.bag1.measures.end_pt(i,:,2)];
+    plot(-rows_y, rows_x, 'LineStyle','--','LineWidth',0.3, 'DisplayName','Rows');
 
     txt = sprintf('sample %d / %d', i-S.iStart+1, S.iEnd-S.iStart+1);
     title(S.ax, ['map — ' txt]);
@@ -149,36 +146,30 @@ function drawCurrentSample()
     end
 
     % --------- TABLE 2: ROWS ----------
-    if log_row_eq
-        p1r  = S.bag1.measures.p1(i,:);
-        p2r  = S.bag1.measures.p2(i,:);
-        rhor = S.bag1.measures.rho(i,:);
-        associatedr = S.bag1.measures.associated_line(i,:);
-        x0r  = S.bag1.measures.coeff(i,:,1);
-        y0r  = S.bag1.measures.coeff(i,:,2);
-        dxr  = S.bag1.measures.coeff(i,:,4);
-        dyr  = S.bag1.measures.coeff(i,:,5);
+    p1r  = S.bag1.measures.p1(i,:);
+    p2r  = S.bag1.measures.p2(i,:);
+    rhor = S.bag1.measures.rho(i,:);
+    associatedr = S.bag1.measures.associated_line(i,:);
+    x0r  = S.bag1.measures.coeff(i,:,1);
+    y0r  = S.bag1.measures.coeff(i,:,2);
+    dxr  = S.bag1.measures.coeff(i,:,4);
+    dyr  = S.bag1.measures.coeff(i,:,5);
 
-        nR = numel(rhor);
-        dataRows = cell(nR, 8);
-        for k = 1:nR
-            dataRows{k,1} = k;
-            dataRows{k,2} = p1r(k);
-            dataRows{k,3} = p2r(k);
-            dataRows{k,4} = rhor(k);
-            dataRows{k,5} = associatedr(k);
-            dataRows{k,6} = x0r(k);
-            dataRows{k,7} = y0r(k);
-            dataRows{k,8} = dxr(k);
-            dataRows{k,9} = dyr(k);
-        end
+    nR = numel(rhor);
+    dataRows = cell(nR, 8);
+    for k = 1:nR
+        dataRows{k,1} = k;
+        dataRows{k,2} = p1r(k);
+        dataRows{k,3} = p2r(k);
+        dataRows{k,4} = rhor(k);
+        dataRows{k,5} = associatedr(k);
+        dataRows{k,6} = x0r(k);
+        dataRows{k,7} = y0r(k);
+        dataRows{k,8} = dxr(k);
+        dataRows{k,9} = dyr(k);
+    end
 
-        if isfield(S,'tblRows') && isvalid(S.tblRows)
-            S.tblRows.Data = dataRows;
-        end
-    else
-        if isfield(S,'tblRows') && isvalid(S.tblRows)
-            S.tblRows.Data = cell(0,8);
-        end
+    if isfield(S,'tblRows') && isvalid(S.tblRows)
+        S.tblRows.Data = dataRows;
     end
 end
