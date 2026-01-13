@@ -3,7 +3,6 @@ close all
 clc
 
 compare     = true;
-log_row_eq  = true;
 line_form   = 'normal';
 
 
