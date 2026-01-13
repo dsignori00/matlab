@@ -11,6 +11,10 @@ if (ismember(strategies, INROWDETSTR.AUTOMATIC))
     grid on; hold on;
     plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.chunks.end_row_detection_len(inrowdet_idx,1), 'DisplayName', bag1.log_name + " L");
     plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.chunks.end_row_detection_len(inrowdet_idx,2), 'DisplayName',bag1.log_name+  " R");
+    if compare 
+        plot(bag2.debug.stamp(inrowdet_idx), bag2.debug.chunks.end_row_detection_len(inrowdet_idx,1), 'DisplayName', bag2.log_name + " L");
+        plot(bag2.debug.stamp(inrowdet_idx), bag2.debug.chunks.end_row_detection_len(inrowdet_idx,2), 'DisplayName',bag2.log_name+  " R");
+    end
     plot_patches(bag1.state.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);
     ylabel("chunk length")
     legend show
@@ -20,13 +24,20 @@ if (ismember(strategies, INROWDETSTR.AUTOMATIC))
     grid on; hold on;
     plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.chunks.density(inrowdet_idx,1), 'DisplayName', bag1.log_name + " L");
     plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.chunks.density(inrowdet_idx,2), 'DisplayName',bag1.log_name +" R");
+    if compare 
+        plot(bag2.debug.stamp(inrowdet_idx), bag2.debug.chunks.density(inrowdet_idx,1), 'DisplayName', bag2.log_name + " L");
+        plot(bag2.debug.stamp(inrowdet_idx), bag2.debug.chunks.density(inrowdet_idx,2), 'DisplayName',bag2.log_name+  " R");
+    end
     plot_patches(bag1.state.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);
     ylabel("density chunk ")
     legend show
     
     ax(f) = nexttile([2,1]); f=f+1;
     grid on; hold on;
-    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.chunks.state(inrowdet_idx,1), 'DisplayName', bag1.log_name + " L");
+    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.chunks.state(inrowdet_idx,1),'Color',colors.matlab{1}, 'DisplayName', bag1.log_name + " L");
+    if compare 
+        plot(bag2.debug.stamp(inrowdet_idx), bag2.debug.chunks.state(inrowdet_idx,1),'Color',colors.matlab{3}, 'DisplayName', bag2.log_name + " L");
+    end
     plot_patches(bag1.state.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);
     xlabel("timestamp [s]")
     ax(f-1).YTickLabel = {'forgot','not fitted','fitted', 'discarded'};
@@ -35,7 +46,10 @@ if (ismember(strategies, INROWDETSTR.AUTOMATIC))
     
     ax(f) = nexttile([2,1]); f=f+1;
     grid on; hold on;
-    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.chunks.state(inrowdet_idx,2), 'DisplayName', bag1.log_name + " R");
+    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.chunks.state(inrowdet_idx,2),'Color',colors.matlab{2}, 'DisplayName', bag1.log_name + " R");
+    if compare 
+        plot(bag2.debug.stamp(inrowdet_idx), bag2.debug.chunks.state(inrowdet_idx,2),'Color',colors.matlab{4}, 'DisplayName', bag2.log_name + " R");
+    end
     plot_patches(bag1.state.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);
     xlabel("timestamp [s]")
     ax(f-1).YTickLabel = {'forgot','not fitted','fitted', 'discarded'};
