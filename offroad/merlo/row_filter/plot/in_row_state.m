@@ -1,9 +1,9 @@
 figure('Name','Row State');
-tiledlayout(1,1);
+tiledlayout(2,1);
 
 %% VEHICLE STATUS
 if isfield(bag1, 'supervisor')
-    tiledlayout(2,1);
+    tiledlayout(3,1);
     ax(f) = nexttile; f = f+1; hold on;
     plot(bag1.supervisor.stamp, double(bag1.supervisor.state),'DisplayName','Trajectory');
     yticks(double([VEH_STATUS.IDLE, ...
@@ -29,17 +29,34 @@ if isfield(bag1, 'supervisor')
                  'MANUAL'});
     legend('Location','northwest')
 end
+%% In row detection strategy
+
+ax(f) = nexttile; f=f+1; hold on; grid on;
+plot(bag1.debug.stamp, double(bag1.debug.in_row_det.in_row_det_strategy), 'LineWidth', 1.5, 'DisplayName', 'Bag 1');
+if compare
+    plot(bag2.debug.stamp, double(bag2.debug.in_row_det.in_row_det_strategy), 'LineWidth', 1.5, 'DisplayName', 'Bag 2');
+    legend('Location','northwest');
+end
+yticks(double([ INROWDETSTR.TRAJECTORY, ...
+                INROWDETSTR.AUTOMATIC, ...
+                INROWDETSTR.MANUAL]));
+yticklabels({'TRAJECTORY', 'AUTOMATIC', 'MANUAL'});
+
 
 %% In Row State
 ax(f) = nexttile; f=f+1; hold on; grid on;
-plot(ax(f-1), bag1.state.stamp, bag1.state.in_row, 'LineWidth', 1.5, 'DisplayName', in_row_label);
 
 % Plot supervisor trajectory if available
 if isfield(bag1, 'supervisor')
     plot(ax(f-1), bag1.supervisor.stamp, bag1.supervisor.in_row, 'LineWidth', 1.5, 'DisplayName', 'Supervisor');
 end
+
+plot(ax(f-1), bag1.state.stamp, bag1.state.in_row, 'LineWidth', 1.5, 'DisplayName', 'Bag 1');
+if compare
+    plot(ax(f-1), bag2.state.stamp, bag2.state.in_row, 'LineWidth', 1.5, 'DisplayName', 'Bag 2');
+end
+legend('Location','northwest')
 ylim([-0.1 1.1]);
 ylabel('In-Row State');
 xlabel('timestamp [s]');
-legend('Location','northwest')
 

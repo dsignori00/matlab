@@ -4,26 +4,54 @@ t = tiledlayout(4,2,'TileSpacing','compact','Padding','compact');
 
 % --- Grafici temporali ---
 ax(f) = nexttile(1); f=f+1; hold on; grid on
-plot(bag1.lines.stamp, bag1.lines.coeff(:,:,1)); ylabel('x0');
+if compare
+    h1 = plot(bag1.lines.stamp, bag1.lines.coeff(:,:,1),"Color",colors.matlab{1}, 'DisplayName','Bag 1'); 
+    h2 = plot(bag2.lines.stamp, bag2.lines.coeff(:,:,1),"Color",colors.matlab{2}, 'DisplayName','Bag 2'); 
+else
+    plot(bag1.lines.stamp, bag1.lines.coeff(:,:,1));    
+end
+ylabel('x0'); legend([h1(1),h2(1)]);
 
 ax(f) = nexttile(3); f=f+1; hold on; grid on
-plot(bag1.lines.stamp, bag1.lines.coeff(:,:,2)); ylabel('y0');
+if compare
+    h1 = plot(bag1.lines.stamp, bag1.lines.coeff(:,:,2),"Color",colors.matlab{1}, 'DisplayName','Bag 1'); 
+    h2 = plot(bag2.lines.stamp, bag2.lines.coeff(:,:,2),"Color",colors.matlab{2}, 'DisplayName','Bag 2'); 
+else
+    plot(bag1.lines.stamp, bag1.lines.coeff(:,:,2));    
+end
+ylabel('y0'); legend([h1(1),h2(1)]);
 
 ax(f) = nexttile(5); f=f+1; hold on; grid on
-plot(bag1.lines.stamp, bag1.lines.coeff(:,:,4)); ylabel('dx');
+if compare
+    h1 = plot(bag1.lines.stamp, bag1.lines.coeff(:,:,4),"Color",colors.matlab{1}, 'DisplayName','Bag 1'); 
+    h2 = plot(bag2.lines.stamp, bag2.lines.coeff(:,:,4),"Color",colors.matlab{2}, 'DisplayName','Bag 2'); 
+else
+    plot(bag1.lines.stamp, bag1.lines.coeff(:,:,4));    
+end
+ylabel('dx'); legend([h1(1),h2(1)]);
 
 ax(f) = nexttile(7); f=f+1; hold on; grid on
-plot(bag1.lines.stamp, bag1.lines.coeff(:,:,5)); ylabel('dy'); xlabel('timestamp [s]');
+if compare
+    h1 = plot(bag1.lines.stamp, bag1.lines.coeff(:,:,5),"Color",colors.matlab{1}, 'DisplayName','Bag 1'); 
+    h2 = plot(bag2.lines.stamp, bag2.lines.coeff(:,:,5),"Color",colors.matlab{2}, 'DisplayName','Bag 2'); 
+else
+    plot(bag1.lines.stamp, bag1.lines.coeff(:,:,5));    
+end
+ylabel('dy'); legend([h1(1),h2(1)]);
+xlabel('Time [s]');
 
 % --- Grafico 2D ---
 axx(1) = nexttile([4,1]); hold on; grid on;
 xlabel('x'); ylabel('y');
-hp = quiver(0,0,0,0,0,'b','LineWidth',1.5);
-hp_pts = plot(0,0,'ro','MarkerSize',6,'LineWidth',1.5);
+hp1 = quiver(0,0,0,0,0,'b','Color', colors.matlab{1},'LineWidth',1.5);
+hp1_pts = plot(0,0,'o', 'Color', colors.matlab{1},'MarkerSize',6,'LineWidth',1.5);
+hp2 = quiver(0,0,0,0,0,'r','Color', colors.matlab{2},'LineWidth',1.5);
+hp2_pts = plot(0,0,'o', 'Color', colors.matlab{2},'MarkerSize',6,'LineWidth',1.5);
 
-% Store handles in base workspace so evalin can access them
-assignin('base', 'hp', hp);
-assignin('base', 'hp_pts', hp_pts);
+assignin('base','hp1',hp1);
+assignin('base','hp1_pts',hp1_pts);
+assignin('base','hp2',hp2);
+assignin('base','hp2_pts',hp2_pts);
 
 % --- Slider sotto il grafico 2D ---
 axis equal;
@@ -47,19 +75,40 @@ hYline = yline(0,'--','HandleVisibility','off');
 
 % --- Funzione annidata per aggiornare il grafico 2D ---
 function update_2D(idx)
-    bag1 = evalin('base', 'bag1');  
-    hp = evalin('base', 'hp');
-    hp_pts = evalin('base', 'hp_pts');
+
+    bag1    = evalin('base', 'bag1');  
+    bag2    = evalin('base', 'bag2');  
+    hp1     = evalin('base', 'hp1');
+    hp1_pts = evalin('base', 'hp1_pts');
+    hp2     = evalin('base', 'hp2');
+    hp2_pts = evalin('base', 'hp2_pts');
+    compare = evalin('base', 'compare');
     hSlider = evalin('base', 'hSlider');
-    
-    x0 = squeeze(bag1.lines.coeff(idx,:,1));
-    y0 = squeeze(bag1.lines.coeff(idx,:,2));
-    dx = squeeze(bag1.lines.coeff(idx,:,4));
-    dy = squeeze(bag1.lines.coeff(idx,:,5));
-    
-    set(hp, 'XData', x0, 'YData', y0, 'UData', dx, 'VData', dy);
-    set(hp_pts, 'XData', x0, 'YData', y0);
-    set(hSlider, 'Value', idx);
+
+    % ---- Bag 1 ----
+    x1  = squeeze(bag1.lines.coeff(idx,:,1));
+    y1  = squeeze(bag1.lines.coeff(idx,:,2));
+    dx1 = squeeze(bag1.lines.coeff(idx,:,4));
+    dy1 = squeeze(bag1.lines.coeff(idx,:,5));
+
+    set(hp1,     'XData',x1, 'YData',y1, 'UData',dx1, 'VData',dy1);
+    set(hp1_pts, 'XData',x1, 'YData',y1);
+
+    % ---- Bag 2 ----
+    if compare
+        x2  = squeeze(bag2.lines.coeff(idx,:,1));
+        y2  = squeeze(bag2.lines.coeff(idx,:,2));
+        dx2 = squeeze(bag2.lines.coeff(idx,:,4));
+        dy2 = squeeze(bag2.lines.coeff(idx,:,5));
+
+        set(hp2,     'XData',x2, 'YData',y2, 'UData',dx2, 'VData',dy2);
+        set(hp2_pts, 'XData',x2, 'YData',y2);
+    else
+        set(hp2,     'XData',NaN,'YData',NaN,'UData',NaN,'VData',NaN);
+        set(hp2_pts, 'XData',NaN,'YData',NaN);
+    end
+
+    set(hSlider,'Value',idx);
     drawnow;
 end
 
