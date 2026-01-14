@@ -7,37 +7,41 @@ ax(f) = nexttile(1); f=f+1; hold on; grid on
 if compare
     h1 = plot(bag1.lines.stamp, bag1.lines.coeff(:,:,1),"Color",colors.matlab{1}, 'DisplayName','Bag 1'); 
     h2 = plot(bag2.lines.stamp, bag2.lines.coeff(:,:,1),"Color",colors.matlab{2}, 'DisplayName','Bag 2'); 
+    legend([h1(1),h2(1)]);
 else
     plot(bag1.lines.stamp, bag1.lines.coeff(:,:,1));    
 end
-ylabel('x0'); legend([h1(1),h2(1)]);
+ylabel('x0'); 
 
 ax(f) = nexttile(3); f=f+1; hold on; grid on
 if compare
     h1 = plot(bag1.lines.stamp, bag1.lines.coeff(:,:,2),"Color",colors.matlab{1}, 'DisplayName','Bag 1'); 
     h2 = plot(bag2.lines.stamp, bag2.lines.coeff(:,:,2),"Color",colors.matlab{2}, 'DisplayName','Bag 2'); 
+    legend([h1(1),h2(1)]);
 else
     plot(bag1.lines.stamp, bag1.lines.coeff(:,:,2));    
 end
-ylabel('y0'); legend([h1(1),h2(1)]);
+ylabel('y0'); 
 
 ax(f) = nexttile(5); f=f+1; hold on; grid on
 if compare
     h1 = plot(bag1.lines.stamp, bag1.lines.coeff(:,:,4),"Color",colors.matlab{1}, 'DisplayName','Bag 1'); 
     h2 = plot(bag2.lines.stamp, bag2.lines.coeff(:,:,4),"Color",colors.matlab{2}, 'DisplayName','Bag 2'); 
+    legend([h1(1),h2(1)]);
 else
     plot(bag1.lines.stamp, bag1.lines.coeff(:,:,4));    
 end
-ylabel('dx'); legend([h1(1),h2(1)]);
+ylabel('dx'); 
 
 ax(f) = nexttile(7); f=f+1; hold on; grid on
 if compare
     h1 = plot(bag1.lines.stamp, bag1.lines.coeff(:,:,5),"Color",colors.matlab{1}, 'DisplayName','Bag 1'); 
-    h2 = plot(bag2.lines.stamp, bag2.lines.coeff(:,:,5),"Color",colors.matlab{2}, 'DisplayName','Bag 2'); 
+    h2 = plot(bag2.lines.stamp, bag2.lines.coeff(:,:,5),"Color",colors.matlab{2}, 'DisplayName','Bag 2');
+    legend([h1(1),h2(1)]);
 else
     plot(bag1.lines.stamp, bag1.lines.coeff(:,:,5));    
 end
-ylabel('dy'); legend([h1(1),h2(1)]);
+ylabel('dy');
 xlabel('Time [s]');
 
 % --- Grafico 2D ---
@@ -45,13 +49,15 @@ axx(1) = nexttile([4,1]); hold on; grid on;
 xlabel('x'); ylabel('y');
 hp1 = quiver(0,0,0,0,0,'b','Color', colors.matlab{1},'LineWidth',1.5);
 hp1_pts = plot(0,0,'o', 'Color', colors.matlab{1},'MarkerSize',6,'LineWidth',1.5);
-hp2 = quiver(0,0,0,0,0,'r','Color', colors.matlab{2},'LineWidth',1.5);
-hp2_pts = plot(0,0,'o', 'Color', colors.matlab{2},'MarkerSize',6,'LineWidth',1.5);
-
 assignin('base','hp1',hp1);
 assignin('base','hp1_pts',hp1_pts);
-assignin('base','hp2',hp2);
-assignin('base','hp2_pts',hp2_pts);
+
+if compare
+    hp2 = quiver(0,0,0,0,0,'r','Color', colors.matlab{2},'LineWidth',1.5);
+    hp2_pts = plot(0,0,'o', 'Color', colors.matlab{2},'MarkerSize',6,'LineWidth',1.5);
+    assignin('base','hp2',hp2);
+    assignin('base','hp2_pts',hp2_pts);
+end
 
 % --- Slider sotto il grafico 2D ---
 axis equal;
@@ -77,13 +83,15 @@ hYline = yline(0,'--','HandleVisibility','off');
 function update_2D(idx)
 
     bag1    = evalin('base', 'bag1');  
-    bag2    = evalin('base', 'bag2');  
     hp1     = evalin('base', 'hp1');
     hp1_pts = evalin('base', 'hp1_pts');
-    hp2     = evalin('base', 'hp2');
-    hp2_pts = evalin('base', 'hp2_pts');
-    compare = evalin('base', 'compare');
     hSlider = evalin('base', 'hSlider');
+    compare = evalin('base', 'compare');
+    if compare
+        bag2    = evalin('base', 'bag2');  
+        hp2     = evalin('base', 'hp2');
+        hp2_pts = evalin('base', 'hp2_pts');
+    end
 
     % ---- Bag 1 ----
     x1  = squeeze(bag1.lines.coeff(idx,:,1));
@@ -103,9 +111,6 @@ function update_2D(idx)
 
         set(hp2,     'XData',x2, 'YData',y2, 'UData',dx2, 'VData',dy2);
         set(hp2_pts, 'XData',x2, 'YData',y2);
-    else
-        set(hp2,     'XData',NaN,'YData',NaN,'UData',NaN,'VData',NaN);
-        set(hp2_pts, 'XData',NaN,'YData',NaN);
     end
 
     set(hSlider,'Value',idx);

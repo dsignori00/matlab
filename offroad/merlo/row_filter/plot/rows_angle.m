@@ -19,9 +19,11 @@ for i = 1:nIters
     angles_i = mod(angles_i + pi/2, pi) - pi/2;
     angles_i = angles_i(:);
 
+    associated_i = bag1.measures.associated_angle(i, 1:nRows_i);
+
     angles_cell{i} = angles_i;
     stamp_cell{i}  = repmat(bag1.measures.stamp(i), nRows_i, 1);
-    associated_cell{i} = repmat(bag1.measures.associated_angle(i), nRows_i, 1);
+    associated_cell{i} = associated_i(:);
 end
 meas_angle = vertcat(angles_cell{:});
 meas_stamp = vertcat(stamp_cell{:});
@@ -44,9 +46,11 @@ if compare
         angles_i = mod(angles_i + pi/2, pi) - pi/2;
         angles_i = angles_i(:);
 
+        associated_i = bag2.measures.associated_angle(i, 1:nRows_i);
+
         angles_cell{i} = angles_i;
         stamp_cell{i}  = repmat(bag2.measures.stamp(i), nRows_i, 1);
-        associated_cell{i} = repmat(bag2.measures.associated_angle(i), nRows_i, 1);
+        associated_cell{i} = associated_i(:);
     end
     meas_angle2 = vertcat(angles_cell{:});
     meas_stamp2 = vertcat(stamp_cell{:});
