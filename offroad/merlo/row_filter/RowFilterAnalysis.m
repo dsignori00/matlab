@@ -2,7 +2,7 @@ clearvars -except log log2
 close all
 clc
 
-compare     = true;
+compare     = false;
 line_form   = 'normal';
 
 

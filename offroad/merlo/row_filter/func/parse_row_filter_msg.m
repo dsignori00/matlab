@@ -14,6 +14,8 @@ function row_filt_msg = parse_row_filter_msg(log)
     
     row_filt_msg.dist_left_row(row_filt_msg.dist_left_row == -1) = nan;
     row_filt_msg.dist_right_row(row_filt_msg.dist_right_row == -1) = nan;
+    row_filt_msg.dist_left_row(row_filt_msg.dist_left_row == 999) = nan;
+    row_filt_msg.dist_right_row(row_filt_msg.dist_right_row == 999) = nan;
 
 end
 
