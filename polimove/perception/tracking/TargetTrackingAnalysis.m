@@ -101,7 +101,7 @@ if(compare); tt2.range = sqrt(tt2.x_rel.^2 + tt2.y_rel.^2); end
 %% INFO
 figure('Name','Info');
 
-if(~exist("log.planner_manager","var"))
+if(isfield(log,'planner_manager'))
     % racetype
     tiledlayout(3,1,'Padding','compact');
     axes(f) = nexttile([1,1]); f=f+1; hold on;
