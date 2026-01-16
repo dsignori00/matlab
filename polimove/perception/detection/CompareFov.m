@@ -2,11 +2,11 @@ clc
 close all
 clearvars -except log log2 log_ref trajDatabase
 
-compare      = true;
-ground_truth = true;
+compare      = false;
+ground_truth = false;
 
-NAME_1 = "modified clustering";
-NAME_2 = "old";
+NAME_1 = "";
+NAME_2 = "old - ";
 
 %#ok<*UNRCH>
 %#ok<*INUSD>
@@ -60,14 +60,14 @@ DateTime = datetime(log.time_offset_nsec,'ConvertFrom','epochtime','TicksPerSeco
 
 %% OPTIONS
 graphics_options;
-col.lidar        = colors.green{1};
-col.lidar2       = colors.green{2};
-col.radar        = colors.blue{1};
-col.radar2       = colors.blue{2};
-col.camera       = colors.yellow{1};
-col.camera2      = colors.yellow{2};
-col.pointpillars = colors.orange{1};
-col.pointpillars2= colors.orange{2};
+col.lidar        = colors.green{2};
+col.lidar2       = colors.green{1};
+col.radar        = colors.blue{2};
+col.radar2       = colors.blue{1};
+col.camera       = colors.yellow{2};
+col.camera2      = colors.yellow{1};
+col.pointpillars = colors.orange{2};
+col.pointpillars2= colors.orange{1};
 col.ref          = colors.black;
 
 sz=3; % Marker size
@@ -109,15 +109,15 @@ tiledlayout(2,1,'Padding','compact')
 % Rho 
 axes(f)=nexttile([1,1]); f=f+1; hold on;
 
-scatter(repmat(lid_clust.sens_stamp, size(lid_clust.range,2), 1), lid_clust.range(:), 36, col.lidar, '*', 'DisplayName', NAME_1+" - lidar");
-scatter(repmat(rad_clust.sens_stamp, size(rad_clust.range,2), 1), rad_clust.range(:), 36, col.radar, '*', 'DisplayName', NAME_1+" - radar");
-scatter(repmat(lid_pp.sens_stamp, size(lid_pp.range,2), 1), lid_pp.range(:), 36, col.pointpillars, '*', 'DisplayName', NAME_1+" - pointpillars");
-scatter(repmat(cam_yolo.sens_stamp, size(cam_yolo.range,2), 1), cam_yolo.range(:), 36, col.camera, '*', 'DisplayName', NAME_1+" - yolo");
+scatter(repmat(lid_clust.sens_stamp, size(lid_clust.range,2), 1), lid_clust.range(:), 36, col.lidar, '*', 'DisplayName', NAME_1+"lidar");
+scatter(repmat(rad_clust.sens_stamp, size(rad_clust.range,2), 1), rad_clust.range(:), 36, col.radar, '*', 'DisplayName', NAME_1+"radar");
+scatter(repmat(lid_pp.sens_stamp, size(lid_pp.range,2), 1), lid_pp.range(:), 36, col.pointpillars, '*', 'DisplayName', NAME_1+"pointpillars");
+scatter(repmat(cam_yolo.sens_stamp, size(cam_yolo.range,2), 1), cam_yolo.range(:), 36, col.camera, '*', 'DisplayName', NAME_1+"yolo");
 if(compare)
-    scatter(repmat(lid_clust2.sens_stamp,size(lid_clust2.range,2), 1)', lid_clust2.range(:), 36, col.lidar2, 'filled', 'DisplayName', NAME_2+" - lidar");
-    scatter(repmat(rad_clust2.sens_stamp,size(rad_clust2.range,2), 1)', rad_clust2.range(:), 36, col.radar2, 'filled', 'DisplayName', NAME_2+" - radar");
-    scatter(repmat(lid_pp2.sens_stamp,size(lid_pp2.range,2), 1)', lid_pp2.range(:), 36, col.pointpillars2, 'filled', 'DisplayName', NAME_2+" - pointpillars");
-    scatter(repmat(cam_yolo2.sens_stamp,size(cam_yolo2.range,2), 1)', cam_yolo2.range(:), 36, col.camera2, 'filled', 'DisplayName', NAME_2+" - yolo");
+    scatter(repmat(lid_clust2.sens_stamp,size(lid_clust2.range,2), 1)', lid_clust2.range(:), 36, col.lidar2, 'filled', 'DisplayName', NAME_2+"lidar");
+    scatter(repmat(rad_clust2.sens_stamp,size(rad_clust2.range,2), 1)', rad_clust2.range(:), 36, col.radar2, 'filled', 'DisplayName', NAME_2+"radar");
+    scatter(repmat(lid_pp2.sens_stamp,size(lid_pp2.range,2), 1)', lid_pp2.range(:), 36, col.pointpillars2, 'filled', 'DisplayName', NAME_2+"pointpillars");
+    scatter(repmat(cam_yolo2.sens_stamp,size(cam_yolo2.range,2), 1)', cam_yolo2.range(:), 36, col.camera2, 'filled', 'DisplayName', NAME_2+"yolo");
 end
 if(ground_truth); plot(gt.stamp, gt.rho, 'Color', col.ref, 'DisplayName', 'ground truth'); end
 title("range [m]"); xlim(x_lim); ylim([0 200]); grid on; xlabel('time [s]'); ylabel('range [m]'); legend;
@@ -125,7 +125,7 @@ title("range [m]"); xlim(x_lim); ylim([0 200]); grid on; xlabel('time [s]'); yla
 
 % Rho Dot 
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-scatter(repmat(rad_clust.sens_stamp, size(rad_clust.rho_dot,2), 1), rad_clust.rho_dot(:), 36, 'd', 'MarkerEdgeColor', col.radar, 'DisplayName', NAME_1+" - radar");
+scatter(repmat(rad_clust.sens_stamp, size(rad_clust.rho_dot,2), 1), rad_clust.rho_dot(:), 36, 'd', 'MarkerEdgeColor', col.radar, 'DisplayName', NAME_1+"radar");
 if(compare); scatter(repmat(rad_clust2.sens_stamp, size(rad_clust2.rho_dot,2), 1), rad_clust2.rho_dot(:), 36, 'd', 'MarkerEdgeColor', col.radar2, 'DisplayName', NAME_2+" - radar"); end
 if(ground_truth); plot(gt.stamp, gt.rho_dot, 'Color', col.ref, 'DisplayName', 'ground truth'); end
 title("range rate [m/s]"); xlim(x_lim); grid on; xlabel('time [s]'); ylabel('range rate [m/s]'); legend;
@@ -192,24 +192,24 @@ function fovButtonPushed(~,~)
     % Sensor Plot
     subplot(1,2,1)
     cla reset 
-    legend('Location','west')
+    legend('Location','northwest')
     hold on
     grid on
     xlabel('y[m]')
     ylabel('x[m]')
     axis equal
 
-    plot(lid_pp.y_rel(t1_lid_pp:tend_lid_pp),lid_pp.x_rel(t1_lid_pp:tend_lid_pp),'*','Color',col.pointpillars,'DisplayName',NAME_1+" - pointpillars")
-    plot(lid_clust.y_rel(t1_lid_clust:tend_lid_clust),lid_clust.x_rel(t1_lid_clust:tend_lid_clust),'*','Color',col.lidar,'DisplayName',NAME_1+" - lidar")
-    plot(rad_clust.y_rel(t1_rad_clust:tend_rad_clust),rad_clust.x_rel(t1_rad_clust:tend_rad_clust),'*','Color',col.radar,'DisplayName',NAME_1+" - radar")
-    plot(cam_yolo.y_rel(t1_cam_yolo:tend_cam_yolo),cam_yolo.x_rel(t1_cam_yolo:tend_cam_yolo),'*','Color',col.camera,'DisplayName',NAME_1+" - yolo")
+    plot(cam_yolo.y_rel(t1_cam_yolo:tend_cam_yolo),cam_yolo.x_rel(t1_cam_yolo:tend_cam_yolo),'*','Color',col.camera,'DisplayName',NAME_1+"yolo")
+    plot(rad_clust.y_rel(t1_rad_clust:tend_rad_clust),rad_clust.x_rel(t1_rad_clust:tend_rad_clust),'*','Color',col.radar,'DisplayName',NAME_1+"radar")
+    plot(lid_pp.y_rel(t1_lid_pp:tend_lid_pp),lid_pp.x_rel(t1_lid_pp:tend_lid_pp),'*','Color',col.pointpillars,'DisplayName',NAME_1+"pointpillars")
+    plot(lid_clust.y_rel(t1_lid_clust:tend_lid_clust),lid_clust.x_rel(t1_lid_clust:tend_lid_clust),'*','Color',col.lidar,'DisplayName',NAME_1+"lidar")
     if(compare)
-        plot(lid_pp2.y_rel(t1_lid_pp2:tend_lid_pp2),lid_pp2.x_rel(t1_lid_pp2:tend_lid_pp2),'*','Color',col.pointpillars2,'DisplayName',NAME_2+" - pointpillars")
-        plot(lid_clust2.y_rel(t1_lid_clust2:tend_lid_clust2),lid_clust2.x_rel(t1_lid_clust2:tend_lid_clust2),'*','Color',col.lidar2,'DisplayName',NAME_2+" - lidar")
-        plot(rad_clust2.y_rel(t1_rad_clust2:tend_rad_clust2),rad_clust2.x_rel(t1_rad_clust2:tend_rad_clust2),'*','Color',col.radar2,'DisplayName',NAME_2+" - radar")
-        plot(cam_yolo2.y_rel(t1_cam_yolo2:tend_cam_yolo2),cam_yolo2.x_rel(t1_cam_yolo2:tend_cam_yolo2),'*','Color',col.camera2,'DisplayName',NAME_2+" - yolo")
+        plot(cam_yolo2.y_rel(t1_cam_yolo2:tend_cam_yolo2),cam_yolo2.x_rel(t1_cam_yolo2:tend_cam_yolo2),'*','Color',col.camera2,'DisplayName',NAME_2+"yolo")
+        plot(rad_clust2.y_rel(t1_rad_clust2:tend_rad_clust2),rad_clust2.x_rel(t1_rad_clust2:tend_rad_clust2),'*','Color',col.radar2,'DisplayName',NAME_2+"radar")
+        plot(lid_pp2.y_rel(t1_lid_pp2:tend_lid_pp2),lid_pp2.x_rel(t1_lid_pp2:tend_lid_pp2),'*','Color',col.pointpillars2,'DisplayName',NAME_2+"pointpillars")
+        plot(lid_clust2.y_rel(t1_lid_clust2:tend_lid_clust2),lid_clust2.x_rel(t1_lid_clust2:tend_lid_clust2),'*','Color',col.lidar2,'DisplayName',NAME_2+"lidar")
     end
-
+    title("sensors fov")
     plot(fov.rad_y,fov.rad_x,'-','LineWidth',0.5,'Color',col.radar,'HandleVisibility','off')
     plot(fov.rad_y,-fov.rad_x,'-','LineWidth',0.5,'Color',col.radar,'HandleVisibility','off')
     plot(fov.lid_y,fov.lid_x,'-','LineWidth',0.5,'Color',col.lidar,'HandleVisibility','off')
