@@ -30,4 +30,3 @@ plot(tt.stamp,log.perception__opponents.opponents__cm_dec_prob(:,1),'Color',col.
 grid on; ylabel('model probs [\%]'); legend
 
 xlabel("Time [s]");
-linkaxes(axes,'x')

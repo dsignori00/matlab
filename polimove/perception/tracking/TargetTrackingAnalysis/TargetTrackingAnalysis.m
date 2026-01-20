@@ -105,7 +105,11 @@ info;
 latency;
 state_map;
 state_cog;
+% covariance;
 range;
 speed_acc;
 map;
 % imm_fig;
+
+
+linkaxes(axes,'x')
