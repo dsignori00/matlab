@@ -16,6 +16,7 @@ function tt = load_target_tracking(log)
         tt.vx = log.perception__opponents.opponents__vx;
         tt.ax = log.perception__opponents.opponents__ax;
         tt.yaw_map = log.perception__opponents.opponents__psi;
+        tt.covariance = valid_covariance(log.perception__opponents.opponents__ekf_p);
         tt.count = log.perception__opponents.count;
         tt.max_opp = max(tt.count);
         tt.x_map(tt.x_map==0)=nan;
@@ -23,6 +24,18 @@ function tt = load_target_tracking(log)
         tt.vx(tt.vx==0)=nan;
         tt.ax(tt.ax==0)=nan;
         tt.yaw_map(tt.yaw_map==0)=nan;
+        % associated measurea
+        if isfield(log.perception__opponents,"opponents__meas_count")
+            tt.measures.count = log.perception__opponents.opponents__meas_count;
+            tt.measures.source = log.perception__opponents.opponents__meas_source_type;
+            tt.measures.stamp = log.perception__opponents.opponents__meas_stamp;
+            tt.measures.x_map = log.perception__opponents.opponents__meas_x_map;
+            tt.measures.y_map = log.perception__opponents.opponents__meas_y_map;
+            tt.measures.stamp(tt.measures.stamp==0)=nan;
+            tt.measures.x_map(tt.measures.x_map==0)=nan;
+            tt.measures.y_map(tt.measures.y_map==0)=nan;
+            tt.measures.stamp = tt.measures.stamp - log.time_offset_nsec*10^-9;
+        end
     else
         error('No target tracking data found in the log.');
     end
