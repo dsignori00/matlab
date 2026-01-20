@@ -5,14 +5,23 @@ if (ismember(strategies,INROWDETSTR.AUTOMATIC))
     ax(f) = nexttile([1,2]); f=f+1;
     grid on; hold on;
     x_length(:,1) = abs(bag1.debug.closest_lines.start_pt(inrowdet_idx,1,1) - bag1.debug.closest_lines.end_pt(inrowdet_idx,1,1)); 
-    x_length(:,2) = abs(bag1.debug.closest_lines.start_pt(inrowdet_idx,2,1) - bag1.debug.closest_lines.end_pt(inrowdet_idx,2,1)); 
-    plot(bag1.debug.stamp(inrowdet_idx), x_length(:,1), 'DisplayName', bag1.log_name + " L");
-    plot(bag1.debug.stamp(inrowdet_idx), x_length(:,2), 'DisplayName',bag1.log_name+  " R");
+    x_length(:,2) = abs(bag1.debug.closest_lines.start_pt(inrowdet_idx,2,1) - bag1.debug.closest_lines.end_pt(inrowdet_idx,2,1));
+    x_length(:,3) = abs(bag1.debug.closest_lines.start_pt(inrowdet_idx,3,1) - bag1.debug.closest_lines.end_pt(inrowdet_idx,3,1)); 
+    x_length(:,4) = abs(bag1.debug.closest_lines.start_pt(inrowdet_idx,4,1) - bag1.debug.closest_lines.end_pt(inrowdet_idx,4,1));
+
+    plot(bag1.debug.stamp(inrowdet_idx), x_length(:,2), 'DisplayName',bag1.log_name+  " L");
+    plot(bag1.debug.stamp(inrowdet_idx), x_length(:,3), 'DisplayName', bag1.log_name + " R");
+    plot(bag1.debug.stamp(inrowdet_idx), x_length(:,1), 'DisplayName', bag1.log_name + "LF",'LineStyle','--','LineWidth',0.3);
+    plot(bag1.debug.stamp(inrowdet_idx), x_length(:,4), 'DisplayName', bag1.log_name + "RF",'LineStyle','--','LineWidth',0.3);
     if compare 
         x_length2(:,1) = abs(bag2.debug.closest_lines.start_pt(inrowdet_idx,1,1) - bag2.debug.closest_lines.end_pt(inrowdet_idx,1,1)); 
-        x_length2(:,2) = abs(bag2.debug.closest_lines.start_pt(inrowdet_idx,2,1) - bag2.debug.closest_lines.end_pt(inrowdet_idx,2,1)); 
-        plot(bag2.debug.stamp(inrowdet_idx), x_length2(:,1), 'DisplayName', bag2.log_name + " L");
-        plot(bag2.debug.stamp(inrowdet_idx), x_length2(:,2), 'DisplayName',bag2.log_name+  " R");
+        x_length2(:,2) = abs(bag2.debug.closest_lines.start_pt(inrowdet_idx,2,1) - bag2.debug.closest_lines.end_pt(inrowdet_idx,2,1));
+        x_length2(:,3) = abs(bag2.debug.closest_lines.start_pt(inrowdet_idx,3,1) - bag2.debug.closest_lines.end_pt(inrowdet_idx,3,1)); 
+        x_length2(:,4) = abs(bag2.debug.closest_lines.start_pt(inrowdet_idx,4,1) - bag2.debug.closest_lines.end_pt(inrowdet_idx,4,1));
+        plot(bag1.debug.stamp(inrowdet_idx), x_length2(:,2), 'Color',colors.matlab{5} ,DisplayName', bag2.log_name+  " L");
+        plot(bag1.debug.stamp(inrowdet_idx), x_length2(:,3), 'Color',colors.matlab{6} ,DisplayName', bag2.log_name + " R");
+        plot(bag1.debug.stamp(inrowdet_idx), x_length2(:,1), 'Color',colors.matlab{7} ,DisplayName', bag2.log_name + "LF",'LineStyle','--','LineWidth',0.3);
+        plot(bag1.debug.stamp(inrowdet_idx), x_length2(:,4), 'Color',colors.matlab{8} ,DisplayName', bag2.log_name + "RF",'LineStyle','--','LineWidth',0.3);
     end
     plot_patches(bag1.state.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);
     ylabel("x length")
@@ -20,15 +29,23 @@ if (ismember(strategies,INROWDETSTR.AUTOMATIC))
     
     ax(f) = nexttile([1,2]); f=f+1;
     grid on; hold on;
-    y_length(:, 1) = abs(bag1.debug.closest_lines.start_pt(inrowdet_idx,1,2) - bag1.debug.closest_lines.end_pt(inrowdet_idx,1,2)); 
-    y_length(:, 2) = abs(bag1.debug.closest_lines.start_pt(inrowdet_idx,2,2) - bag1.debug.closest_lines.end_pt(inrowdet_idx,2,2)); 
-    plot(bag1.debug.stamp(inrowdet_idx), y_length(inrowdet_idx,1), 'DisplayName', bag1.log_name + " L");
-    plot(bag1.debug.stamp(inrowdet_idx), y_length(inrowdet_idx,2), 'DisplayName',bag1.log_name+  " R");
+    y_length(:,1) = abs(bag1.debug.closest_lines.start_pt(inrowdet_idx,1,2) - bag1.debug.closest_lines.end_pt(inrowdet_idx,1,2)); 
+    y_length(:,2) = abs(bag1.debug.closest_lines.start_pt(inrowdet_idx,2,2) - bag1.debug.closest_lines.end_pt(inrowdet_idx,2,2));
+    y_length(:,3) = abs(bag1.debug.closest_lines.start_pt(inrowdet_idx,3,2) - bag1.debug.closest_lines.end_pt(inrowdet_idx,3,2)); 
+    y_length(:,4) = abs(bag1.debug.closest_lines.start_pt(inrowdet_idx,4,2) - bag1.debug.closest_lines.end_pt(inrowdet_idx,4,2)); 
+    plot(bag1.debug.stamp(inrowdet_idx), y_length(:,2), 'DisplayName',bag1.log_name+  " L");
+    plot(bag1.debug.stamp(inrowdet_idx), y_length(:,3), 'DisplayName', bag1.log_name + " R");
+    plot(bag1.debug.stamp(inrowdet_idx), y_length(:,1), 'DisplayName', bag1.log_name + "LF",'LineStyle','--','LineWidth',0.3);
+    plot(bag1.debug.stamp(inrowdet_idx), y_length(:,4), 'DisplayName', bag1.log_name + "RF",'LineStyle','--','LineWidth',0.3);
     if compare 
-        y_length2(:, 1) = abs(bag2.debug.closest_lines.start_pt(inrowdet_idx,1,2) - bag2.debug.closest_lines.end_pt(inrowdet_idx,1,2)); 
-        y_length2(:, 2) = abs(bag2.debug.closest_lines.start_pt(inrowdet_idx,2,2) - bag2.debug.closest_lines.end_pt(inrowdet_idx,2,2)); 
-        plot(bag2.debug.stamp(inrowdet_idx), y_length2(inrowdet_idx,1), 'DisplayName', bag2.log_name + " L");
-        plot(bag2.debug.stamp(inrowdet_idx), y_length2(inrowdet_idx,2), 'DisplayName',bag2.log_name+  " R");
+        y_length2(:,1) = abs(bag2.debug.closest_lines.start_pt(inrowdet_idx,1,2) - bag2.debug.closest_lines.end_pt(inrowdet_idx,1,2)); 
+        y_length2(:,2) = abs(bag2.debug.closest_lines.start_pt(inrowdet_idx,2,2) - bag2.debug.closest_lines.end_pt(inrowdet_idx,2,2));
+        y_length2(:,3) = abs(bag2.debug.closest_lines.start_pt(inrowdet_idx,3,2) - bag2.debug.closest_lines.end_pt(inrowdet_idx,3,2)); 
+        y_length2(:,4) = abs(bag2.debug.closest_lines.start_pt(inrowdet_idx,4,2) - bag2.debug.closest_lines.end_pt(inrowdet_idx,4,2));
+        plot(bag1.debug.stamp(inrowdet_idx), y_length2(:,2), 'Color',colors.matlab{5} ,DisplayName', bag2.log_name+  " L");
+        plot(bag1.debug.stamp(inrowdet_idx), y_length2(:,3), 'Color',colors.matlab{6} ,DisplayName', bag2.log_name + " R");
+        plot(bag1.debug.stamp(inrowdet_idx), y_length2(:,1), 'Color',colors.matlab{7} ,DisplayName', bag2.log_name + "LF",'LineStyle','--','LineWidth',0.3);
+        plot(bag1.debug.stamp(inrowdet_idx), y_length2(:,4), 'Color',colors.matlab{8} ,DisplayName', bag2.log_name + "RF",'LineStyle','--','LineWidth',0.3);
     end
     plot_patches(bag1.state.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);
     ylabel("y length")
@@ -36,11 +53,15 @@ if (ismember(strategies,INROWDETSTR.AUTOMATIC))
     
     ax(f) = nexttile([1,1]); f=f+1;
     grid on; hold on;
-    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p1(inrowdet_idx,1), 'DisplayName', bag1.log_name + " L");
-    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p1(inrowdet_idx,2), 'DisplayName',bag1.log_name+  " R");
+    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p1(inrowdet_idx,2), 'DisplayName', bag1.log_name+  " L");
+    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p1(inrowdet_idx,3), 'DisplayName', bag1.log_name + " R");
+    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p1(inrowdet_idx,1), 'DisplayName', bag1.log_name + "LF",'LineStyle','--','LineWidth',0.3);
+    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p1(inrowdet_idx,4), 'DisplayName', bag1.log_name + "RF",'LineStyle','--','LineWidth',0.3);
     if compare 
-        plot(bag2.debug.stamp(inrowdet_idx), bag2.debug.closest_lines.p1(inrowdet_idx,1), 'DisplayName', bag2.log_name + " L");
-        plot(bag2.debug.stamp(inrowdet_idx), bag2.debug.closest_lines.p1(inrowdet_idx,2), 'DisplayName',bag2.log_name+  " R");
+        plot(bag2.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p1(inrowdet_idx,2), 'DisplayName', bag2.log_name+  " L");
+        plot(bag2.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p1(inrowdet_idx,3), 'DisplayName', bag2.log_name + " R");
+        plot(bag2.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p1(inrowdet_idx,1), 'DisplayName', bag2.log_name + "LF",'LineStyle','--','LineWidth',0.3);
+        plot(bag2.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p1(inrowdet_idx,4), 'DisplayName', bag2.log_name + "RF",'LineStyle','--','LineWidth',0.3);
     end
     plot_patches(bag1.debug.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);
     xlabel("time [s]")
@@ -49,11 +70,15 @@ if (ismember(strategies,INROWDETSTR.AUTOMATIC))
     
     ax(f) = nexttile([1,1]); f=f+1;
     grid on; hold on;
-    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p2(inrowdet_idx,1), 'DisplayName', bag1.log_name + " L");
-    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p2(inrowdet_idx,2), 'DisplayName',bag1.log_name+  " R");
+    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p2(inrowdet_idx,2), 'DisplayName', bag1.log_name+  " L");
+    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p2(inrowdet_idx,3), 'DisplayName', bag1.log_name + " R");
+    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p2(inrowdet_idx,1), 'DisplayName', bag1.log_name + "LF",'LineStyle','--','LineWidth',0.3);
+    plot(bag1.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p2(inrowdet_idx,4), 'DisplayName', bag1.log_name + "RF",'LineStyle','--','LineWidth',0.3);
     if compare 
-        plot(bag2.debug.stamp(inrowdet_idx), bag2.debug.closest_lines.p2(inrowdet_idx,1), 'DisplayName', bag2.log_name + " L");
-        plot(bag2.debug.stamp(inrowdet_idx), bag2.debug.closest_lines.p2(inrowdet_idx,2), 'DisplayName',bag2.log_name+  " R");
+        plot(bag2.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p2(inrowdet_idx,2), 'DisplayName', bag2.log_name+  " L");
+        plot(bag2.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p2(inrowdet_idx,3), 'DisplayName', bag2.log_name + " R");
+        plot(bag2.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p2(inrowdet_idx,1), 'DisplayName', bag2.log_name + "LF",'LineStyle','--','LineWidth',0.3);
+        plot(bag2.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p2(inrowdet_idx,4), 'DisplayName', bag2.log_name + "RF",'LineStyle','--','LineWidth',0.3);
     end
     plot_patches(bag1.state.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);
     xlabel("time [s]")

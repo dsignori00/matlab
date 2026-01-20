@@ -1,4 +1,4 @@
-function chunks = parse_chunk_msg(log, topic, name)
+function chunks = parse_chunk_msg(log, topic, name, enable_far_chunks)
 %PARSE_LINE_EQUATIONS Parse line equations from log structure
 
     chunks = struct();
@@ -6,20 +6,19 @@ function chunks = parse_chunk_msg(log, topic, name)
 
     % ---- Campi principali (dinamici) ----
     chunks.state                        = log.(topic).(sprintf('%s__state', name));
-    chunks.density                      = log.(topic).(sprintf('%s__density', name));
     chunks.forget_chunk_len_counter     = log.(topic).(sprintf('%s__forget_chunk_len_counter', name));
     chunks.end_row_detection_len        = log.(topic).(sprintf('%s__end_row_detection_len', name));
+    chunks.start_pt = log.(topic).(sprintf('%s__start_pt', name));
+    chunks.end_pt   = log.(topic).(sprintf('%s__end_pt', name));
 
-    % ---- Pulizia colonne oltre num_chunks ----
-    n_cols = size(chunks.state, 2);
-    for i = 1:length(chunks.num_chunks)
-        idx = chunks.num_chunks(i);
-        if idx < n_cols
-            cols = idx+1:n_cols;
-            chunks.state(i,cols)   = NaN;
-            chunks.density(i,cols)   = NaN;
-            chunks.forget_chunk_len_counter(i,cols)  = NaN;
-            chunks.end_row_detection_len(i,cols) = NaN;
+    % ---- Rimuovi chunk in base a flag ----
+    if(~enable_far_chunks)
+        for i = 1:length(chunks.num_chunks)
+            for idx =1:4:4
+                chunks.state(i,idx)   = NaN;
+                chunks.forget_chunk_len_counter(i,idx)  = NaN;
+                chunks.end_row_detection_len(i,idx) = NaN;
+            end
         end
     end
 end

@@ -15,11 +15,12 @@ function line_eq = parse_line_equations(log, topic, name)
     line_eq.start_pt = log.(topic).(sprintf('%s__start_pt', name));
     line_eq.end_pt   = log.(topic).(sprintf('%s__end_pt', name));
 
-    % ---- Pulizia colonne oltre num_lines ----
+    % ---- Pulizia colonne oltre num_lines o per linee non inizializzate----
     n_cols = size(line_eq.p1, 2);
     for i = 1:length(line_eq.num_lines)
         idx = line_eq.num_lines(i);
-        if idx < n_cols
+        form = line_eq.form(i);
+        if idx < n_cols || form == -1
             cols = idx+1:n_cols;
             line_eq.p1(i,cols)   = NaN;
             line_eq.p2(i,cols)   = NaN;
