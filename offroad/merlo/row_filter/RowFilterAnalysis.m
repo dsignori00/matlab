@@ -78,6 +78,8 @@ line_distance;
 line_coefficients;
 rows_angle;
 line_viz;
+chunk_viz;
+
 
 % linkaxes
 t0 = 0;   
