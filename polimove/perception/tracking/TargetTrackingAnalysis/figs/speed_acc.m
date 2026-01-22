@@ -14,7 +14,7 @@ axes(f) = nexttile([1,1]); f=f+1; hold on;
 plotTT(tt.stamp, tt.ax, tt.max_opp, col.tt, 'tt');
 if(compare); plotTT(tt2.stamp, tt2.ax, tt2.max_opp, col.tt2, name2); end
 if(use_sim_ref); plot(gt.stamp,gt.ax,'Color',col.ref,'DisplayName','Ground Truth'); end
-grid on; ylabel('ax [m/s$^2$]'); legend show;
+grid on; ylabel('ax [m/s$^2$]'); legend show; xlabel('timestamp [s]');
 
 linkaxes(axes,'x');
 xlim(x_lim);
