@@ -1,12 +1,15 @@
+%#ok<*UNRCH>
+%#ok<*INUSD>
+
 %% MAP
 fig = figure('name','MAP');
 
-c = uicontrol('Style','pushbutton');
-c.String = {'Refresh'};
-c.Callback = @refreshTimeButtonPushed;
-
-%#ok<*UNRCH>
-%#ok<*INUSD>
+% Button
+c = uicontrol('Style','pushbutton', ...
+    'String','Refresh', ...
+    'Units','normalized', ...
+    'Position',[0.01 0.01 0.1 0.05], ...
+    'Callback',@refreshTimeButtonPushed);
 
 function refreshTimeButtonPushed(src, event)
 
