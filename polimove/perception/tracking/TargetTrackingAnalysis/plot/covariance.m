@@ -32,6 +32,22 @@ sensor_points = struct();
 source_vec = reshape(tt.measures.source(:,1,:), [], 1);   % [N*M x 1]
 stamp_vec  = reshape(tt.measures.stamp(:,1,:),  [], 1);   % same size as source_vec
 
+N = size(tt.covariance,1);
+cov_xy_map = zeros(2,2,N);
+cov_xy_cog = zeros(2,2,N);
+
+for i = 1:N
+    c = tt.covariance(i,1,:);
+    cov_xy_map(:,:,i) = [c(1) c(2);
+                         c(6) c(7)];
+
+    yaw = tt.yaw_map(i,1);
+    R = [cos(yaw) -sin(yaw);
+         sin(yaw)  cos(yaw)];
+
+    cov_xy_cog(:,:,i) = R * cov_xy_map(:,:,i) * R.';
+end
+
 axes(f) = nexttile([1,1]); f=f+1; hold on;
 % --- Loop over each sensor type ---
 for k = 1:size(sensor_list,1)
@@ -41,7 +57,9 @@ for k = 1:size(sensor_list,1)
     noise = sensor_list{k,4};
     
     idx = (source_vec == type.Value);   % logical vector
-    sensor_points.(name) = interp1(tt.stamp, sqrt(tt.covariance(:,1,1)), stamp_vec(idx));
+    [unique_stamps, ia] = unique(tt.stamp);
+    unique_cov = squeeze(sqrt(cov_xy_cog(1,1,ia)));
+    sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
     plot(stamp_vec(idx), sensor_points.(name), 'o', ...
         'MarkerFaceColor', color, ...
@@ -50,12 +68,12 @@ for k = 1:size(sensor_list,1)
         'DisplayName', "R: " + num2str(noise(1,1)) + " - " + strrep(name,'_',' '));  
     hold on
 end
-plot(tt.stamp,sqrt(tt.covariance(:,1, 1)),'Color',col.tt,'DisplayName','Track');
+plot(tt.stamp, squeeze(sqrt(cov_xy_cog(1,1,:))),'Color', col.tt, 'DisplayName', 'track');
 
 if(compare)
     plot(tt2.stamp,sqrt(tt2.covariance(:,1, 1)),'Color',col.tt2,'DisplayName',name2);
 end
-grid on; ylabel('x map [m]');  legend show;
+grid on; ylabel('x cog - std [m]'); legend show;
 
 
 axes(f) = nexttile([1,1]); f=f+1; hold on;
@@ -67,7 +85,9 @@ for k = 1:size(sensor_list,1)
     noise = sensor_list{k,4};
     
     idx = (source_vec == type.Value);   % logical vector
-    sensor_points.(name) = interp1(tt.stamp, sqrt(tt.covariance(:,1,7)), stamp_vec(idx));
+    [unique_stamps, ia] = unique(tt.stamp);
+    unique_cov = squeeze(sqrt(cov_xy_cog(2,2,ia)));
+    sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
     plot(stamp_vec(idx), sensor_points.(name), 'o', ...
         'MarkerFaceColor', color, ...
@@ -76,12 +96,12 @@ for k = 1:size(sensor_list,1)
         'DisplayName', "R: " + num2str(noise(2,2)) + " - " + strrep(name,'_',' '));  % nicer display
     hold on
 end
-plot(tt.stamp,sqrt(tt.covariance(:,1, 7)),'Color',col.tt,'DisplayName','Track');
+plot(tt.stamp,squeeze(sqrt(cov_xy_cog(2,2,:))),'Color',col.tt,'DisplayName','track');
 
 if(compare)
     plot(tt2.stamp,sqrt(tt2.covariance(:,1, 7)),'Color',col.tt2,'DisplayName',name2);
 end
-grid on; ylabel('y map [m]');  legend show;
+grid on; ylabel('y cog - std [m]');  legend show;
 
 
 % yaw
@@ -93,7 +113,9 @@ for k = 1:size(sensor_list,1)
     color = sensor_list{k,3};
     
     idx = (source_vec == type.Value);   % logical vector
-    sensor_points.(name) = interp1(tt.stamp, sqrt(tt.covariance(:,1,25)), stamp_vec(idx));
+    [unique_stamps, ia] = unique(tt.stamp);
+    unique_cov = sqrt(tt.covariance(ia,1,25));
+    sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
     plot(stamp_vec(idx), sensor_points.(name), 'o', ...
         'MarkerFaceColor', color, ...
@@ -102,12 +124,12 @@ for k = 1:size(sensor_list,1)
         'DisplayName', strrep(name,'_',' '));  % nicer display
     hold on
 end
-plot(tt.stamp,sqrt(tt.covariance(:,1, 25)),'Color',col.tt,'DisplayName','Track');
+plot(tt.stamp,rad2deg(sqrt(tt.covariance(:,1, 25))),'Color',col.tt,'DisplayName','track');
 
 if(compare)
-    plot(tt2.stamp,sqrt(tt2.covariance(:,1, 25)),'Color',col.tt2,'DisplayName',name2);
+    plot(tt2.stamp,rad2deg(sqrt(tt2.covariance(:,1, 25))),'Color',col.tt2,'DisplayName',name2);
 end
-grid on; ylabel('yaw map [m]'); legend show;
+grid on; ylabel('yaw map std [deg]'); legend show;
 
 
 figure('name', 'Covariance - Speed Acc');
@@ -122,7 +144,9 @@ for k = 1:size(sensor_list,1)
     color = sensor_list{k,3};
     
     idx = (source_vec == type.Value);   % logical vector
-    sensor_points.(name) = interp1(tt.stamp, sqrt(tt.covariance(:,1,13)), stamp_vec(idx));
+    [unique_stamps, ia] = unique(tt.stamp);
+    unique_cov = sqrt(tt.covariance(ia,1,13));
+    sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
     plot(stamp_vec(idx), sensor_points.(name), 'o', ...
         'MarkerFaceColor', color, ...
@@ -131,7 +155,7 @@ for k = 1:size(sensor_list,1)
         'DisplayName', strrep(name,'_',' '));  % nicer display
     hold on
 end
-plot(tt.stamp,sqrt(tt.covariance(:,1, 13)),'Color',col.tt,'DisplayName','Track');
+plot(tt.stamp,sqrt(tt.covariance(:,1, 13)),'Color',col.tt,'DisplayName','track');
 
 if(compare)
     plot(tt2.stamp,sqrt(tt2.covariance(:,1, 13)),'Color',col.tt2,'DisplayName',name2);
@@ -148,7 +172,9 @@ for k = 1:size(sensor_list,1)
     color = sensor_list{k,3};
     
     idx = (source_vec == type.Value);   % logical vector
-    sensor_points.(name) = interp1(tt.stamp, sqrt(tt.covariance(:,1,19)), stamp_vec(idx));
+    [unique_stamps, ia] = unique(tt.stamp);
+    unique_cov = sqrt(tt.covariance(ia,1,19));
+    sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
     plot(stamp_vec(idx), sensor_points.(name), 'o', ...
         'MarkerFaceColor', color, ...
@@ -157,7 +183,7 @@ for k = 1:size(sensor_list,1)
         'DisplayName', strrep(name,'_',' '));  % nicer display
     hold on
 end
-plot(tt.stamp,sqrt(tt.covariance(:,1, 19)),'Color',col.tt,'DisplayName','Track');
+plot(tt.stamp,sqrt(tt.covariance(:,1, 19)),'Color',col.tt,'DisplayName','track');
 
 if(compare)
     plot(tt2.stamp,sqrt(tt2.covariance(:,1, 19)),'Color',col.tt2,'DisplayName',name2);
@@ -191,9 +217,12 @@ guidata(assFig,S);
 
 function refreshTimeButtonPushed(~,~)
     % Pull needed vars
-    assFig        = evalin('base', 'assFig');
+    assFig     = evalin('base', 'assFig');
     axes       = evalin('base', 'axes');
     tt         = evalin('base', 'tt');
+    traj_db    = evalin('base', 'trajDatabase');
+    col        = evalin('base', 'col');
+    dist       = evalin('base', 'dist');
 
     % Determine range from x-limits
     t_lim = xlim(axes(1));
@@ -208,6 +237,9 @@ function refreshTimeButtonPushed(~,~)
     % Build/update state
     S = guidata(assFig);
 
+    S.dist      = dist;
+    S.col       = col;
+    S.traj_db   = traj_db;
     S.tt        = tt;
     S.iStart    = t1_tt;
     S.iEnd      = tend_tt;
@@ -241,18 +273,15 @@ end
 
 function drawCurrentSample()
     assFig = evalin('base','assFig');
-    traj_db = evalin('base', 'trajDatabase');
-    col = evalin('base', 'col');
-    sensor_list = evalin('base', 'sensor_list');
-    dist = evalin('base', 'dist');
     S = guidata(assFig);
+    sensor_list = evalin('base', 'sensor_list');
     i = S.iCur;
 
     % --------- MAP DRAW ----------
     builtin('axes', S.ax);
     cla(S.ax,'reset');
     hold(S.ax,'on'); grid(S.ax,'on');
-    xlabel(S.ax,'y[m]'); ylabel(S.ax,'x[m]'); axis(S.ax,'equal'); 
+    xlabel(S.ax,'x[m]'); ylabel(S.ax,'y[m]'); axis(S.ax,'equal'); 
 
     % stampa tutte la misura tra le due iterazioni i e i-1 (solo 1, usa tt simulator)
     query_time = [];
@@ -303,45 +332,48 @@ function drawCurrentSample()
             'DisplayName', name);
     end
 
-    x = interp1(S.tt.stamp(:), S.tt.x_map, query_time);
-    y = interp1(S.tt.stamp(:), S.tt.y_map, query_time);
+    [unique_stamps, ia] = unique(S.tt.stamp);
+    unique_x = S.tt.x_map(ia,:);
+    unique_y = S.tt.y_map(ia,:);
+    x = interp1(unique_stamps, unique_x, query_time);
+    y = interp1(unique_stamps, unique_y, query_time);
     for j = 1:length(~isnan(x))
         if isnan(x(j)) || isnan(y(j))
             continue;
         end
 
         % euclidean distance 
-        [xt, yt] = covariance_ellipse(diag([dist.^2, dist.^2]), [x(j); y(j)], 1);  % ellisse 1-sigma
-        patch(xt, yt, col.tt, ...
+        [xt, yt] = covariance_ellipse(diag([S.dist.^2, S.dist.^2]), [x(j); y(j)], 1);  % ellisse 1-sigma
+        patch(xt, yt, S.col.tt, ...
             'FaceAlpha', 0.0, ...
-            'EdgeColor', col.tt, ...
+            'EdgeColor', S.col.tt, ...
             'LineWidth', 1, ...
             'LineStyle', '--', ...
             'HandleVisibility','off');
-        scatter(x(j), y(j), 'filled', 'MarkerFaceColor',col.tt, 'DisplayName','Track');
+        scatter(x(j), y(j), 'filled', 'MarkerFaceColor',S.col.tt, 'DisplayName','track');
         
         % state covariance - NB: approximation, should predict back to measure time
         sigma = reshape(S.tt.covariance(i,j,:), 5, 5);
         [xc, yc] = covariance_ellipse(sigma(1:2,1:2), [x(j); y(j)], 1);  % ellisse 1-sigma
-        patch(xc, yc, col.tt, ...
+        patch(xc, yc, S.col.tt, ...
             'FaceAlpha', 0.3, ...
-            'EdgeColor', col.tt, ...
+            'EdgeColor', S.col.tt, ...
             'LineWidth', 1, ...
             'HandleVisibility','off');
     end
 
     margin = 20;
     if ~isnan(S.tt.x_map(i,1)) && ~isnan(S.tt.y_map(i,1))
-        xlim(S.ax, [min(S.tt.x_map(i,:))-margin max(S.tt.x_map(i,:))+margin]);
-        ylim(S.ax, [min(S.tt.y_map(i,:))-margin max(S.tt.y_map(i,:))+margin]);
+        xlim(S.ax, [min([S.tt.x_map(i,:)]) - margin max([S.tt.x_map(i,:)]) + margin]);
+        ylim(S.ax, [min([S.tt.y_map(i,:)]) - margin max([S.tt.y_map(i,:)]) + margin]);
         axis(S.ax, 'manual');
     end
 
     % plot track lines
-    id_left = length(traj_db) - 2;
-    id_right = length(traj_db) - 1;
-    plot(traj_db(id_left).X, traj_db(id_left).Y, 'color', 'k', 'LineWidth', 1, 'HandleVisibility','off');
-    plot(traj_db(id_right).X, traj_db(id_right).Y, 'color', 'k', 'LineWidth', 1, 'HandleVisibility','off');
+    id_left = length(S.traj_db) - 2;
+    id_right = length(S.traj_db) - 1;
+    plot(S.traj_db(id_left).X, S.traj_db(id_left).Y, 'color', 'k', 'LineWidth', 1, 'HandleVisibility','off');
+    plot(S.traj_db(id_right).X, S.traj_db(id_right).Y, 'color', 'k', 'LineWidth', 1, 'HandleVisibility','off');
 
     txt = sprintf('sample %d / %d', i-S.iStart+1, S.iEnd-S.iStart+1);
     title(S.ax, ['map - ' txt]);
