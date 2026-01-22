@@ -287,7 +287,7 @@ function drawCurrentSample()
                                    sin(yaw),  cos(yaw)];
             end
 
-            noise_map = R_vehicle_world * noise * R_vehicle_world'
+            noise_map = R_vehicle_world * noise * R_vehicle_world';
             [xe, ye] = covariance_ellipse(noise_map, mu, 1);  % ellisse 1-sigma
     
             patch(xe, ye, color, ...
@@ -309,6 +309,8 @@ function drawCurrentSample()
         if isnan(x(j)) || isnan(y(j))
             continue;
         end
+
+        % euclidean distance 
         [xt, yt] = covariance_ellipse(diag([dist.^2, dist.^2]), [x(j); y(j)], 1);  % ellisse 1-sigma
         patch(xt, yt, col.tt, ...
             'FaceAlpha', 0.0, ...
@@ -317,6 +319,15 @@ function drawCurrentSample()
             'LineStyle', '--', ...
             'HandleVisibility','off');
         scatter(x(j), y(j), 'filled', 'MarkerFaceColor',col.tt, 'DisplayName','Track');
+        
+        % state covariance - NB: approximation, should predict back to measure time
+        sigma = reshape(S.tt.covariance(i,j,:), 5, 5);
+        [xc, yc] = covariance_ellipse(sigma(1:2,1:2), [x(j); y(j)], 1);  % ellisse 1-sigma
+        patch(xc, yc, col.tt, ...
+            'FaceAlpha', 0.3, ...
+            'EdgeColor', col.tt, ...
+            'LineWidth', 1, ...
+            'HandleVisibility','off');
     end
 
     margin = 20;
