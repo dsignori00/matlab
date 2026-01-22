@@ -16,6 +16,7 @@ addpath("../../../common/plot/")
 addpath("../../../../common/graphic_tools/")
 addpath("../../utils/")
 addpath("plot/")
+addpath("figs/")
 normal_path = "../../../bags";
 opp_dir = "../../opponent_gps/mat/";
 
@@ -49,7 +50,7 @@ if(compare)
         clearvars tmp;
         end
     end
-    name2 = 'New TT';
+    name2 = 'tt2';
 end
 
 % load log ref
@@ -90,14 +91,12 @@ end
 
 cam_yolo.sens_stamp(cam_yolo.sens_stamp < 0) = NaN;
 
-% Range Computation
-lid_clust.range = sqrt(lid_clust.x_rel.^2 + lid_clust.y_rel.^2);
-rad_clust.range = sqrt(rad_clust.x_rel.^2 + rad_clust.y_rel.^2);
-cam_yolo.range = sqrt(cam_yolo.x_rel.^2 + cam_yolo.y_rel.^2);
-lid_pp.range = sqrt(lid_pp.x_rel.^2 + lid_pp.y_rel.^2);
-tt.range = sqrt(tt.x_rel.^2 + tt.y_rel.^2);
-if(compare); tt2.range = sqrt(tt2.x_rel.^2 + tt2.y_rel.^2); end
-
+sensors = { ...
+    struct('s', lid_clust, 'col', col.lidar,        'name', 'Lid Clust'), ...
+    struct('s', rad_clust, 'col', col.radar,        'name', 'Rad Clust'), ...
+    struct('s', cam_yolo,  'col', col.camera,       'name', 'Camera'), ...
+    struct('s', lid_pp,    'col', col.pointpillars, 'name', 'Lid PP') ...
+};
 
 %% PLOTTING
 
@@ -105,7 +104,7 @@ info;
 latency;
 state_map;
 state_cog;
-% covariance;
+covariance;
 range;
 speed_acc;
 map;

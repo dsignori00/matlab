@@ -9,6 +9,7 @@
 
 % gating distance
 dist = 10;  % [m]
+
 % measurement matrices
 R.lidar         = diag([0.7 0.7]);   % [m^2]
 R.radar         = diag([1.5 2.0]);   % [m^2]
@@ -73,7 +74,7 @@ plot(tt.stamp, squeeze(sqrt(cov_xy_cog(1,1,:))),'Color', col.tt, 'DisplayName', 
 if(compare)
     plot(tt2.stamp,sqrt(tt2.covariance(:,1, 1)),'Color',col.tt2,'DisplayName',name2);
 end
-grid on; ylabel('x cog - std [m]'); legend show;
+grid on; ylabel('x cog [m]'); legend show;
 
 
 axes(f) = nexttile([1,1]); f=f+1; hold on;
@@ -101,7 +102,7 @@ plot(tt.stamp,squeeze(sqrt(cov_xy_cog(2,2,:))),'Color',col.tt,'DisplayName','tra
 if(compare)
     plot(tt2.stamp,sqrt(tt2.covariance(:,1, 7)),'Color',col.tt2,'DisplayName',name2);
 end
-grid on; ylabel('y cog - std [m]');  legend show;
+grid on; ylabel('y cog [m]');  legend show;
 
 
 % yaw
@@ -117,7 +118,7 @@ for k = 1:size(sensor_list,1)
     unique_cov = sqrt(tt.covariance(ia,1,25));
     sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
-    plot(stamp_vec(idx), sensor_points.(name), 'o', ...
+    plot(stamp_vec(idx), rad2deg(sensor_points.(name)), 'o', ...
         'MarkerFaceColor', color, ...
         'MarkerEdgeColor', color, ...
         'MarkerSize', sz + size(sensor_list,1) - k, ...
@@ -129,7 +130,7 @@ plot(tt.stamp,rad2deg(sqrt(tt.covariance(:,1, 25))),'Color',col.tt,'DisplayName'
 if(compare)
     plot(tt2.stamp,rad2deg(sqrt(tt2.covariance(:,1, 25))),'Color',col.tt2,'DisplayName',name2);
 end
-grid on; ylabel('yaw map std [deg]'); legend show;
+grid on; ylabel('yaw map [deg]'); legend show; xlabel('timestamp [s]');
 
 
 figure('name', 'Covariance - Speed Acc');
@@ -188,7 +189,7 @@ plot(tt.stamp,sqrt(tt.covariance(:,1, 19)),'Color',col.tt,'DisplayName','track')
 if(compare)
     plot(tt2.stamp,sqrt(tt2.covariance(:,1, 19)),'Color',col.tt2,'DisplayName',name2);
 end
-grid on; ylabel('acc [m/s$^2$]'); legend show;
+grid on; ylabel('acc [m/s$^2$]'); legend show; xlabel('timestamp [s]');
 
 
 %% Association Figure
@@ -376,6 +377,6 @@ function drawCurrentSample()
     plot(S.traj_db(id_right).X, S.traj_db(id_right).Y, 'color', 'k', 'LineWidth', 1, 'HandleVisibility','off');
 
     txt = sprintf('sample %d / %d', i-S.iStart+1, S.iEnd-S.iStart+1);
-    title(S.ax, ['map - ' txt]);
+    title(S.ax, ['map - ' txt]); legend(S.ax,'show');
     hold(S.ax,'off');
 end
