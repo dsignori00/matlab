@@ -69,7 +69,7 @@ DateTime = datetime(log.time_offset_nsec,'ConvertFrom','epochtime','TicksPerSeco
 %% NAMING
 graphics_options;
 col.lidar        = colors.green{2};
-col.radar        = '#4DBEEE';
+col.radar        = [77 190 238] / 255;
 col.camera       = colors.yellow{2};
 col.pointpillars = colors.orange{2};
 col.tt           = colors.blue{2};

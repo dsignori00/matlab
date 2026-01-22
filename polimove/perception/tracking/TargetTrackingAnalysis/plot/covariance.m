@@ -7,7 +7,8 @@
 %   (attenzione a effetto reprocessing -> vedi latenza, aggiungi campo a oppoenents)
 % - plot covariance with shaded area (2 sigma) (vedi plot del cingo -> utile per analisi associazione misure)
 
-
+% gating distance
+dist = 10;  % [m]
 % measurement matrices
 R.lidar         = diag([0.7 0.7]);   % [m^2]
 R.radar         = diag([1.5 2.0]);   % [m^2]
@@ -242,7 +243,8 @@ function drawCurrentSample()
     assFig = evalin('base','assFig');
     traj_db = evalin('base', 'trajDatabase');
     col = evalin('base', 'col');
-    % sensor_list = evalin('base', 'sensor_list');
+    sensor_list = evalin('base', 'sensor_list');
+    dist = evalin('base', 'dist');
     S = guidata(assFig);
     i = S.iCur;
 
@@ -252,29 +254,73 @@ function drawCurrentSample()
     hold(S.ax,'on'); grid(S.ax,'on');
     xlabel(S.ax,'y[m]'); ylabel(S.ax,'x[m]'); axis(S.ax,'equal'); 
 
-    scatter(S.tt.x_map(i,:), S.tt.y_map(i,:), 'filled', 'MarkerFaceColor',col.tt, 'DisplayName','Track');
+    % stampa tutte la misura tra le due iterazioni i e i-1 (solo 1, usa tt simulator)
+    query_time = [];
+    for k = 1:size(sensor_list,1)
+        name  = sensor_list{k,1};
+        color = sensor_list{k,3};
+        noise = sensor_list{k,4};
+        data  = sensor_list{k,5};
 
-    % % stampa tutte le misure comprese tra le due iterazioni i e i-1
-    % l = i;
-    % if i == 1
-    %     l = 2;
-    % end
-    % for k = 1:size(sensor_list,1)
-    %     name  = sensor_list{k,1};
-    %     color = sensor_list{k,3};
-    %     noise = sensor_list{k,4};
-    %     data  = sensor_list{k,5};
+        if i == 1
+            continue;
+        end
 
-    %     idxs = find(data.stamp >= S.tt.stamp(l-1) & data.stamp < S.tt.stamp(l));
-    %     scatter(data.x_map(idxs), data.y_map(idxs), 'filled', ...
-    %         'MarkerFaceColor', color, ...
-    %         'MarkerEdgeColor', color, ...
-    %         'DisplayName', name);
-    % end
+        idx = find(data.stamp >= S.tt.stamp(i-1) & data.stamp < S.tt.stamp(i));
+        if ~any(idx)
+            continue;
+        end
+
+        query_time = data.sens_stamp(idx);
+
+        for j = 1:sum(~isnan(data.x_map(idx,:)))
+            % plot covariance ellipse
+            mu = [data.x_map(idx,j); 
+                  data.y_map(idx,j)];
+
+            % rotazione yaw - per essere 'precisi' dovrei interpolare la yaw del veicolo al tempo della misura
+            yaw = S.tt.yaw_map(i,j);
+            if isnan(yaw)
+                continue
+            else
+                R_vehicle_world = [cos(yaw), -sin(yaw);
+                                   sin(yaw),  cos(yaw)];
+            end
+
+            noise_map = R_vehicle_world * noise * R_vehicle_world'
+            [xe, ye] = covariance_ellipse(noise_map, mu, 1);  % ellisse 1-sigma
+    
+            patch(xe, ye, color, ...
+                'FaceAlpha', 0.3, ...
+                'EdgeColor', color, ...
+                'LineWidth', 1, ...
+                'HandleVisibility','off');
+        end
+
+        scatter(data.x_map(idx,:), data.y_map(idx,:), 'filled', ...
+            'MarkerFaceColor', color, ...
+            'MarkerEdgeColor', color, ...
+            'DisplayName', name);
+    end
+
+    x = interp1(S.tt.stamp(:), S.tt.x_map, query_time);
+    y = interp1(S.tt.stamp(:), S.tt.y_map, query_time);
+    for j = 1:length(~isnan(x))
+        if isnan(x(j)) || isnan(y(j))
+            continue;
+        end
+        [xt, yt] = covariance_ellipse(diag([dist.^2, dist.^2]), [x(j); y(j)], 1);  % ellisse 1-sigma
+        patch(xt, yt, col.tt, ...
+            'FaceAlpha', 0.0, ...
+            'EdgeColor', col.tt, ...
+            'LineWidth', 1, ...
+            'LineStyle', '--', ...
+            'HandleVisibility','off');
+        scatter(x(j), y(j), 'filled', 'MarkerFaceColor',col.tt, 'DisplayName','Track');
+    end
 
     margin = 20;
     if ~isnan(S.tt.x_map(i,1)) && ~isnan(S.tt.y_map(i,1))
-        [min(S.tt.x_map(i,:))-margin max(S.tt.x_map(i,:))+margin]
         xlim(S.ax, [min(S.tt.x_map(i,:))-margin max(S.tt.x_map(i,:))+margin]);
         ylim(S.ax, [min(S.tt.y_map(i,:))-margin max(S.tt.y_map(i,:))+margin]);
         axis(S.ax, 'manual');
