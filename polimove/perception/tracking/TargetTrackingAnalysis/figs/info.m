@@ -20,10 +20,9 @@ labels = {'0 - RACING','1 - TAILGATING','2 - OVERTAKE','3 - ABORT','4 - CRITICAL
 for i = 1:numel(labels)
     plot(nan, nan, 'DisplayName', labels{i}, 'Color', 'none');
 end
-legend;
 
 % opponent count
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot(tt.stamp, tt.count, 'Color',col.tt);
-if(compare); plot(tt2.stamp, tt2.count, 'Color', col.tt2); end
-grid on; ylabel('Opponent count');
+plotTT(tt.stamp, tt.count, 1, col.tt, 'tt');
+if(compare); plotTT(tt2.stamp, tt2.count, 1, col.tt2, name2); end
+grid on; ylabel('Opponent count'); xlabel('timestamp [s]'); legend show;
