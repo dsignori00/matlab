@@ -1,6 +1,6 @@
 %% STATE FIGURE MAP
 figure('name', 'Filter - Map');
-tiledlayout(2,1,'Padding','compact');
+tiledlayout(3,1,'Padding','compact');
 
 % pos x
 axes(f) = nexttile([1,1]); f=f+1; hold on;
@@ -23,12 +23,10 @@ end
 plotTT(tt.stamp, tt.y_map, tt.max_opp, col.tt, 'tt');
 if(compare); plotTT(tt2.stamp, tt2.y_map, tt2.max_opp, col.tt2, name2); end
 if(use_ref || use_sim_ref); plot(gt.stamp,gt.y_map,'Color',col.ref,'DisplayName','Ground Truth'); end
-grid on; ylabel('y map [m]'); xlabel('timestamp [s]'); legend show;
+grid on; ylabel('y map [m]'); legend show;
 
-%% YAW
-figure('name', 'Filter - Yaw');
+% yaw
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-
 for i = 1:numel(sensors)
     s = sensors{i}.s;
     s.yaw_map = mod(s.yaw_map,2*pi);

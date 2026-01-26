@@ -1,5 +1,5 @@
 %% LATENCY FIGURE
-figure('name','Latency')
+figure('name','Detections - Latency')
 tiledlayout(4,1,'Padding','compact');
 
 for i = 1:numel(sensors)
