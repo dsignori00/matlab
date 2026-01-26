@@ -1,4 +1,9 @@
 %% FIGURE IMM
+
+if ~isfield(tt,'opponents__ctra_prob')
+    return;
+end
+
 figure('name','Imm')
 tiledlayout(3,1,'Padding','compact');
 
@@ -23,7 +28,7 @@ if(compare); plot(repmat(tt2.stamp,tt2.max_opp, 1),tt2.ax(:,1:tt2.max_opp),'Colo
 grid on; ylabel('ax [m/s$^2$]'); legend
 
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-%  plot(tt.stamp,log.perception__opponents.opponents__ctra_prob(:,1),'Color',col.radar,'DisplayName','CTRA');
+plot(tt.stamp,log.perception__opponents.opponents__ctra_prob(:,1),'Color',col.radar,'DisplayName','CTRA');
 plot(tt.stamp,log.perception__opponents.opponents__ctrv_prob(:,1),'Color',col.pointpillars,'DisplayName','CTRV');
 plot(tt.stamp,log.perception__opponents.opponents__cm_acc_prob(:,1),'Color',col.lidar,'DisplayName','CCP - A');
 plot(tt.stamp,log.perception__opponents.opponents__cm_dec_prob(:,1),'Color',col.camera,'DisplayName','CCP - B');

@@ -50,7 +50,7 @@ if(compare)
         clearvars tmp;
         end
     end
-    name2 = 'tt2';
+    name2 = 'tt old';
 end
 
 % load log ref
@@ -101,14 +101,14 @@ sensors = { ...
 %% PLOTTING
 
 info;
+detections;
 latency;
 state_map;
 state_cog;
-covariance;
 range;
 speed_acc;
+covariance;
 map;
-% imm_fig;
-
+imm;
 
 linkaxes(axes,'x')

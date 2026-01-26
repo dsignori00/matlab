@@ -7,6 +7,12 @@
 %   (attenzione a effetto reprocessing -> vedi latenza, aggiungi campo a oppoenents)
 % - plot covariance with shaded area (2 sigma) (vedi plot del cingo -> utile per analisi associazione misure)
 
+
+if ~isfield(tt, 'measures')
+    warning('tt struct must contain measures field for covariance analysis (resimulate using bag reader).');
+    return;
+end
+
 % gating distance
 dist = 10;  % [m]
 
@@ -66,7 +72,7 @@ for k = 1:size(sensor_list,1)
         'MarkerFaceColor', color, ...
         'MarkerEdgeColor', color, ...
         'MarkerSize', sz + size(sensor_list,1) - k, ...
-        'DisplayName', "R: " + num2str(noise(1,1)) + " - " + strrep(name,'_',' '));  
+        'DisplayName', ['R: ' sprintf('%.1f', noise(1,1)) ' - ' strrep(name,'_',' ')]); 
     hold on
 end
 plot(tt.stamp, squeeze(sqrt(cov_xy_cog(1,1,:))),'Color', col.tt, 'DisplayName', 'track');
@@ -94,7 +100,7 @@ for k = 1:size(sensor_list,1)
         'MarkerFaceColor', color, ...
         'MarkerEdgeColor', color, ...
         'MarkerSize', sz + size(sensor_list,1) - k, ...
-        'DisplayName', "R: " + num2str(noise(2,2)) + " - " + strrep(name,'_',' '));  % nicer display
+        'DisplayName', ['R: ' sprintf('%.1f', noise(2,2)) ' - ' strrep(name,'_',' ')]); 
     hold on
 end
 plot(tt.stamp,squeeze(sqrt(cov_xy_cog(2,2,:))),'Color',col.tt,'DisplayName','track');
