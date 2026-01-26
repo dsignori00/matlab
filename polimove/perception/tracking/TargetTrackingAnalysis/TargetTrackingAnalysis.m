@@ -4,7 +4,7 @@ clearvars -except log log_2 log_ref trajDatabase
 use_ref     = false;
 use_sim_ref = false;
 compare     = false;
-opp_idx     = 2;
+opp_idx     = 1;
 
 %#ok<*UNRCH>
 %#ok<*INUSD>
