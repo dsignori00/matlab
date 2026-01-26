@@ -13,6 +13,11 @@ if ~isfield(tt, 'measures')
     return;
 end
 
+if(opp_idx > tt.max_opp)
+    warning('Selected opp_idx exceeds the number of tracked opponents. Using first opponent instead.');
+    opp_idx = 1;  
+end
+
 % gating distance
 dist = 10;  % [m]
 
@@ -36,19 +41,19 @@ figure('name', 'Covariance - Positions');
 tiledlayout(3,1,'Padding','compact');
 sensor_points = struct();
 
-source_vec = reshape(tt.measures.source(:,1,:), [], 1);   % [N*M x 1]
-stamp_vec  = reshape(tt.measures.stamp(:,1,:),  [], 1);   % same size as source_vec
+source_vec = reshape(tt.measures.source(:,opp_idx,:), [], 1);   % [N*M x 1]
+stamp_vec  = reshape(tt.measures.stamp(:,opp_idx,:),  [], 1);   % same size as source_vec
 
 N = size(tt.covariance,1);
 cov_xy_map = zeros(2,2,N);
 cov_xy_cog = zeros(2,2,N);
 
 for i = 1:N
-    c = tt.covariance(i,1,:);
+    c = tt.covariance(i,opp_idx,:);
     cov_xy_map(:,:,i) = [c(1) c(2);
                          c(6) c(7)];
 
-    yaw = tt.yaw_map(i,1);
+    yaw = tt.yaw_map(i,opp_idx);
     R = [cos(yaw) -sin(yaw);
          sin(yaw)  cos(yaw)];
 
@@ -76,10 +81,6 @@ for k = 1:size(sensor_list,1)
     hold on
 end
 plot(tt.stamp, squeeze(sqrt(cov_xy_cog(1,1,:))),'Color', col.tt, 'DisplayName', 'track');
-
-if(compare)
-    plot(tt2.stamp,sqrt(tt2.covariance(:,1, 1)),'Color',col.tt2,'DisplayName',name2);
-end
 grid on; ylabel('x cog [m]'); legend show;
 
 
@@ -104,10 +105,6 @@ for k = 1:size(sensor_list,1)
     hold on
 end
 plot(tt.stamp,squeeze(sqrt(cov_xy_cog(2,2,:))),'Color',col.tt,'DisplayName','track');
-
-if(compare)
-    plot(tt2.stamp,sqrt(tt2.covariance(:,1, 7)),'Color',col.tt2,'DisplayName',name2);
-end
 grid on; ylabel('y cog [m]');  legend show;
 
 
@@ -121,7 +118,7 @@ for k = 1:size(sensor_list,1)
     
     idx = (source_vec == type.Value);   % logical vector
     [unique_stamps, ia] = unique(tt.stamp);
-    unique_cov = sqrt(tt.covariance(ia,1,25));
+    unique_cov = sqrt(tt.covariance(ia,opp_idx,25));
     sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
     plot(stamp_vec(idx), rad2deg(sensor_points.(name)), 'o', ...
@@ -131,11 +128,7 @@ for k = 1:size(sensor_list,1)
         'DisplayName', strrep(name,'_',' '));  % nicer display
     hold on
 end
-plot(tt.stamp,rad2deg(sqrt(tt.covariance(:,1, 25))),'Color',col.tt,'DisplayName','track');
-
-if(compare)
-    plot(tt2.stamp,rad2deg(sqrt(tt2.covariance(:,1, 25))),'Color',col.tt2,'DisplayName',name2);
-end
+plot(tt.stamp,rad2deg(sqrt(tt.covariance(:,opp_idx, 25))),'Color',col.tt,'DisplayName','track');
 grid on; ylabel('yaw map [deg]'); legend show; xlabel('timestamp [s]');
 
 
@@ -152,7 +145,7 @@ for k = 1:size(sensor_list,1)
     
     idx = (source_vec == type.Value);   % logical vector
     [unique_stamps, ia] = unique(tt.stamp);
-    unique_cov = sqrt(tt.covariance(ia,1,13));
+    unique_cov = sqrt(tt.covariance(ia,opp_idx,13));
     sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
     plot(stamp_vec(idx), sensor_points.(name), 'o', ...
@@ -162,11 +155,7 @@ for k = 1:size(sensor_list,1)
         'DisplayName', strrep(name,'_',' '));  % nicer display
     hold on
 end
-plot(tt.stamp,sqrt(tt.covariance(:,1, 13)),'Color',col.tt,'DisplayName','track');
-
-if(compare)
-    plot(tt2.stamp,sqrt(tt2.covariance(:,1, 13)),'Color',col.tt2,'DisplayName',name2);
-end
+plot(tt.stamp,sqrt(tt.covariance(:,opp_idx, 13)),'Color',col.tt,'DisplayName','track');
 grid on; ylabel('speed [m/s]'); legend show;
 
 
@@ -180,7 +169,7 @@ for k = 1:size(sensor_list,1)
     
     idx = (source_vec == type.Value);   % logical vector
     [unique_stamps, ia] = unique(tt.stamp);
-    unique_cov = sqrt(tt.covariance(ia,1,19));
+    unique_cov = sqrt(tt.covariance(ia,opp_idx,19));
     sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
     plot(stamp_vec(idx), sensor_points.(name), 'o', ...
@@ -190,11 +179,7 @@ for k = 1:size(sensor_list,1)
         'DisplayName', strrep(name,'_',' '));  % nicer display
     hold on
 end
-plot(tt.stamp,sqrt(tt.covariance(:,1, 19)),'Color',col.tt,'DisplayName','track');
-
-if(compare)
-    plot(tt2.stamp,sqrt(tt2.covariance(:,1, 19)),'Color',col.tt2,'DisplayName',name2);
-end
+plot(tt.stamp,sqrt(tt.covariance(:,opp_idx, 19)),'Color',col.tt,'DisplayName','track');
 grid on; ylabel('acc [m/s$^2$]'); legend show; xlabel('timestamp [s]');
 
 
