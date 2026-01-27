@@ -65,8 +65,11 @@ col.tt2          = colors.blue{1};
 col.ref          = colors.black;
 sz=3; % Marker size
 f=1;
+b=0;
+
+err_thr = 10;
 x_lim = [0 inf];
-y_err_lim = [-10 10];
+y_err_lim = [-err_thr err_thr];
 
 %% LOAD DATA
 
