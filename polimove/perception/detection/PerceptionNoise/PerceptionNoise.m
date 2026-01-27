@@ -1,9 +1,8 @@
-clc; close all;
-clearvars -except log log_ref trajDatabase
+clc; close all; clearvars -except log log_ref trajDatabase
 
 use_sim_ref         = false;
-show_error_series   = true;
-search_correlations = true;
+show_error_series   = false;
+search_correlations = false;
 
 %% Paths
 
@@ -113,8 +112,6 @@ correlations;
 error_summary;
 sensors_fov;
 map;
-
-
 
 
 % linkaxes
