@@ -18,19 +18,11 @@ function refreshTimeButtonPushed(src, event)
     traj_db  = evalin('base','trajDatabase');
     sensors  = evalin('base','sensors');
     col      = evalin('base','col');
-
-    use_ref      = evalin('base','use_ref');
-    use_sim_ref  = evalin('base','use_sim_ref');
-
-    if use_ref || use_sim_ref
-        gt = evalin('base','gt');
-    end
+    gt = evalin('base','gt');
 
     % --- time window ---
     t_lim = xlim(ax(1));
-    if use_ref || use_sim_ref
-        [t1_gt, tend_gt] = timeWindowIdx(gt.stamp, t_lim);
-    end
+    [t1_gt, tend_gt] = timeWindowIdx(gt.stamp, t_lim);
 
     % --- reset ax ---
     subplot(1,1,1); cla reset; hold on;
@@ -61,13 +53,11 @@ function refreshTimeButtonPushed(src, event)
     end
 
     % --- ground truth ---
-    if use_ref || use_sim_ref
-        plot( ...
-            gt.x_map(t1_gt:tend_gt), ...
-            gt.y_map(t1_gt:tend_gt), ...
-            'Color', col.ref, ...
-            'DisplayName','gt');
-    end
+    plot( ...
+        gt.x_map(t1_gt:tend_gt), ...
+        gt.y_map(t1_gt:tend_gt), ...
+        'Color', col.ref, ...
+        'DisplayName','gt');
 
     legend show
 end

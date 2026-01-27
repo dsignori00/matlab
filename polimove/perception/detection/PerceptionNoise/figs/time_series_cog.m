@@ -8,7 +8,7 @@ for i = 1:numel(sensors)
     s = sensors{i}.s;
     plot_detections(s.sens_stamp, s.x_rel, s.max_det, sensors{i}.col, sensors{i}.name);
 end
-if(use_ref || use_sim_ref); plot(gt.stamp, gt.x_rel, 'Color',col.ref,'DisplayName','gt'); end
+plot(gt.stamp, gt.x_rel, 'Color',col.ref,'DisplayName','gt'); 
 grid on; ylabel('x rel [m]'); legend show;
 
 % pos y
@@ -17,7 +17,7 @@ for i = 1:numel(sensors)
     s = sensors{i}.s;
     plot_detections(s.sens_stamp, s.y_rel, s.max_det, sensors{i}.col, sensors{i}.name);
 end
-if(use_ref || use_sim_ref); plot(gt.stamp, gt.y_rel, 'Color',col.ref,'DisplayName','gt'); end
+plot(gt.stamp, gt.y_rel, 'Color',col.ref,'DisplayName','gt'); 
 grid on; ylabel('y rel [m]'); legend show; ylim([-100 100]);
 
 % count

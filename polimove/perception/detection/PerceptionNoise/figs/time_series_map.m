@@ -8,7 +8,7 @@ for i = 1:numel(sensors)
     s = sensors{i}.s;
     plot_detections(s.sens_stamp, s.x_map, s.max_det, sensors{i}.col, sensors{i}.name);
 end
-if(use_ref || use_sim_ref); plot(gt.stamp,gt.x_map,'Color',col.ref,'DisplayName','gt'); end
+plot(gt.stamp,gt.x_map,'Color',col.ref,'DisplayName','gt'); 
 grid on; ylabel('x map [m]'); legend show;
 
 % pos y
@@ -18,7 +18,7 @@ for i = 1:numel(sensors)
     plot_detections(s.sens_stamp, s.y_map, s.max_det, sensors{i}.col, sensors{i}.name);
 end
 
-if(use_ref || use_sim_ref); plot(gt.stamp,gt.y_map,'Color',col.ref,'DisplayName','gt'); end
+plot(gt.stamp,gt.y_map,'Color',col.ref,'DisplayName','gt'); 
 grid on; ylabel('y map [m]'); legend show;
 
 % yaw
@@ -27,5 +27,5 @@ for i = 1:numel(sensors)
     s = sensors{i}.s;
     plot_detections(s.sens_stamp, s.yaw_map, s.max_det, sensors{i}.col, sensors{i}.name);
 end
-if(use_ref || use_sim_ref); plot(gt.stamp,gt.yaw_map,'Color',col.ref,'DisplayName','gt'); end
+plot(gt.stamp,gt.yaw_map,'Color',col.ref,'DisplayName','gt'); 
 grid on; ylabel('yaw [rad]'); legend show; xlabel('timestamp [s]');
