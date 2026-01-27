@@ -4,7 +4,6 @@ clearvars -except log log_ref trajDatabase
 use_sim_ref         = false;
 show_error_series   = true;
 search_correlations = true;
-drop_out_analyses   = true;
 
 %% Paths
 
@@ -67,6 +66,7 @@ col.ref          = colors.black;
 sz=3; % Marker size
 f=1;
 x_lim = [0 inf];
+y_err_lim = [-10 10];
 
 %% LOAD DATA
 
@@ -106,10 +106,11 @@ time_series_map;
 time_series_cog;
 time_series_range;
 time_series_errors;
+correlations;
 error_summary;
 sensors_fov;
 map;
-% correlation_fig;
+
 
 
 
