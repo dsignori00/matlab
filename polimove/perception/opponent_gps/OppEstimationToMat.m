@@ -27,6 +27,9 @@
 % clos_idx                  % traj server closest idx
 % lap                       % lap counter
 
+% NOTE: for UTM conversion, install following add-on
+% https://github.com/geographiclib/geographiclib-octave
+
 %% Paths
 clc; close all; clearvars -except ego opp_log closest_idxs opp_idxs file_name out.clos_idx
 
@@ -107,6 +110,7 @@ end
 
 switch(opp_id)
     case 3
+        ref_sys = "lla";
         opp_lat0 = 24.471024;
         opp_lon0 = 54.605536;
         opp_alt0 = -29.96;
@@ -117,6 +121,7 @@ switch(opp_id)
         out.speed = opp_log.vx;
 
     case 6
+        ref_sys = "utm";
         opp_lat0 = 24.46477;
         opp_lon0 = 54.60523;
         opp_alt0 = 0.0;
@@ -127,6 +132,7 @@ switch(opp_id)
         out.speed = opp_log.x__loc_vehicle_state_linVel_value0;
 
     case 71
+        ref_sys = "lla";
         opp_lat0 = 24.46992202098782;
         opp_lon0 = 54.60522506805341;
         opp_alt0 = 0.0;
@@ -191,9 +197,20 @@ switch (track_id)
         error("Error in track selection");  
 end
 
-[x0,y0,~] = geodetic2enu(opp_lat0,opp_lon0,opp_alt0,lat0,lon0,alt0,wgs84);
-out.x_map = out.x_map + x0;
-out.y_map = out.y_map + y0;
+if strcmp(ref_sys, "lla")
+    [x0,y0,~] = geodetic2enu(opp_lat0,opp_lon0,opp_alt0,lat0,lon0,alt0,wgs84);
+    out.x_map = out.x_map + x0;
+    out.y_map = out.y_map + y0;
+elseif strcmp(ref_sys, "utm")
+    [opp_e0, opp_n0, zone, is_north] = utmups_fwd(opp_lat0, opp_lon0);
+    out.x_map = out.x_map + opp_e0;
+    out.y_map = out.y_map + opp_n0;
+    [out.x_map,out.y_map] = utmups_inv(out.x_map,out.y_map,zone, is_north);
+    [out.x_map,out.y_map,~] = geodetic2enu(out.x_map,out.y_map,zeros(size(out.x_map)),lat0,lon0,alt0,wgs84);
+else
+    disp("Unrecognized reference system")
+end
+
 
 opp_sz = length(out.timestamp);
 out.gps = NaN;
