@@ -1,7 +1,7 @@
 clc; close all; clearvars -except log log_ref trajDatabase
 
 use_sim_ref         = false;
-show_error_series   = false;
+show_error_series   = true;
 search_correlations = false;
 
 %% Paths

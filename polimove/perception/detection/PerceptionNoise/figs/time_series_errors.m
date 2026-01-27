@@ -2,7 +2,12 @@ if ~show_error_series
     return
 end
 
-x_max = max(cellfun(@(x) max(x.s.sens_stamp), sensors));
+x_max = -inf;
+for k = 1:numel(sensors)
+    if ~isempty(sensors{k}.s.sens_stamp)
+        x_max = max(x_max, max(sensors{k}.s.sens_stamp(:)));
+    end
+end
 t0 = linspace(0,x_max,100);
 
 % ---------------- X MAP ----------------
