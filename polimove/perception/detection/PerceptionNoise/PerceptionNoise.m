@@ -1,11 +1,10 @@
 clc; close all;
 clearvars -except log log_ref trajDatabase
 
-use_ref             = true;
 use_sim_ref         = false;
-search_correlations = false;
-show_error_series   = false;
-drop_out_analyses   = false;
+show_error_series   = true;
+search_correlations = true;
+drop_out_analyses   = true;
 
 %% Paths
 
@@ -71,7 +70,7 @@ x_lim = [0 inf];
 
 %% LOAD DATA
 
-[lid_clust, rad_clust, cam_yolo, lid_pp, gt] = load_perception(log, use_sim_ref, use_ref, log_ref);
+[lid_clust, rad_clust, cam_yolo, lid_pp, gt] = load_perception(log, use_sim_ref, ~use_sim_ref, log_ref);
 cam_yolo.sens_stamp(cam_yolo.sens_stamp < 0) = NaN;
 
 % ego
@@ -110,7 +109,7 @@ time_series_errors;
 error_summary;
 sensors_fov;
 map;
-correlation_fig;
+% correlation_fig;
 
 
 
