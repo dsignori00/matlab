@@ -67,7 +67,7 @@ graphics_options;
 col.lidar        = colors.green{2};
 col.radar        = '#4DBEEE';
 col.camera       = colors.yellow{2};
-col.pointpillars = colors.orange{2};
+col.pp = colors.orange{2};
 col.v2v          = colors.red{2};
 col.tt           = colors.blue{2};
 col.tt2          = colors.blue{1};
@@ -166,7 +166,7 @@ hold on;
 scatter(repmat(v2v.sens_stamp,v2v.max_opp,1), reshape(v2v.x_rel(:,1:v2v.max_opp), [], 1), sz.^2, col.v2v, 'filled', 'DisplayName','v2v');
 plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.x_rel(:,1:tt.max_opp), [], 1), 'Color',col.tt,'DisplayName','tt');
 if(use_ref)
-    plot(tt.stamp_ref, tt.x_rel_ref, 'Color',col.ref,'DisplayName','Ground Truth');
+    plot(tt.stamp_ref, tt.x_rel_ref, 'Color',col.ref,'DisplayName','gt');
 end
 grid on;
 ylabel('x rel [m]');
@@ -179,7 +179,7 @@ hold on;
 scatter(repmat(v2v.sens_stamp,v2v.max_opp,1), reshape(v2v.y_rel(:,1:v2v.max_opp), [], 1), sz.^2, col.v2v, 'filled', 'DisplayName','v2v');
 plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.y_rel(:,1:tt.max_opp), [], 1), 'Color',col.tt,'DisplayName','tt');
 if(use_ref)
-    plot(tt.stamp_ref, tt.y_rel_ref, 'Color',col.ref,'DisplayName','Ground Truth');
+    plot(tt.stamp_ref, tt.y_rel_ref, 'Color',col.ref,'DisplayName','gt');
 end
 grid on;
 ylabel('y rel [m]');
@@ -191,7 +191,7 @@ f=f+1;
 hold on;
 plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.rho_dot(:,1:tt.max_opp), [], 1), 'Color',col.tt,'DisplayName','tt');
 if(use_ref)
-    plot(tt.stamp_ref, tt.rho_dot_ref, 'Color',col.ref,'DisplayName','Ground Truth');
+    plot(tt.stamp_ref, tt.rho_dot_ref, 'Color',col.ref,'DisplayName','gt');
 end
 grid on;
 ylabel('rho dot [m/s]');
@@ -218,7 +218,7 @@ hold on;
 scatter(repmat(v2v.sens_stamp,v2v.max_opp,1), reshape(v2v.x_map(:,1:v2v.max_opp), [], 1), sz.^2, col.v2v, 'filled', 'DisplayName','v2v');
 plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.x_map(:,1:tt.max_opp), [], 1), 'Color', col.tt, 'DisplayName','tt');
 if(use_ref)
-    plot(tt.stamp_ref,tt.x_map_ref,'Color',col.ref,'DisplayName','Ground Truth');
+    plot(tt.stamp_ref,tt.x_map_ref,'Color',col.ref,'DisplayName','gt');
 end
 grid on;
 ylabel('x map [m]');
@@ -231,7 +231,7 @@ hold on;
 scatter(repmat(v2v.sens_stamp,v2v.max_opp,1), reshape(v2v.y_map(:,1:v2v.max_opp), [], 1), sz.^2, col.v2v, 'filled', 'DisplayName','v2v');
 plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.y_map(:,1:tt.max_opp), [], 1), 'Color', col.tt, 'DisplayName','tt');
 if(use_ref)
-    plot(tt.stamp_ref,tt.y_map_ref,'Color',col.ref,'DisplayName','Ground Truth');
+    plot(tt.stamp_ref,tt.y_map_ref,'Color',col.ref,'DisplayName','gt');
 end
 grid on;
 ylabel('y map [m]');
@@ -244,7 +244,7 @@ hold on;
 scatter(repmat(v2v.sens_stamp,v2v.max_opp,1), reshape(v2v.vx_map(:,1:v2v.max_opp), [], 1), sz.^2, col.v2v, 'filled', 'DisplayName','v2v');
 plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.vx(:,1:tt.max_opp), [], 1), 'Color', col.tt, 'DisplayName','tt');
 if(use_ref)
-    plot(tt.stamp_ref,tt.vx_ref,'Color',col.ref,'DisplayName','Ground Truth');
+    plot(tt.stamp_ref,tt.vx_ref,'Color',col.ref,'DisplayName','gt');
 end
 grid on;
 ylabel('vx [m/s]');
@@ -266,7 +266,7 @@ hold on;
 scatter(repmat(v2v.sens_stamp,v2v.max_opp,1), reshape(v2v.yaw_map(:,1:v2v.max_opp), [], 1), sz.^2, col.v2v, 'filled', 'DisplayName','v2v');
 plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.yaw_map(:,1:tt.max_opp), [], 1), 'Color', col.tt, 'DisplayName','tt');
 if(use_ref)
-    plot(tt.stamp_ref,tt.yaw_map_ref,'Color',col.ref,'DisplayName','Ground Truth');
+    plot(tt.stamp_ref,tt.yaw_map_ref,'Color',col.ref,'DisplayName','gt');
 end
 grid on;
 ylabel('yaw [deg]');

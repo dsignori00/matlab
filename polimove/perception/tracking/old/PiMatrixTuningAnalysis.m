@@ -63,7 +63,7 @@ col.tt = '#0072BD';
 col.lidar = '#77AC30';
 col.radar = '#4DBEEE';
 col.camera = '#EDB120';
-col.pointpillars = '#D95319';
+col.pp = '#D95319';
 col.err = '#77AC30';
 col.ref = '#FF00FF';
 

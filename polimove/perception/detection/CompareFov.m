@@ -66,7 +66,7 @@ col.radar        = colors.blue{2};
 col.radar2       = colors.blue{1};
 col.camera       = colors.yellow{2};
 col.camera2      = colors.yellow{1};
-col.pointpillars = colors.orange{2};
+col.pp = colors.orange{2};
 col.pointpillars2= colors.orange{1};
 col.ref          = colors.black;
 
@@ -111,7 +111,7 @@ axes(f)=nexttile([1,1]); f=f+1; hold on;
 
 scatter(repmat(lid_clust.sens_stamp, size(lid_clust.range,2), 1), lid_clust.range(:), 36, col.lidar, '*', 'DisplayName', NAME_1+"lidar");
 scatter(repmat(rad_clust.sens_stamp, size(rad_clust.range,2), 1), rad_clust.range(:), 36, col.radar, '*', 'DisplayName', NAME_1+"radar");
-scatter(repmat(lid_pp.sens_stamp, size(lid_pp.range,2), 1), lid_pp.range(:), 36, col.pointpillars, '*', 'DisplayName', NAME_1+"pointpillars");
+scatter(repmat(lid_pp.sens_stamp, size(lid_pp.range,2), 1), lid_pp.range(:), 36, col.pp, '*', 'DisplayName', NAME_1+"pointpillars");
 scatter(repmat(cam_yolo.sens_stamp, size(cam_yolo.range,2), 1), cam_yolo.range(:), 36, col.camera, '*', 'DisplayName', NAME_1+"yolo");
 if(compare)
     scatter(repmat(lid_clust2.sens_stamp,size(lid_clust2.range,2), 1)', lid_clust2.range(:), 36, col.lidar2, 'filled', 'DisplayName', NAME_2+"lidar");
@@ -201,7 +201,7 @@ function fovButtonPushed(~,~)
 
     plot(cam_yolo.y_rel(t1_cam_yolo:tend_cam_yolo),cam_yolo.x_rel(t1_cam_yolo:tend_cam_yolo),'*','Color',col.camera,'DisplayName',NAME_1+"yolo")
     plot(rad_clust.y_rel(t1_rad_clust:tend_rad_clust),rad_clust.x_rel(t1_rad_clust:tend_rad_clust),'*','Color',col.radar,'DisplayName',NAME_1+"radar")
-    plot(lid_pp.y_rel(t1_lid_pp:tend_lid_pp),lid_pp.x_rel(t1_lid_pp:tend_lid_pp),'*','Color',col.pointpillars,'DisplayName',NAME_1+"pointpillars")
+    plot(lid_pp.y_rel(t1_lid_pp:tend_lid_pp),lid_pp.x_rel(t1_lid_pp:tend_lid_pp),'*','Color',col.pp,'DisplayName',NAME_1+"pointpillars")
     plot(lid_clust.y_rel(t1_lid_clust:tend_lid_clust),lid_clust.x_rel(t1_lid_clust:tend_lid_clust),'*','Color',col.lidar,'DisplayName',NAME_1+"lidar")
     if(compare)
         plot(cam_yolo2.y_rel(t1_cam_yolo2:tend_cam_yolo2),cam_yolo2.x_rel(t1_cam_yolo2:tend_cam_yolo2),'*','Color',col.camera2,'DisplayName',NAME_2+"yolo")

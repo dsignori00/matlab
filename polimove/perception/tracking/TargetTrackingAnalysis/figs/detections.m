@@ -4,10 +4,10 @@ tiledlayout(2,1,'Padding','compact');
 
 % count
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plotArea(tt.stamp, log.perception__opponents.opponents__rad_clust_meas, tt.max_opp, col.radar,        'Rad Clust');
-plotArea(tt.stamp, log.perception__opponents.opponents__lid_pp_meas,    tt.max_opp, col.pointpillars, 'Lid PP');
-plotArea(tt.stamp, log.perception__opponents.opponents__lid_clust_meas, tt.max_opp, col.lidar,        'Lid Clust');
-plotArea(tt.stamp, log.perception__opponents.opponents__cam_yolo_meas,  tt.max_opp, col.camera,       'Camera');
+plot_area(tt.stamp, log.perception__opponents.opponents__rad_clust_meas, tt.max_opp, col.radar,        'Rad Clust');
+plot_area(tt.stamp, log.perception__opponents.opponents__lid_pp_meas,    tt.max_opp, col.pp, 'Lid PP');
+plot_area(tt.stamp, log.perception__opponents.opponents__lid_clust_meas, tt.max_opp, col.lidar,        'Lid Clust');
+plot_area(tt.stamp, log.perception__opponents.opponents__cam_yolo_meas,  tt.max_opp, col.camera,       'Camera');
 grid on; ylabel('Count'); legend show; xlabel('timestamp [s]');
 
 

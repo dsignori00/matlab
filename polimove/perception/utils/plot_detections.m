@@ -1,4 +1,4 @@
-function plotDetections(stamp, data, max_det, color, name, marker)
+function plot_detections(stamp, data, max_det, color, name, marker)
     if nargin < 6
         marker = 'o';
     end

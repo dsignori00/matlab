@@ -189,7 +189,7 @@ axes(f) = nexttile([1,1]); f=f+1;
 hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.x_rel, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
 if(compare);plot(rad2_sens_stamp, safe_cols(rad2.x_rel, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
-if(ground_truth); plot(gt_timestamp, gt.x_rel, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
+if(ground_truth); plot(gt_timestamp, gt.x_rel, 'Color', col.ref, 'DisplayName', 'gt'); end
 grid on; title('x rel [m]'); xlim(x_lim); ylim([-200 200]);
 
 % pos y
@@ -197,7 +197,7 @@ axes(f) = nexttile([1,1]); f=f+1;
 hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.y_rel, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
 if(compare); plot(rad2_sens_stamp, safe_cols(rad2.y_rel, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
-if(ground_truth); plot(gt_timestamp, gt.y_rel, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
+if(ground_truth); plot(gt_timestamp, gt.y_rel, 'Color', col.ref, 'DisplayName', 'gt'); end
 grid on; title('y rel [m]'); xlim(x_lim); ylim([-100 100]);
 
 %% STATE FIGURE RANGE
@@ -209,7 +209,7 @@ axes(f) = nexttile([1,1]); f=f+1;
 hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.range, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
 if(compare); plot(rad2_sens_stamp, safe_cols(rad2.range, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
-if(ground_truth); plot(gt_timestamp, gt.rho, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
+if(ground_truth); plot(gt_timestamp, gt.rho, 'Color', col.ref, 'DisplayName', 'gt'); end
 grid on; title('range [m]'); xlim(x_lim); ylim([0 200]);
 
 % detections
@@ -229,7 +229,7 @@ axes(f) = nexttile([1,1]); f=f+1;
 hold on;
 plot(rad1.sens_stamp(:), safe_cols(rad1.x_map, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
 if(compare); plot(rad2_sens_stamp, safe_cols(rad2.x_map, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
-if(ground_truth); plot(gt_timestamp, gt.x_map, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
+if(ground_truth); plot(gt_timestamp, gt.x_map, 'Color', col.ref, 'DisplayName', 'gt'); end
 grid on; title('x map [m]'); xlim(x_lim);
 
 % pos y
@@ -237,7 +237,7 @@ axes(f) = nexttile([1,1]); f=f+1;
 hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.y_map, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
 if(compare); plot(rad2_sens_stamp, safe_cols(rad2.y_map, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
-if(ground_truth); plot(gt_timestamp, gt.y_map, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
+if(ground_truth); plot(gt_timestamp, gt.y_map, 'Color', col.ref, 'DisplayName', 'gt'); end
 grid on; title('y map [m]'); xlim(x_lim);
 
 %% STATE FIGURE SPEED
@@ -249,7 +249,7 @@ axes(f) = nexttile([1,1]); f=f+1;
 hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.rho_dot, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
 if(compare); plot(rad2_sens_stamp, safe_cols(rad2.rho_dot, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
-if(ground_truth); plot(gt_timestamp, gt.rho_dot, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
+if(ground_truth); plot(gt_timestamp, gt.rho_dot, 'Color', col.ref, 'DisplayName', 'gt'); end
 grid on; title('rho dot [m/s]'); xlim(x_lim);
 
 % vx
@@ -257,7 +257,7 @@ axes(f) = nexttile([1,1]); f=f+1;
 hold on;
 plot(rad1.sens_stamp, safe_cols(rad1.vx, rad1.max_det), 'o', 'MarkerFaceColor', col.radar, 'MarkerEdgeColor', col.radar, 'MarkerSize', sz, 'DisplayName', NAME_1);
 if(compare); plot(rad2_sens_stamp, safe_cols(rad2.vx, rad2.max_det), 'o', 'MarkerFaceColor', col.radar2, 'MarkerEdgeColor', col.radar2, 'MarkerSize', sz, 'DisplayName', NAME_2); end
-if(ground_truth); plot(gt_timestamp, gt.speed, 'Color', col.ref, 'DisplayName', 'Ground Truth'); end
+if(ground_truth); plot(gt_timestamp, gt.speed, 'Color', col.ref, 'DisplayName', 'gt'); end
 grid on; title('vx [m/s]'); xlim(x_lim); ylim([0 inf]);
 
 linkaxes(axes,'x');
