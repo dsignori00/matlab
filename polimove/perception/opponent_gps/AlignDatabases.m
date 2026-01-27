@@ -29,7 +29,6 @@ clearvars tmp;
 end
 
 lap = 3;
-
 lap_idx = log_ref.lap == lap;
 x_opp = log_ref.x_map(lap_idx);
 y_opp = log_ref.y_map(lap_idx);

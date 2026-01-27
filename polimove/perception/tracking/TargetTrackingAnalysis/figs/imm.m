@@ -29,7 +29,7 @@ grid on; ylabel('ax [m/s$^2$]'); legend
 
 axes(f) = nexttile([1,1]); f=f+1; hold on;
 plot(tt.stamp,log.perception__opponents.opponents__ctra_prob(:,1),'Color',col.radar,'DisplayName','CTRA');
-plot(tt.stamp,log.perception__opponents.opponents__ctrv_prob(:,1),'Color',col.pointpillars,'DisplayName','CTRV');
+plot(tt.stamp,log.perception__opponents.opponents__ctrv_prob(:,1),'Color',col.pp,'DisplayName','CTRV');
 plot(tt.stamp,log.perception__opponents.opponents__cm_acc_prob(:,1),'Color',col.lidar,'DisplayName','CCP - A');
 plot(tt.stamp,log.perception__opponents.opponents__cm_dec_prob(:,1),'Color',col.camera,'DisplayName','CCP - B');
 grid on; ylabel('model probs [\%]'); legend

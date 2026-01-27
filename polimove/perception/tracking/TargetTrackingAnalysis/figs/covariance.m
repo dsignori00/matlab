@@ -30,7 +30,7 @@ R.pointpillars  = diag([0.7 0.7]);   % [m^2]
 sensor_list = { ...
     'lidar',  SensorType.LIDAR_CLUSTERING,   col.lidar,        R.lidar,         lid_clust;
     'radar',  SensorType.RADAR_CLUSTERING,   col.radar,        R.radar,         rad_clust;
-    'pp',     SensorType.LIDAR_POINTPILLARS, col.pointpillars, R.pointpillars,  lid_pp;
+    'pp',     SensorType.LIDAR_POINTPILLARS, col.pp, R.pointpillars,  lid_pp;
     'camera', SensorType.CAMERA_YOLO,        col.camera,       R.camera,        cam_yolo;
 };
 

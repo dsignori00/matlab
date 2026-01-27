@@ -23,6 +23,6 @@ end
 
 % opponent count
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plotTT(tt.stamp, tt.count, 1, col.tt, 'tt');
-if(compare); plotTT(tt2.stamp, tt2.count, 1, col.tt2, name2); end
+plot_tt(tt.stamp, tt.count, 1, col.tt, 'tt');
+if(compare); plot_tt(tt2.stamp, tt2.count, 1, col.tt2, name2); end
 grid on; ylabel('Opponent count'); xlabel('timestamp [s]'); legend show;

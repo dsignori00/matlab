@@ -26,5 +26,5 @@ gt.vx = log_ref.speed;
 figure('name', 'Filter - Speed Acc');
 hold on;
 plot(ego.stamp,ego.vx(:,1),'DisplayName','ego');
-plot(gt.stamp,gt.vx,'DisplayName','Ground Truth'); 
+plot(gt.stamp,gt.vx,'DisplayName','gt'); 
 grid on; title('vx [m/s]');  legend
