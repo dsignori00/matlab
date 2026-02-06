@@ -19,6 +19,7 @@ function refreshTimeButtonPushed(src, event)
     sensors  = evalin('base','sensors');
     col      = evalin('base','col');
     tt       = evalin('base','tt');
+    name1    = evalin('base','name1');
 
     use_ref      = evalin('base','use_ref');
     use_sim_ref  = evalin('base','use_sim_ref');
@@ -73,7 +74,7 @@ function refreshTimeButtonPushed(src, event)
 
     % --- tracked targets ---
     plot(tt.x_map(t1_tt:tend_tt,1:tt.max_opp),tt.y_map(t1_tt:tend_tt,1:tt.max_opp),'Color',col.tt,'HandleVisibility','off');
-    plot_tt(NaN,NaN,1,col.tt,'tt');
+    plot_tt(NaN,NaN,1,col.tt,name1);
 
     if compare
         plot(tt2.x_map(t1_tt2:tend_tt2,1:tt2.max_opp),tt2.y_map(t1_tt2:tend_tt2,1:tt2.max_opp),'Color',col.tt2,'HandleVisibility','off');

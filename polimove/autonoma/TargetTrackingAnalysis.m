@@ -164,7 +164,7 @@ axes(f) = nexttile([1,1]);
 f=f+1;
 hold on;
 scatter(repmat(v2v.sens_stamp,v2v.max_opp,1), reshape(v2v.x_rel(:,1:v2v.max_opp), [], 1), sz.^2, col.v2v, 'filled', 'DisplayName','v2v');
-plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.x_rel(:,1:tt.max_opp), [], 1), 'Color',col.tt,'DisplayName','tt');
+plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.x_rel(:,1:tt.max_opp), [], 1), 'Color',col.tt,'DisplayName',name1);
 if(use_ref)
     plot(tt.stamp_ref, tt.x_rel_ref, 'Color',col.ref,'DisplayName','gt');
 end
@@ -177,7 +177,7 @@ axes(f) = nexttile([1,1]);
 f=f+1;
 hold on;
 scatter(repmat(v2v.sens_stamp,v2v.max_opp,1), reshape(v2v.y_rel(:,1:v2v.max_opp), [], 1), sz.^2, col.v2v, 'filled', 'DisplayName','v2v');
-plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.y_rel(:,1:tt.max_opp), [], 1), 'Color',col.tt,'DisplayName','tt');
+plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.y_rel(:,1:tt.max_opp), [], 1), 'Color',col.tt,'DisplayName',name1);
 if(use_ref)
     plot(tt.stamp_ref, tt.y_rel_ref, 'Color',col.ref,'DisplayName','gt');
 end
@@ -189,7 +189,7 @@ legend
 axes(f) = nexttile([1,2]);
 f=f+1;
 hold on;
-plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.rho_dot(:,1:tt.max_opp), [], 1), 'Color',col.tt,'DisplayName','tt');
+plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.rho_dot(:,1:tt.max_opp), [], 1), 'Color',col.tt,'DisplayName',name1);
 if(use_ref)
     plot(tt.stamp_ref, tt.rho_dot_ref, 'Color',col.ref,'DisplayName','gt');
 end
@@ -216,7 +216,7 @@ axes(f) = nexttile([1,1]);
 f=f+1;
 hold on;
 scatter(repmat(v2v.sens_stamp,v2v.max_opp,1), reshape(v2v.x_map(:,1:v2v.max_opp), [], 1), sz.^2, col.v2v, 'filled', 'DisplayName','v2v');
-plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.x_map(:,1:tt.max_opp), [], 1), 'Color', col.tt, 'DisplayName','tt');
+plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.x_map(:,1:tt.max_opp), [], 1), 'Color', col.tt, 'DisplayName',name1);
 if(use_ref)
     plot(tt.stamp_ref,tt.x_map_ref,'Color',col.ref,'DisplayName','gt');
 end
@@ -229,7 +229,7 @@ axes(f) = nexttile([1,1]);
 f=f+1;
 hold on;
 scatter(repmat(v2v.sens_stamp,v2v.max_opp,1), reshape(v2v.y_map(:,1:v2v.max_opp), [], 1), sz.^2, col.v2v, 'filled', 'DisplayName','v2v');
-plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.y_map(:,1:tt.max_opp), [], 1), 'Color', col.tt, 'DisplayName','tt');
+plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.y_map(:,1:tt.max_opp), [], 1), 'Color', col.tt, 'DisplayName',name1);
 if(use_ref)
     plot(tt.stamp_ref,tt.y_map_ref,'Color',col.ref,'DisplayName','gt');
 end
@@ -242,7 +242,7 @@ axes(f) = nexttile([1,1]);
 f=f+1;
 hold on;
 scatter(repmat(v2v.sens_stamp,v2v.max_opp,1), reshape(v2v.vx_map(:,1:v2v.max_opp), [], 1), sz.^2, col.v2v, 'filled', 'DisplayName','v2v');
-plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.vx(:,1:tt.max_opp), [], 1), 'Color', col.tt, 'DisplayName','tt');
+plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.vx(:,1:tt.max_opp), [], 1), 'Color', col.tt, 'DisplayName',name1);
 if(use_ref)
     plot(tt.stamp_ref,tt.vx_ref,'Color',col.ref,'DisplayName','gt');
 end
@@ -254,7 +254,7 @@ legend
 axes(f) = nexttile([1,1]);
 f=f+1;
 hold on;
-plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.ax(:,1:tt.max_opp), [], 1), 'Color', col.tt, 'DisplayName','tt');
+plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.ax(:,1:tt.max_opp), [], 1), 'Color', col.tt, 'DisplayName',name1);
 grid on;
 ylabel('ax [m/s$^2$]');
 legend
@@ -264,7 +264,7 @@ axes(f) = nexttile([1,2]);
 f=f+1;
 hold on;
 scatter(repmat(v2v.sens_stamp,v2v.max_opp,1), reshape(v2v.yaw_map(:,1:v2v.max_opp), [], 1), sz.^2, col.v2v, 'filled', 'DisplayName','v2v');
-plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.yaw_map(:,1:tt.max_opp), [], 1), 'Color', col.tt, 'DisplayName','tt');
+plot(repmat(tt.stamp,tt.max_opp, 1), reshape(tt.yaw_map(:,1:tt.max_opp), [], 1), 'Color', col.tt, 'DisplayName',name1);
 if(use_ref)
     plot(tt.stamp_ref,tt.yaw_map_ref,'Color',col.ref,'DisplayName','gt');
 end
@@ -287,7 +287,7 @@ function refreshTimeButtonPushed(src,event)
     use_ref = evalin('base', 'use_ref');
     col = evalin('base', 'col');
     v2v = evalin('base', 'v2v');
-    tt=evalin('base','tt');
+    tt=evalin('base',name1);
 
     t_lim=xlim(axes(1));
     t1_v2v = find(v2v.sens_stamp>t_lim(1),1);
