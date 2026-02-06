@@ -16,7 +16,7 @@ addpath("../../../../common/constants/")
 addpath("../../../common/plot/")
 addpath("../../../../common/graphic_tools/")
 addpath("../../utils/")
-addpath("plot/")
+addpath("func/")
 addpath("figs/")
 normal_path = "../../../bags";
 opp_dir = "../../opponent_gps/mat/";
@@ -38,6 +38,7 @@ if (~exist('log','var'))
     [file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load log');
     load(fullfile(path,file));
 end
+name1 = 'tt';
 
 % load log 2
 if(compare)
@@ -51,7 +52,7 @@ if(compare)
         clearvars tmp;
         end
     end
-    name2 = 'tt old';
+    name2 = 'old tuning';
 end
 
 % load log ref
@@ -108,7 +109,7 @@ state_map;
 state_cog;
 range;
 speed_acc;
-covariance;
+% covariance;
 map;
 imm;
 

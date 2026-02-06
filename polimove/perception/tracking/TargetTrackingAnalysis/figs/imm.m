@@ -13,18 +13,18 @@ end
 
 % vx
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot(repmat(tt.stamp,tt.max_opp, 1),tt.vx(:,1:tt.max_opp),'Color',col.tt,'DisplayName','tt');
+plot(repmat(tt.stamp,tt.max_opp, 1),tt.vx(:,1:tt.max_opp),'Color',col.tt,'DisplayName',name1);
 if(use_ref || use_sim_ref); plot(gt.stamp,gt.vx,'Color',col.ref,'DisplayName','ref'); end
-if(compare); plot(repmat(tt2.stamp,tt2.max_opp, 1),tt2.vx(:,1:tt2.max_opp),'Color',col.tt2,'DisplayName','tt'); end
+if(compare); plot(repmat(tt2.stamp,tt2.max_opp, 1),tt2.vx(:,1:tt2.max_opp),'Color',col.tt2,'DisplayName',name2); end
 grid on;
 ylabel('vx [m/s]');
 legend
 
 % ax
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot(repmat(tt.stamp,tt.max_opp, 1),tt.ax(:,1:tt.max_opp),'Color',col.tt,'DisplayName','tt');
+plot(repmat(tt.stamp,tt.max_opp, 1),tt.ax(:,1:tt.max_opp),'Color',col.tt,'DisplayName',name1);
 if(use_sim_ref); plot(gt.stamp,gt.ax,'Color',col.ref,'DisplayName','ref'); end
-if(compare); plot(repmat(tt2.stamp,tt2.max_opp, 1),tt2.ax(:,1:tt2.max_opp),'Color',col.tt2,'DisplayName','tt'); end
+if(compare); plot(repmat(tt2.stamp,tt2.max_opp, 1),tt2.ax(:,1:tt2.max_opp),'Color',col.tt2,'DisplayName',name2); end
 grid on; ylabel('ax [m/s$^2$]'); legend
 
 axes(f) = nexttile([1,1]); f=f+1; hold on;

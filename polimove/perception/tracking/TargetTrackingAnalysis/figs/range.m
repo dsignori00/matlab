@@ -11,7 +11,7 @@ for i = 1:numel(sensors)
 end
 
 tt.range = sqrt(tt.x_rel.^2 + tt.y_rel.^2);
-plot_tt(tt.stamp, tt.range, tt.max_opp, col.tt, 'tt');
+plot_tt(tt.stamp, tt.range, tt.max_opp, col.tt, name1);
 
 if(compare) 
     tt2.range = sqrt(tt2.x_rel.^2 + tt2.y_rel.^2);
@@ -27,7 +27,7 @@ grid on; ylabel('range [m]'); ylim([0 200]); legend show;
 % rho dot
 axes(f) = nexttile([1,1]); f=f+1; hold on;
 plot_detections(rad_clust.sens_stamp, rad_clust.rho_dot, rad_clust.max_det, col.radar, 'Rad Clust');
-plot_tt(tt.stamp, tt.rho_dot, tt.max_opp, col.tt, 'tt');
+plot_tt(tt.stamp, tt.rho_dot, tt.max_opp, col.tt, name1);
 if(compare); plot_tt(tt2.stamp, tt2.rho_dot, tt2.max_opp, col.tt2, name2); end
 if(use_ref || use_sim_ref); plot(gt.stamp, gt.rho_dot, 'Color',col.ref,'DisplayName','gt'); end
 grid on; ylabel('rho dot [m/s]'); legend show;
