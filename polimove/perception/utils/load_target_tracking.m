@@ -14,17 +14,19 @@ function tt = load_target_tracking(log)
         tt.x_map = log.perception__opponents.opponents__x_geom;
         tt.y_map = log.perception__opponents.opponents__y_geom;
         tt.vx = log.perception__opponents.opponents__vx;
-        tt.ax = log.perception__opponents.opponents__ax;
         tt.yaw_map = log.perception__opponents.opponents__psi;
+        tt.yaw_rate = log.perception__opponents.opponents__yaw_rate;
+        tt.ax = log.perception__opponents.opponents__ax;
         tt.covariance = valid_covariance(log.perception__opponents.opponents__ekf_p);
         tt.count = log.perception__opponents.count;
         tt.max_opp = max(tt.count);
         tt.x_map(tt.x_map==0)=nan;
         tt.y_map(tt.y_map==0)=nan;
         tt.vx(tt.vx==0)=nan;
-        tt.ax(tt.ax==0)=nan;
         tt.yaw_map(tt.yaw_map==0)=nan;
-        % associated measurea
+        tt.yaw_rate(tt.yaw_rate==0)=nan;
+        tt.ax(tt.ax==0)=nan;
+        % associated measures
         if isfield(log.perception__opponents,"opponents__meas_count")
             tt.measures.count = log.perception__opponents.opponents__meas_count;
             tt.measures.source = log.perception__opponents.opponents__meas_source_type;

@@ -118,7 +118,7 @@ for k = 1:size(sensor_list,1)
     
     idx = (source_vec == type.Value);   % logical vector
     [unique_stamps, ia] = unique(tt.stamp);
-    unique_cov = sqrt(tt.covariance(ia,opp_idx,25));
+    unique_cov = sqrt(tt.covariance(ia,opp_idx,22));
     sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
     plot(stamp_vec(idx), rad2deg(sensor_points.(name)), 'o', ...
@@ -128,12 +128,12 @@ for k = 1:size(sensor_list,1)
         'DisplayName', strrep(name,'_',' '));  % nicer display
     hold on
 end
-plot(tt.stamp,rad2deg(sqrt(tt.covariance(:,opp_idx, 25))),'Color',col.tt,'DisplayName','track');
+plot(tt.stamp,rad2deg(sqrt(tt.covariance(:,opp_idx, 22))),'Color',col.tt,'DisplayName','track');
 grid on; ylabel('yaw map [deg]'); legend show; xlabel('timestamp [s]');
 
 
 figure('name', 'Covariance - Speed Acc');
-tiledlayout(2,1,'Padding','compact');
+tiledlayout(3,1,'Padding','compact');
 
 % speed
 axes(f) = nexttile([1,1]); f=f+1; hold on;
@@ -145,7 +145,7 @@ for k = 1:size(sensor_list,1)
     
     idx = (source_vec == type.Value);   % logical vector
     [unique_stamps, ia] = unique(tt.stamp);
-    unique_cov = sqrt(tt.covariance(ia,opp_idx,13));
+    unique_cov = sqrt(tt.covariance(ia,opp_idx,15));
     sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
     plot(stamp_vec(idx), sensor_points.(name), 'o', ...
@@ -155,7 +155,7 @@ for k = 1:size(sensor_list,1)
         'DisplayName', strrep(name,'_',' '));  % nicer display
     hold on
 end
-plot(tt.stamp,sqrt(tt.covariance(:,opp_idx, 13)),'Color',col.tt,'DisplayName','track');
+plot(tt.stamp,sqrt(tt.covariance(:,opp_idx, 15)),'Color',col.tt,'DisplayName','track');
 grid on; ylabel('speed [m/s]'); legend show;
 
 
@@ -169,7 +169,7 @@ for k = 1:size(sensor_list,1)
     
     idx = (source_vec == type.Value);   % logical vector
     [unique_stamps, ia] = unique(tt.stamp);
-    unique_cov = sqrt(tt.covariance(ia,opp_idx,19));
+    unique_cov = sqrt(tt.covariance(ia,opp_idx,36));
     sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
     plot(stamp_vec(idx), sensor_points.(name), 'o', ...
@@ -179,8 +179,31 @@ for k = 1:size(sensor_list,1)
         'DisplayName', strrep(name,'_',' '));  % nicer display
     hold on
 end
-plot(tt.stamp,sqrt(tt.covariance(:,opp_idx, 19)),'Color',col.tt,'DisplayName','track');
-grid on; ylabel('acc [m/s$^2$]'); legend show; xlabel('timestamp [s]');
+plot(tt.stamp,sqrt(tt.covariance(:,opp_idx, 36)),'Color',col.tt,'DisplayName','track');
+grid on; ylabel('acc [m/s$^2$]'); legend show; 
+
+% yaw rate
+axes(f) = nexttile([1,1]); f=f+1; hold on;
+% --- Loop over each sensor type ---
+for k = 1:size(sensor_list,1)
+    name = sensor_list{k,1};
+    type = sensor_list{k,2};
+    color = sensor_list{k,3};
+    
+    idx = (source_vec == type.Value);   % logical vector
+    [unique_stamps, ia] = unique(tt.stamp);
+    unique_cov = sqrt(tt.covariance(ia,opp_idx,29));
+    sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
+
+    plot(stamp_vec(idx), rad2deg(sensor_points.(name)), 'o', ...
+        'MarkerFaceColor', color, ...
+        'MarkerEdgeColor', color, ...
+        'MarkerSize', sz + size(sensor_list,1) - k, ...
+        'DisplayName', strrep(name,'_',' '));  % nicer display
+    hold on
+end
+plot(tt.stamp,rad2deg(sqrt(tt.covariance(:,opp_idx, 29))),'Color',col.tt,'DisplayName','track');
+grid on; ylabel('yaw rate [deg/s]'); legend show;xlabel('timestamp [s]');
 
 
 %% Association Figure
