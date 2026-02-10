@@ -37,7 +37,7 @@ sensor_list = { ...
 %% Time series figure
 
 
-figure('name', 'Covariance - Positions');
+figure('name', 'Covariance - Positions', 'NumberTitle', 'off');
 tiledlayout(3,1,'Padding','compact');
 sensor_points = struct();
 
@@ -132,7 +132,7 @@ plot(tt.stamp,rad2deg(sqrt(tt.covariance(:,opp_idx, 22))),'Color',col.tt,'Displa
 grid on; ylabel('yaw map [deg]'); legend show; xlabel('timestamp [s]');
 
 
-figure('name', 'Covariance - Speed Acc');
+figure('name', 'Covariance - Speed Acc', 'NumberTitle', 'off');
 tiledlayout(3,1,'Padding','compact');
 
 % speed
@@ -211,7 +211,7 @@ grid on; ylabel('yaw rate [deg/s]'); legend show;xlabel('timestamp [s]');
 
 %%% Select time portion on any plots, click refresh, use arrows to show
 %%% each iteration in the selected range
-assFig = figure('name', 'Covariance - Association');
+assFig = figure('name', 'Covariance - Association', 'NumberTitle', 'off');
 set(assFig,'KeyPressFcn',@keyPressed);   
 
 % Axes for map (left side)

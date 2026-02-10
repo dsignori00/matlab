@@ -1,9 +1,10 @@
 close all
-clearvars -except log log_2 log_ref trajDatabase
+clearvars -except log log_2 log_3 log_ref trajDatabase
 
 use_ref     = true;
 use_sim_ref = false;
 compare     = true;
+compare2    = true;
 
 opp_idx     = 1;
 err_thr     = 10;
@@ -58,6 +59,21 @@ if(compare)
     name2 = 'ctra';
 end
 
+% load log 3
+if(compare2)
+    if (~exist('log_3','var'))
+        [file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load log_3');
+        if isequal(file, 0)  
+        disp('User canceled file selection.');
+        else
+        tmp = load(fullfile(path,file));
+        log_3 = tmp.log;
+        clearvars tmp;
+        end
+    end
+    name3 = 'ctrv';
+end
+
 % load log ref
 if(use_ref)
     if  (~exist('log_ref','var'))
@@ -82,6 +98,7 @@ col.pp = colors.orange{2};
 % col.tt2          = colors.blue{1};
 col.tt = colors.matlab{1};
 col.tt2 = colors.matlab{2};
+col.tt3 = colors.matlab{3};
 col.ref          = colors.black;
 sz=3; % Marker size
 f=1;
@@ -100,6 +117,12 @@ if(compare)
     tt2.col = col.tt2;
     tt2.name = name2;
 end
+if(compare2)
+    tt3 = load_target_tracking(log_3); 
+    tt3.stamp = tt3.stamp + double(log_3.time_offset_nsec-log.time_offset_nsec)*1e-9;
+    tt3.col = col.tt3;
+    tt3.name = name3;
+end
 
 cam_yolo.sens_stamp(cam_yolo.sens_stamp < 0) = NaN;
 
@@ -114,6 +137,9 @@ if(use_ref || use_sim_ref)
     errors = process_states(gt, tt, err_thr, err_stats);
     if(compare)
         errors2 = process_states(gt, tt2, err_thr, err_stats);
+    end
+    if(compare2)
+        errors3 = process_states(gt, tt3, err_thr, err_stats);
     end
 end
 
