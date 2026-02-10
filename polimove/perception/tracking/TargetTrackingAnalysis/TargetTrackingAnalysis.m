@@ -1,10 +1,11 @@
 close all
 clearvars -except log log_2 log_ref trajDatabase
 
-use_ref     = false;
+use_ref     = true;
 use_sim_ref = false;
 compare     = false;
 opp_idx     = 1;
+err_thr     = 10;
 
 %#ok<*UNRCH>
 %#ok<*INUSD>
@@ -80,15 +81,20 @@ col.tt2          = colors.blue{1};
 col.ref          = colors.black;
 sz=3; % Marker size
 f=1;
+c = 0;
 x_lim = [0 inf];
 
 %% PARSING
 
 [lid_clust, rad_clust, cam_yolo, lid_pp, gt] = load_perception(log, use_sim_ref, use_ref, log_ref);
 tt = load_target_tracking(log);
+tt.col = col.tt;
+tt.name = name1;
 if(compare) 
     tt2 = load_target_tracking(log_2); 
     tt2.stamp = tt2.stamp + double(log_2.time_offset_nsec-log.time_offset_nsec)*1e-9;
+    tt2.col = col.tt2;
+    tt2.name = name2;
 end
 
 cam_yolo.sens_stamp(cam_yolo.sens_stamp < 0) = NaN;
@@ -100,6 +106,10 @@ sensors = { ...
     struct('s', lid_pp,    'col', col.pp, 'name', 'Lid PP') ...
 };
 
+if(use_ref || use_sim_ref)
+    errors = process_states(gt, tt, err_thr);
+end
+
 %% PLOTTING
 
 info;
@@ -109,8 +119,9 @@ state_map;
 state_cog;
 range;
 speed_acc;
-% covariance;
 map;
+% covariance;
+error_analysis;
 imm;
 
 linkaxes(axes,'x')
