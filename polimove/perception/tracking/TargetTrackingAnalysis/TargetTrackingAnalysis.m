@@ -7,7 +7,7 @@ compare     = true;
 
 opp_idx     = 1;
 err_thr     = 10;
-err_stats = {'yaw_map','vx'};
+err_stats = {'yaw_map','vx','ax'};
 
 %#ok<*UNRCH>
 %#ok<*INUSD>
@@ -78,8 +78,10 @@ col.lidar        = colors.green{2};
 col.radar        = [77 190 238] / 255;
 col.camera       = colors.yellow{2};
 col.pp = colors.orange{2};
-col.tt           = colors.blue{2};
-col.tt2          = colors.blue{1};
+% col.tt           = colors.blue{2};
+% col.tt2          = colors.blue{1};
+col.tt = colors.matlab{1};
+col.tt2 = colors.matlab{2};
 col.ref          = colors.black;
 sz=3; % Marker size
 f=1;
@@ -109,11 +111,12 @@ sensors = { ...
 };
 
 if(use_ref || use_sim_ref)
-    errors = process_states(gt, tt, err_thr);
+    errors = process_states(gt, tt, err_thr, err_stats);
     if(compare)
-        errors2 = process_states(gt, tt2, err_thr);
+        errors2 = process_states(gt, tt2, err_thr, err_stats);
     end
 end
+
 
 %% PLOTTING
 

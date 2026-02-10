@@ -21,7 +21,9 @@
 % z_rel                     % z in car reference frame 
 % yaw_rel                   % relative yaw between ego and opp car 
 % speed                     % opp speed
-% calculated speed          % true if speed calculated from gps pos measures
+% ax                        % longitudinal acceleration
+% calculated_speed          % true if speed calculated from gps pos measures
+% calculated_acceleration   % true if acceleration derived from speed
 % rho                       % distance from opponent (range)
 % rho_dot                   % range rate (relative speed)
 % clos_idx                  % traj server closest idx
@@ -229,6 +231,11 @@ freq = 1./diff;
 avg_freq = mean(freq)*10^9;
 out.bag_avg_freq = avg_freq;
 
+% acceleration
+if ~isfield(out,'ax') || all(isnan(out.ax))
+    out.ax = sgolayfilt(gradient(out.speed(:)) ./ gradient(out.timestamp(:))*10^9, 3, 21);
+    out.calculated_acceleration = true;
+end
 
 %% Ego
 ego_bag_timestamp = (ego.estimation.bag_stamp)*10^9+double(ego.time_offset_nsec);
