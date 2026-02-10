@@ -3,9 +3,11 @@ clearvars -except log log_2 log_ref trajDatabase
 
 use_ref     = true;
 use_sim_ref = false;
-compare     = false;
+compare     = true;
+
 opp_idx     = 1;
 err_thr     = 10;
+err_stats = {'yaw_map','vx'};
 
 %#ok<*UNRCH>
 %#ok<*INUSD>
@@ -39,7 +41,7 @@ if (~exist('log','var'))
     [file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load log');
     load(fullfile(path,file));
 end
-name1 = 'tt';
+name1 = 'cca';
 
 % load log 2
 if(compare)
@@ -53,7 +55,7 @@ if(compare)
         clearvars tmp;
         end
     end
-    name2 = 'old tuning';
+    name2 = 'ctra';
 end
 
 % load log ref
@@ -108,6 +110,9 @@ sensors = { ...
 
 if(use_ref || use_sim_ref)
     errors = process_states(gt, tt, err_thr);
+    if(compare)
+        errors2 = process_states(gt, tt2, err_thr);
+    end
 end
 
 %% PLOTTING
