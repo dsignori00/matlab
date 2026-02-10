@@ -160,6 +160,12 @@ elseif exist('use_ref','var') && use_ref
     gt.z_map   = log_ref.z_map;
     gt.vx      = log_ref.speed;
     gt.yaw_map = log_ref.yaw_map;
+    if ~isfield(log_ref,'ax')
+        gt.ax = sgolayfilt(gradient(log_ref.speed(:)) ./ gradient(log_ref.timestamp(:))*10^9, 3, 101);
+    else
+        gt.ax = log_ref.ax;
+    end
+
 end
 
 
