@@ -4,7 +4,7 @@ clearvars -except log log_2 log_3 log_ref trajDatabase
 use_ref     = true;
 use_sim_ref = false;
 compare     = true;
-compare2    = true;
+compare2    = false;
 
 opp_idx     = 1;
 err_thr     = 10;
@@ -90,16 +90,14 @@ DateTime = datetime(log.time_offset_nsec,'ConvertFrom','epochtime','TicksPerSeco
 
 %% NAMING
 graphics_options;
-col.lidar        = colors.green{2};
-col.radar        = [77 190 238] / 255;
-col.camera       = colors.yellow{2};
-col.pp = colors.orange{2};
-% col.tt           = colors.blue{2};
-% col.tt2          = colors.blue{1};
-col.tt = colors.matlab{1};
-col.tt2 = colors.matlab{2};
-col.tt3 = colors.matlab{3};
-col.ref          = colors.black;
+col.lidar   = colors.green{2};
+col.radar   = [77 190 238] / 255;
+col.camera  = colors.yellow{2};
+col.pp      = colors.orange{2};
+col.tt      = colors.matlab{1};
+col.tt2     = colors.matlab{2};
+col.tt3     = colors.matlab{3};
+col.ref     = colors.black;
 sz=3; % Marker size
 f=1;
 c = 0;
