@@ -34,12 +34,25 @@ function refreshErrorSummaryButtonPushed(~,~)
     % time window from reference axis
     t_lim = xlim(ax_ref(1));
     [t1, tend] = timeWindowIdx(tt.stamp, t_lim);
-
     time = false(size(tt.stamp));
     time(t1:tend) = true;
-
     ass = hypot(errors.x_map_err, errors.y_map_err) < err_thr;
     errors.idx = ass & time;
+
+    if(compare)
+        [t1_2, tend_2] = timeWindowIdx(tt2.stamp, t_lim);
+        time = false(size(tt2.stamp));
+        time(t1_2:tend_2) = true;
+        ass = hypot(errors2.x_map_err, errors2.y_map_err) < err_thr;
+        errors2.idx = ass & time;
+    end
+    if(compare2)
+        [t1_3, tend_3] = timeWindowIdx(tt3.stamp, t_lim);
+        time = false(size(tt3.stamp));
+        time(t1_3:tend_3) = true;
+        ass = hypot(errors3.x_map_err, errors3.y_map_err) < err_thr;
+        errors3.idx = ass & time;
+    end
 
     for l = stats
         err = errors.([l{1} '_err']);
@@ -47,15 +60,62 @@ function refreshErrorSummaryButtonPushed(~,~)
         errors.([l{1} '_mean']) = mean(err(errors.idx));
         if(compare)
             err2 = errors2.([l{1} '_err']);
-            errors2.([l{1} '_std'])  = std(err2(errors.idx));
-            errors2.([l{1} '_mean']) = mean(err2(errors.idx));
+            errors2.([l{1} '_std'])  = std(err2(errors2.idx));
+            errors2.([l{1} '_mean']) = mean(err2(errors2.idx));
         end
         if(compare2)
             err3 = errors3.([l{1} '_err']);
-            errors3.([l{1} '_std'])  = std(err3(errors.idx));
-            errors3.([l{1} '_mean']) = mean(err3(errors.idx));
+            errors3.([l{1} '_std'])  = std(err3(errors3.idx));
+            errors3.([l{1} '_mean']) = mean(err3(errors3.idx));
         end
     end
+
+    fprintf('\n');
+    fprintf('====================================================================================================\n');
+    
+    % Header
+    fprintf('%-15s | ', 'Algorithm');
+    for i = 1:numel(stats)
+        fprintf('%-25s', stats{i});
+    end
+    fprintf('\n');
+    fprintf('====================================================================================================\n');
+    
+    % -------- BASE --------
+    fprintf('%-15s | ', tt.name);
+    for i = 1:numel(stats)
+        name = stats{i};
+        m = errors.([name '_mean']);
+        s = errors.([name '_std']);
+        fprintf('%-25s', sprintf('%.6f ± %.6f', m, s));
+    end
+    fprintf('\n');
+    
+    % -------- COMPARE 1 --------
+    if compare
+        fprintf('%-15s | ', tt2.name);
+        for i = 1:numel(stats)
+            name = stats{i};
+            m = errors2.([name '_mean']);
+            s = errors2.([name '_std']);
+            fprintf('%-25s', sprintf('%.6f ± %.6f', m, s));
+        end
+        fprintf('\n');
+    end
+    
+    % -------- COMPARE 2 --------
+    if compare2
+        fprintf('%-15s | ', tt3.name);
+        for i = 1:numel(stats)
+            name = stats{i};
+            m = errors3.([name '_mean']);
+            s = errors3.([name '_std']);
+            fprintf('%-25s', sprintf('%.6f ± %.6f', m, s));
+        end
+        fprintf('\n');
+    end
+    
+    fprintf('====================================================================================================\n');
 
     [errors.x_ellipse, errors.y_ellipse] = calculate_ellipse( ...
         errors.x_rel_std, errors.y_rel_std, ...
@@ -150,7 +210,7 @@ function refreshErrorSummaryButtonPushed(~,~)
                 'DisplayName', tt.name);
 
         if compare
-            histogram(ax_hist(k), errors2.([l{1} '_err'])(errors.idx), ...
+            histogram(ax_hist(k), errors2.([l{1} '_err'])(errors2.idx), ...
                 'Normalization','pdf', ...
                 'FaceColor', tt2.col, ...
                 'DisplayName', tt2.name);
@@ -158,7 +218,7 @@ function refreshErrorSummaryButtonPushed(~,~)
         end
 
         if compare2
-            histogram(ax_hist(k), errors3.([l{1} '_err'])(errors.idx), ...
+            histogram(ax_hist(k), errors3.([l{1} '_err'])(errors3.idx), ...
                 'Normalization','pdf', ...
                 'FaceColor', tt3.col, ...
                 'DisplayName', tt3.name);
