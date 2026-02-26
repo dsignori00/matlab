@@ -159,18 +159,9 @@ elseif exist('use_ref','var') && use_ref
     gt.y_map   = log_ref.y_map;
     gt.z_map   = log_ref.z_map;
     gt.vx      = log_ref.speed;
+    gt.ax      = log_ref.ax;
     gt.yaw_map = log_ref.yaw_map;
-    if ~isfield(log_ref,'ax')
-        gt.ax = sgolayfilt(gradient(log_ref.speed(:)) ./ gradient(log_ref.timestamp(:))*10^9, 3, 101);
-    else
-        gt.ax = log_ref.ax;
-    end
-    if ~isfield(log_ref,'yaw_rate')
-        gt.yaw_rate = sgolayfilt(gradient(log_ref.yaw_map(:)) ./ gradient(log_ref.timestamp(:))*10^9, 3, 101);
-    else
-        gt.yaw_rate = log_ref.yaw_rate;
-    end
-
+    gt.yaw_rate = log_ref.yaw_rate;
 end
 
 
