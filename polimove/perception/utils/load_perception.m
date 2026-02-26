@@ -165,6 +165,11 @@ elseif exist('use_ref','var') && use_ref
     else
         gt.ax = log_ref.ax;
     end
+    if ~isfield(log_ref,'yaw_rate')
+        gt.yaw_rate = sgolayfilt(gradient(log_ref.yaw_map(:)) ./ gradient(log_ref.timestamp(:))*10^9, 3, 101);
+    else
+        gt.yaw_rate = log_ref.yaw_rate;
+    end
 
 end
 

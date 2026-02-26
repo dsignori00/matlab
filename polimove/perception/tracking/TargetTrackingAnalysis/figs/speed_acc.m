@@ -20,7 +20,8 @@ grid on; ylabel('ax [m/s$^2$]'); legend show;
 
 % yaw rate
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot_tt(tt.stamp, (tt.yaw_rate), tt.max_opp, col.tt, name1);
-if(compare); plot_tt(tt2.stamp, (tt2.yaw_rate), tt2.max_opp, col.tt2, name2); end
-if(compare2); plot_tt(tt3.stamp, (tt3.yaw_rate), tt3.max_opp, col.tt3, name3); end
+plot_tt(tt.stamp, rad2deg(tt.yaw_rate), tt.max_opp, col.tt, name1);
+if(compare); plot_tt(tt2.stamp, rad2deg(tt2.yaw_rate), tt2.max_opp, col.tt2, name2); end
+if(compare2); plot_tt(tt3.stamp, rad2deg(tt3.yaw_rate), tt3.max_opp, col.tt3, name3); end
+if(use_sim_ref || use_ref); plot(gt.stamp,rad2deg(gt.yaw_rate),'Color',col.ref,'DisplayName','gt'); end
 grid on; ylabel('yaw rate [deg/s]'); legend show; xlabel('timestamp [s]');
