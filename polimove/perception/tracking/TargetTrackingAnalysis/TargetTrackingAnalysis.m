@@ -3,7 +3,7 @@ clearvars -except log log_2 log_3 log_ref trajDatabase
 
 use_ref     = true;
 use_sim_ref = false;
-compare     = true;
+compare     = false;
 compare2    = false;
 
 opp_idx     = 1;
