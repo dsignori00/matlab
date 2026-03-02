@@ -20,12 +20,12 @@ function errors = process_states(gt, tt, err_thr, fields)
         errors.([l{1} '_err']) = tt.(l{1}) - gt.([l{1} '_interp']);
 
         if(strcmp(l{1}, 'yaw_map'))
-            tt.yaw_map = unwrap_angle_smart(tt.yaw_map, gt.yaw_map_interp);
+            tt.yaw_map = unwrap_angle_smart_deg(tt.yaw_map, gt.yaw_map_interp);
             errors.yaw_map_err = tt.yaw_map - gt.yaw_map_interp;
         end
 
         if(strcmp(l{1}, 'yaw_rel'))
-            tt.yaw_rel = unwrap_angle_smart(tt.yaw_rel, gt.yaw_rel_interp);
+            tt.yaw_rel = unwrap_angle_smart_deg(tt.yaw_rel, gt.yaw_rel_interp);
         end
     end
 
