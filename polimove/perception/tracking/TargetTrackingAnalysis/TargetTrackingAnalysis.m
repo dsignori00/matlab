@@ -153,7 +153,7 @@ state_cog;
 range;
 speed_acc;
 map;
-% covariance;
+covariance;
 error_analysis;
 imm;
 dataset_analysis;

@@ -49,9 +49,9 @@ cov_xy_map = zeros(2,2,N);
 cov_xy_cog = zeros(2,2,N);
 
 for i = 1:N
-    c = tt.covariance(i,opp_idx,:);
-    cov_xy_map(:,:,i) = [c(1) c(2);
-                         c(6) c(7)];
+    cov = tt.covariance(i,opp_idx,:);
+    cov_xy_map(:,:,i) = [cov(1) cov(2);
+                         cov(7) cov(8)];
 
     yaw = tt.yaw_map(i,opp_idx);
     R = [cos(yaw) -sin(yaw);
