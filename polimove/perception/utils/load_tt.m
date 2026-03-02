@@ -1,4 +1,4 @@
-function tt = load_target_tracking(log)
+function tt = load_tt(log)
     if isfield(log, "perception__opponents")
         tt.stamp = log.perception__opponents.stamp__tot;
         % relative

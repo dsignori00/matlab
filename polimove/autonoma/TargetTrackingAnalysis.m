@@ -97,9 +97,9 @@ v2v.yaw_map(v2v.yaw_map==0)=nan;
 v2v.vx_map(v2v.vx_map==0)=nan;
 v2v.yaw_map = unwrap(v2v.yaw_map);
 
-tt = load_target_tracking(log);
+tt = load_tt(log);
 if(compare) 
-    tt2 = load_target_tracking(log_2); 
+    tt2 = load_tt(log_2); 
     tt2.stamp = tt2.stamp + double(log_2.time_offset_nsec-log.time_offset_nsec)*1e-9;
 end
 
