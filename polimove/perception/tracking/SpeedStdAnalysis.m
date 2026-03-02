@@ -25,7 +25,7 @@ x_lim = [0 inf];
 if (~exist('tt','var'))
     [file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load log');
     load(fullfile(path,file));
-    tt = load_target_tracking(log);
+    tt = load_tt(log);
 end
 
 % load log 2
@@ -41,7 +41,7 @@ if(compare)
         end
     end
     name2 = 'New TT';
-    tt2 = load_target_tracking(log_2);
+    tt2 = load_tt(log_2);
 
 end
 

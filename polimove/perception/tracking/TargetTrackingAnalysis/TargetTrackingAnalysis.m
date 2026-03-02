@@ -105,8 +105,9 @@ x_lim = [0 inf];
 
 %% PARSING
 
-[lid_clust, rad_clust, cam_yolo, lid_pp, gt] = load_perception(log, use_sim_ref, use_ref, log_ref);
-tt = load_target_tracking(log);
+[lid_clust, rad_clust, cam_yolo, lid_pp] = load_perception(log);
+gt = load_ref(log, use_sim_ref, use_ref, log_ref);
+tt = load_tt(log);
 tt.col = col.tt;
 tt.name = name1;
 if(compare) 
@@ -125,10 +126,10 @@ end
 cam_yolo.sens_stamp(cam_yolo.sens_stamp < 0) = NaN;
 
 sensors = { ...
-    struct('s', lid_clust, 'col', col.lidar,        'name', 'lidar'), ...
-    struct('s', lid_pp,    'col', col.pp,           'name', 'pointpillars') ...
-    struct('s', rad_clust, 'col', col.radar,        'name', 'radar'), ...
-    struct('s', cam_yolo,  'col', col.camera,       'name', 'camera'), ...
+    struct('s', lid_clust, 'col', col.lidar,   'name', 'lidar'), ...
+    struct('s', lid_pp,    'col', col.pp,      'name', 'pointpillars'), ...
+    struct('s', rad_clust, 'col', col.radar,   'name', 'radar'), ...
+    struct('s', cam_yolo,  'col', col.camera,  'name', 'camera'), ...
 };
 
 if(use_ref || use_sim_ref)
@@ -152,7 +153,7 @@ state_cog;
 range;
 speed_acc;
 map;
-% covariance;
+covariance;
 error_analysis;
 imm;
 dataset_analysis;
