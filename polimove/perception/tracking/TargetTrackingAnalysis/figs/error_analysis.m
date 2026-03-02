@@ -234,8 +234,8 @@ function refreshErrorSummaryButtonPushed(~,~)
             'Box','on');
 
         ylbl = sprintf(l{1});
-        xlbl = strrep(ylbl, '_', ' ');
-        xlabel(ax_hist(k), xlbl)
+        ylbl = strrep(ylbl, '_', ' ');
+        ylabel(ax_hist(k), ylbl)
     end
     title(ax_hist(1),'Error Distribution - PDF')
 
