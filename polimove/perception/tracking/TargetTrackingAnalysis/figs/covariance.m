@@ -53,7 +53,7 @@ for i = 1:N
     cov_xy_map(:,:,i) = [cov(1) cov(2);
                          cov(7) cov(8)];
 
-    yaw = tt.yaw_map(i,opp_idx);
+    yaw = deg2rad(tt.yaw_map(i,opp_idx));
     R = [cos(yaw) -sin(yaw);
          sin(yaw)  cos(yaw)];
 
