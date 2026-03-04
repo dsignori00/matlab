@@ -24,4 +24,8 @@ function P = valid_covariance(in)
     P2(reshape(bad, [], 1), :) = NaN;
     P = reshape(P2, size(P));
 
+    temp = P(:,:,29);
+    temp(temp == 10) = NaN;
+    P(:,:,29) = temp;
+
 end
