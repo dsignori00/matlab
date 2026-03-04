@@ -19,7 +19,7 @@ if(opp_idx > tt.max_opp)
 end
 
 % gating distance
-dist = 10;  % [m]
+dist = 5;  % [m]
 
 % measurement matrices
 R.lidar         = diag([0.7 0.7]);   % [m^2]
@@ -369,7 +369,7 @@ function drawCurrentSample()
         scatter(x(j), y(j), 'filled', 'MarkerFaceColor',S.col.tt, 'DisplayName','track');
         
         % state covariance - NB: approximation, should predict back to measure time
-        sigma = reshape(S.tt.covariance(i,j,:), 5, 5);
+        sigma = reshape(S.tt.covariance(i,j,:), 6, 6);
         [xc, yc] = covariance_ellipse(sigma(1:2,1:2), [x(j); y(j)], 1);  % ellisse 1-sigma
         patch(xc, yc, S.col.tt, ...
             'FaceAlpha', 0.3, ...

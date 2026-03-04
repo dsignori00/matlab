@@ -42,7 +42,7 @@ if (~exist('log','var'))
     [file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load log');
     load(fullfile(path,file));
 end
-name1 = 'cca';
+name1 = 'new';
 
 % load log 2
 if(compare)
@@ -56,7 +56,7 @@ if(compare)
         clearvars tmp;
         end
     end
-    name2 = 'ctra';
+    name2 = 'old';
 end
 
 % load log 3
@@ -71,7 +71,7 @@ if(compare2)
         clearvars tmp;
         end
     end
-    name3 = 'ctrv';
+    name3 = '';
 end
 
 % load log ref
@@ -111,13 +111,13 @@ tt = load_tt(log);
 tt.col = col.tt;
 tt.name = name1;
 if(compare) 
-    tt2 = load_target_tracking(log_2); 
+    tt2 = load_tt(log_2); 
     tt2.stamp = tt2.stamp + double(log_2.time_offset_nsec-log.time_offset_nsec)*1e-9;
     tt2.col = col.tt2;
     tt2.name = name2;
 end
 if(compare2)
-    tt3 = load_target_tracking(log_3); 
+    tt3 = load_tt(log_3); 
     tt3.stamp = tt3.stamp + double(log_3.time_offset_nsec-log.time_offset_nsec)*1e-9;
     tt3.col = col.tt3;
     tt3.name = name3;

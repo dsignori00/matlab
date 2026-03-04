@@ -27,6 +27,9 @@ function tt = load_tt(log)
         if isfield(log.perception__opponents,"opponents__yaw_rate")
             tt.yaw_rate = rad2deg(log.perception__opponents.opponents__yaw_rate);
             tt.yaw_rate(tt.yaw_rate==0)=nan;
+        elseif isfield(log.perception__opponents,"opponents__psi_dot")
+            tt.yaw_rate = rad2deg(log.perception__opponents.opponents__psi_dot);
+            tt.yaw_rate(tt.yaw_rate==0)=nan;
         end
         % associated measures
         if isfield(log.perception__opponents,"opponents__meas_count")
