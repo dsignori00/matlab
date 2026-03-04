@@ -4,7 +4,7 @@ if ~isfield(tt,'opponents__ctra_prob')
     return;
 end
 
-figure('name','Imm')
+figure('name','Imm', 'NumberTitle', 'off');
 tiledlayout(3,1,'Padding','compact');
 
 if(~exist('use_sim_ref','var'))

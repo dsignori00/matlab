@@ -19,7 +19,7 @@ if(opp_idx > tt.max_opp)
 end
 
 % gating distance
-dist = 10;  % [m]
+dist = 5;  % [m]
 
 % measurement matrices
 R.lidar         = diag([0.7 0.7]);   % [m^2]
@@ -37,7 +37,7 @@ sensor_list = { ...
 %% Time series figure
 
 
-figure('name', 'Covariance - Positions');
+figure('name', 'Covariance - Positions', 'NumberTitle', 'off');
 tiledlayout(3,1,'Padding','compact');
 sensor_points = struct();
 
@@ -49,15 +49,14 @@ cov_xy_map = zeros(2,2,N);
 cov_xy_cog = zeros(2,2,N);
 
 for i = 1:N
-    c = tt.covariance(i,opp_idx,:);
-    cov_xy_map(:,:,i) = [c(1) c(2);
-                         c(6) c(7)];
+    cov = tt.covariance(i,opp_idx,:);
+    cov_xy_map(:,:,i) = [cov(1) cov(2);
+                         cov(7) cov(8)];
 
-    yaw = tt.yaw_map(i,opp_idx);
+    yaw = deg2rad(tt.yaw_map(i,opp_idx));
     R = [cos(yaw) -sin(yaw);
          sin(yaw)  cos(yaw)];
-
-    cov_xy_cog(:,:,i) = R * cov_xy_map(:,:,i) * R.';
+    cov_xy_cog(:,:,i) = R.' * cov_xy_map(:,:,i) * R;
 end
 
 axes(f) = nexttile([1,1]); f=f+1; hold on;
@@ -118,7 +117,7 @@ for k = 1:size(sensor_list,1)
     
     idx = (source_vec == type.Value);   % logical vector
     [unique_stamps, ia] = unique(tt.stamp);
-    unique_cov = sqrt(tt.covariance(ia,opp_idx,25));
+    unique_cov = sqrt(tt.covariance(ia,opp_idx,22));
     sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
     plot(stamp_vec(idx), rad2deg(sensor_points.(name)), 'o', ...
@@ -128,12 +127,12 @@ for k = 1:size(sensor_list,1)
         'DisplayName', strrep(name,'_',' '));  % nicer display
     hold on
 end
-plot(tt.stamp,rad2deg(sqrt(tt.covariance(:,opp_idx, 25))),'Color',col.tt,'DisplayName','track');
+plot(tt.stamp,rad2deg(sqrt(tt.covariance(:,opp_idx, 22))),'Color',col.tt,'DisplayName','track');
 grid on; ylabel('yaw map [deg]'); legend show; xlabel('timestamp [s]');
 
 
-figure('name', 'Covariance - Speed Acc');
-tiledlayout(2,1,'Padding','compact');
+figure('name', 'Covariance - Speed Acc', 'NumberTitle', 'off');
+tiledlayout(3,1,'Padding','compact');
 
 % speed
 axes(f) = nexttile([1,1]); f=f+1; hold on;
@@ -145,7 +144,7 @@ for k = 1:size(sensor_list,1)
     
     idx = (source_vec == type.Value);   % logical vector
     [unique_stamps, ia] = unique(tt.stamp);
-    unique_cov = sqrt(tt.covariance(ia,opp_idx,13));
+    unique_cov = sqrt(tt.covariance(ia,opp_idx,15));
     sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
     plot(stamp_vec(idx), sensor_points.(name), 'o', ...
@@ -155,7 +154,7 @@ for k = 1:size(sensor_list,1)
         'DisplayName', strrep(name,'_',' '));  % nicer display
     hold on
 end
-plot(tt.stamp,sqrt(tt.covariance(:,opp_idx, 13)),'Color',col.tt,'DisplayName','track');
+plot(tt.stamp,sqrt(tt.covariance(:,opp_idx, 15)),'Color',col.tt,'DisplayName','track');
 grid on; ylabel('speed [m/s]'); legend show;
 
 
@@ -169,7 +168,7 @@ for k = 1:size(sensor_list,1)
     
     idx = (source_vec == type.Value);   % logical vector
     [unique_stamps, ia] = unique(tt.stamp);
-    unique_cov = sqrt(tt.covariance(ia,opp_idx,19));
+    unique_cov = sqrt(tt.covariance(ia,opp_idx,36));
     sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
     plot(stamp_vec(idx), sensor_points.(name), 'o', ...
@@ -179,8 +178,31 @@ for k = 1:size(sensor_list,1)
         'DisplayName', strrep(name,'_',' '));  % nicer display
     hold on
 end
-plot(tt.stamp,sqrt(tt.covariance(:,opp_idx, 19)),'Color',col.tt,'DisplayName','track');
-grid on; ylabel('acc [m/s$^2$]'); legend show; xlabel('timestamp [s]');
+plot(tt.stamp,sqrt(tt.covariance(:,opp_idx, 36)),'Color',col.tt,'DisplayName','track');
+grid on; ylabel('acc [m/s$^2$]'); legend show; 
+
+% yaw rate
+axes(f) = nexttile([1,1]); f=f+1; hold on;
+% --- Loop over each sensor type ---
+for k = 1:size(sensor_list,1)
+    name = sensor_list{k,1};
+    type = sensor_list{k,2};
+    color = sensor_list{k,3};
+    
+    idx = (source_vec == type.Value);   % logical vector
+    [unique_stamps, ia] = unique(tt.stamp);
+    unique_cov = sqrt(tt.covariance(ia,opp_idx,29));
+    sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
+
+    plot(stamp_vec(idx), rad2deg(sensor_points.(name)), 'o', ...
+        'MarkerFaceColor', color, ...
+        'MarkerEdgeColor', color, ...
+        'MarkerSize', sz + size(sensor_list,1) - k, ...
+        'DisplayName', strrep(name,'_',' '));  % nicer display
+    hold on
+end
+plot(tt.stamp,rad2deg(sqrt(tt.covariance(:,opp_idx, 29))),'Color',col.tt,'DisplayName','track');
+grid on; ylabel('yaw rate [deg/s]'); legend show;xlabel('timestamp [s]');
 
 
 %% Association Figure
@@ -188,7 +210,7 @@ grid on; ylabel('acc [m/s$^2$]'); legend show; xlabel('timestamp [s]');
 
 %%% Select time portion on any plots, click refresh, use arrows to show
 %%% each iteration in the selected range
-assFig = figure('name', 'Covariance - Association');
+assFig = figure('name', 'Covariance - Association', 'NumberTitle', 'off');
 set(assFig,'KeyPressFcn',@keyPressed);   
 
 % Axes for map (left side)
@@ -196,7 +218,8 @@ axMap = builtin('axes','Parent',assFig);
 title(axMap,'map');
 
 % Button
-c = uicontrol('Style','pushbutton', ...
+c = c + 1;
+b(c) = uicontrol('Style','pushbutton', ...
     'String','Refresh', ...
     'Units','normalized', ...
     'Position',[0.01 0.01 0.1 0.05], ...
@@ -300,7 +323,7 @@ function drawCurrentSample()
                   data.y_map(idx,j)];
 
             % rotazione yaw - per essere 'precisi' dovrei interpolare la yaw del veicolo al tempo della misura
-            yaw = S.tt.yaw_map(i,j);
+            yaw = deg2rad(S.tt.yaw_map(i,j));
             if isnan(yaw)
                 continue
             else
@@ -345,7 +368,7 @@ function drawCurrentSample()
         scatter(x(j), y(j), 'filled', 'MarkerFaceColor',S.col.tt, 'DisplayName','track');
         
         % state covariance - NB: approximation, should predict back to measure time
-        sigma = reshape(S.tt.covariance(i,j,:), 5, 5);
+        sigma = reshape(S.tt.covariance(i,j,:), 6, 6);
         [xc, yc] = covariance_ellipse(sigma(1:2,1:2), [x(j); y(j)], 1);  % ellisse 1-sigma
         patch(xc, yc, S.col.tt, ...
             'FaceAlpha', 0.3, ...

@@ -1,5 +1,5 @@
 %% RANGE
-figure('name', 'Detections - Count');
+figure('name', 'Detections - Count', 'NumberTitle', 'off');
 tiledlayout(2,1,'Padding','compact');
 
 % count

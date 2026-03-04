@@ -24,7 +24,9 @@
 % z_rel                     % z in car reference frame 
 % yaw_rel                   % relative yaw between ego and opp car 
 % speed                     % opp speed
-% calculated speed          % true if speed calculated from gps pos measures
+% ax                        % longitudinal acceleration
+% calculated_speed          % true if speed calculated from gps pos measures
+% calculated_acceleration   % true if acceleration derived from speed
 % rho                       % distance from opponent (range)
 % rho_dot                   % range rate (relative speed)
 % clos_idx                  % traj server closest idx
@@ -394,7 +396,7 @@ log.pitch = pitch;
 log.yaw_map = yaw;
 
 
-%% Opponent speed
+%% Opponent speed and acceleration
 
 if  (exist('raw_speed','var'))
     speed = sqrt(raw_speed.ve.^2+raw_speed.vn.^2);
@@ -404,6 +406,14 @@ else
     log.compute_speed = true;
 end
 log.speed = speed;
+
+acc = NaN(opp_sz,1);
+log.calculated_acceleration = false;
+if ~computed_speed
+    acc = sgolayfilt(gradient(speed(:)) ./ gradient(log.timestamp(:))*10^9, 3, 21);
+    log.ax = acc;
+    log.calculated_acceleration = true;
+end
 
 
 
