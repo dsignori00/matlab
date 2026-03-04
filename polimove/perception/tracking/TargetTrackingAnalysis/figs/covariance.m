@@ -56,8 +56,7 @@ for i = 1:N
     yaw = deg2rad(tt.yaw_map(i,opp_idx));
     R = [cos(yaw) -sin(yaw);
          sin(yaw)  cos(yaw)];
-
-    cov_xy_cog(:,:,i) = R * cov_xy_map(:,:,i) * R.';
+    cov_xy_cog(:,:,i) = R.' * cov_xy_map(:,:,i) * R;
 end
 
 axes(f) = nexttile([1,1]); f=f+1; hold on;
@@ -324,7 +323,7 @@ function drawCurrentSample()
                   data.y_map(idx,j)];
 
             % rotazione yaw - per essere 'precisi' dovrei interpolare la yaw del veicolo al tempo della misura
-            yaw = S.tt.yaw_map(i,j);
+            yaw = deg2rad(S.tt.yaw_map(i,j));
             if isnan(yaw)
                 continue
             else
