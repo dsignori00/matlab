@@ -1,7 +1,5 @@
-function [lid_clust, rad_clust, cam_yolo, lid_pp, gt] = load_perception(log, use_sim_ref, use_ref, log_ref)
-% LOAD_PERCEPTION  Parse perception detections and ground truth from log.
-%
-%   [lid_clust, rad_clust, cam_yolo, lid_pp, gt] = load_perception(log, use_sim_ref, use_ref, log_ref)
+function [lid_clust, rad_clust, cam_yolo, lid_pp] = load_perception(log)
+% LOAD_PERCEPTION  Parse perception detections.
 %
 %   All four detection structs are guaranteed to exist. Missing sources
 %   are replaced with empty structs containing NaN fields.
@@ -38,12 +36,12 @@ if isfield(log,'perception__lidar__clustering_detections')
     lid_clust.x_rel   = replaceZeroWithNaN(d.detections__x_rel);
     lid_clust.y_rel   = replaceZeroWithNaN(d.detections__y_rel);
     lid_clust.z_rel   = replaceZeroWithNaN(d.detections__z_rel);
-    lid_clust.yaw_rel = replaceZeroWithNaN(d.detections__yaw_rel);
+    lid_clust.yaw_rel = rad2deg(replaceZeroWithNaN(d.detections__yaw_rel));
 
     lid_clust.x_map   = replaceZeroWithNaN(d.detections__x_map);
     lid_clust.y_map   = replaceZeroWithNaN(d.detections__y_map);
     lid_clust.z_map   = replaceZeroWithNaN(d.detections__z_map);
-    lid_clust.yaw_map = replaceZeroWithNaN(d.detections__yaw_map);
+    lid_clust.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
 
     lid_clust.max_det = max(sum(~isnan(lid_clust.x_rel')));
 else
@@ -63,13 +61,13 @@ if isfield(log,'perception__radar__clustering_detections')
     rad_clust.x_rel   = replaceZeroWithNaN(d.detections__x_rel);
     rad_clust.y_rel   = replaceZeroWithNaN(d.detections__y_rel);
     rad_clust.z_rel   = replaceZeroWithNaN(d.detections__z_rel);
-    rad_clust.yaw_rel = replaceZeroWithNaN(d.detections__yaw_rel);
+    rad_clust.yaw_rel = rad2deg(replaceZeroWithNaN(d.detections__yaw_rel));
     rad_clust.rho_dot = replaceZeroWithNaN(d.detections__rho_dot);
 
     rad_clust.x_map   = replaceZeroWithNaN(d.detections__x_map);
     rad_clust.y_map   = replaceZeroWithNaN(d.detections__y_map);
     rad_clust.z_map   = replaceZeroWithNaN(d.detections__z_map);
-    rad_clust.yaw_map = replaceZeroWithNaN(d.detections__yaw_map);
+    rad_clust.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
 
     rad_clust.max_det = max(sum(~isnan(rad_clust.x_rel')));
 else
@@ -89,12 +87,12 @@ if isfield(log,'perception__camera__yolo_detections')
     cam_yolo.x_rel   = replaceZeroWithNaN(d.detections__x_rel);
     cam_yolo.y_rel   = replaceZeroWithNaN(d.detections__y_rel);
     cam_yolo.z_rel   = replaceZeroWithNaN(d.detections__z_rel);
-    cam_yolo.yaw_rel = replaceZeroWithNaN(d.detections__yaw_rel);
+    cam_yolo.yaw_rel = rad2deg(replaceZeroWithNaN(d.detections__yaw_rel));
 
     cam_yolo.x_map   = replaceZeroWithNaN(d.detections__x_map);
     cam_yolo.y_map   = replaceZeroWithNaN(d.detections__y_map);
     cam_yolo.z_map   = replaceZeroWithNaN(d.detections__z_map);
-    cam_yolo.yaw_map = replaceZeroWithNaN(d.detections__yaw_map);
+    cam_yolo.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
 
     cam_yolo.max_det = max(sum(~isnan(cam_yolo.x_rel')));
 else
@@ -114,54 +112,18 @@ if isfield(log,'perception__lidar__pointpillars_detections')
     lid_pp.x_rel   = replaceZeroWithNaN(d.detections__x_rel);
     lid_pp.y_rel   = replaceZeroWithNaN(d.detections__y_rel);
     lid_pp.z_rel   = replaceZeroWithNaN(d.detections__z_rel);
-    lid_pp.yaw_rel = replaceZeroWithNaN(d.detections__yaw_rel);
+    lid_pp.yaw_rel = rad2deg(replaceZeroWithNaN(d.detections__yaw_rel));
 
     lid_pp.x_map   = replaceZeroWithNaN(d.detections__x_map);
     lid_pp.y_map   = replaceZeroWithNaN(d.detections__y_map);
     lid_pp.z_map   = replaceZeroWithNaN(d.detections__z_map);
-    lid_pp.yaw_map = replaceZeroWithNaN(d.detections__yaw_map);
+    lid_pp.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
 
     lid_pp.max_det = max(sum(~isnan(lid_pp.x_rel')));
 else
     lid_pp = emptyDetectionStruct;
     lid_pp.max_det = 1;
 end
-
-
-%  GROUND TRUTH EXTRACTION
-
-gt = struct();  % guaranteed existence
-
-if exist("use_sim_ref",'var') && use_sim_ref
-    gt.stamp   = log.sim_out.bag_stamp;
-    gt.x_rel   = log.sim_out.opponents__x_rel(:,1);
-    gt.y_rel   = log.sim_out.opponents__y_rel(:,1);
-    gt.rho_dot = log.sim_out.opponents__rho_dot(:,1);
-    gt.yaw_rel = unwrap(log.sim_out.opponents__psi_rel(:,1));
-
-    gt.x_map   = log.sim_out.opponents__x_geom(:,1);
-    gt.y_map   = log.sim_out.opponents__y_geom(:,1);
-    gt.vx      = log.sim_out.opponents__vx(:,1);
-    gt.ax      = log.sim_out.opponents__ax(:,1);
-
-    gt.yaw_map = unwrap(log.sim_out.opponents__psi(:,1));
-
-elseif exist('use_ref','var') && use_ref
-    gt.stamp   = (log_ref.timestamp - double(log.time_offset_nsec))*1e-9;
-    gt.x_rel   = log_ref.x_rel;
-    gt.y_rel   = log_ref.y_rel;
-    gt.z_rel   = log_ref.z_rel;
-    gt.rho     = log_ref.rho;
-    gt.rho_dot = log_ref.rho_dot;
-    gt.yaw_rel = unwrap(log_ref.yaw_rel);
-
-    gt.x_map   = log_ref.x_map;
-    gt.y_map   = log_ref.y_map;
-    gt.z_map   = log_ref.z_map;
-    gt.vx      = log_ref.speed;
-    gt.yaw_map = log_ref.yaw_map;
-end
-
 
 %  NaN CHECK: Confirm at least one detection source contains data
 

@@ -2,10 +2,11 @@
 %#ok<*INUSD>
 
 %% MAP
-fig = figure('name','MAP');
+fig = figure('name','MAP', 'NumberTitle', 'off');
 
 % Button
-c = uicontrol('Style','pushbutton', ...
+c = c + 1;
+b(c) = uicontrol('Style','pushbutton', ...
     'String','Refresh', ...
     'Units','normalized', ...
     'Position',[0.01 0.01 0.1 0.05], ...
@@ -24,10 +25,15 @@ function refreshTimeButtonPushed(src, event)
     use_ref      = evalin('base','use_ref');
     use_sim_ref  = evalin('base','use_sim_ref');
     compare      = evalin('base','compare');
+    compare2     = evalin('base','compare2');
 
     if compare
         tt2   = evalin('base','tt2');
         name2 = evalin('base','name2');
+    end
+    if compare2
+        tt3   = evalin('base','tt3');
+        name3 = evalin('base','name3');
     end
     if use_ref || use_sim_ref
         gt = evalin('base','gt');
@@ -42,6 +48,9 @@ function refreshTimeButtonPushed(src, event)
     end
     if use_ref || use_sim_ref
         [t1_gt, tend_gt] = timeWindowIdx(gt.stamp, t_lim);
+    end
+    if compare2
+        [t1_tt3, tend_tt3] = timeWindowIdx(tt3.stamp, t_lim);
     end
 
     % --- reset axes ---
@@ -79,6 +88,10 @@ function refreshTimeButtonPushed(src, event)
     if compare
         plot(tt2.x_map(t1_tt2:tend_tt2,1:tt2.max_opp),tt2.y_map(t1_tt2:tend_tt2,1:tt2.max_opp),'Color',col.tt2,'HandleVisibility','off');
         plot_tt(NaN,NaN,1,col.tt2,name2);
+    end
+    if compare2
+        plot(tt3.x_map(t1_tt3:tend_tt3,1:tt3.max_opp),tt3.y_map(t1_tt3:tend_tt3,1:tt3.max_opp),'Color',col.tt3,'HandleVisibility','off');
+        plot_tt(NaN,NaN,1,col.tt3,name3);
     end
 
     % --- ground truth ---

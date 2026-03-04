@@ -21,7 +21,10 @@
 % z_rel                     % z in car reference frame 
 % yaw_rel                   % relative yaw between ego and opp car 
 % speed                     % opp speed
-% calculated speed          % true if speed calculated from gps pos measures
+% ax                        % longitudinal acceleration
+% virtual_speed             % true if speed calculated from gps pos measures
+% virtual_acc               % true if acceleration is virtual (i.e. not measured)
+% virtual_psidot            % true if psidot calculated from heading measures
 % rho                       % distance from opponent (range)
 % rho_dot                   % range rate (relative speed)
 % clos_idx                  % traj server closest idx
@@ -221,7 +224,7 @@ out.latitude = NaN(opp_sz,1);
 out.longitude = NaN(opp_sz,1);
 out.z_map = NaN(opp_sz,1);
 out.z_rel = NaN(opp_sz,1);
-out.calculated_speed = false;
+out.virtual_speed = false;
 
 % average frequency 
 diff = out.timestamp(2:length(out.timestamp))-out.timestamp(1:length(out.timestamp)-1);
@@ -229,6 +232,17 @@ freq = 1./diff;
 avg_freq = mean(freq)*10^9;
 out.bag_avg_freq = avg_freq;
 
+% acceleration
+if ~isfield(out,'ax') || all(isnan(out.ax))
+    out.ax = sgolayfilt(gradient(out.speed(:)) ./ gradient(out.timestamp(:))*10^9, 3, 101);
+    out.virtual_acc = true;
+end
+
+% yaw rate
+if ~isfield(out,'yaw_rate') || all(isnan(out.yaw_rate))
+    out.yaw_rate = sgolayfilt(gradient(out.yaw_map(:)) ./ gradient(out.timestamp(:))*10^9, 3, 101);
+    out.virtual_yawrate = true;
+end
 
 %% Ego
 ego_bag_timestamp = (ego.estimation.bag_stamp)*10^9+double(ego.time_offset_nsec);

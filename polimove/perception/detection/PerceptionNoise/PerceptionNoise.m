@@ -72,7 +72,8 @@ y_err_lim = [-err_thr err_thr];
 
 %% LOAD DATA
 
-[lid_clust, rad_clust, cam_yolo, lid_pp, gt] = load_perception(log, use_sim_ref, ~use_sim_ref, log_ref);
+[lid_clust, rad_clust, cam_yolo, lid_pp] = load_perception(log);
+gt = load_ref(log, use_sim_ref, ~use_sim_ref, log_ref);
 cam_yolo.sens_stamp(cam_yolo.sens_stamp < 0) = NaN;
 
 % ego
@@ -112,7 +113,6 @@ correlations;
 error_summary;
 sensors_fov;
 map;
-
 
 % linkaxes
 ax = ax(isgraphics(ax, 'axes'));
