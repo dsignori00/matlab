@@ -3,7 +3,7 @@
 %%% Select time portion on any plots, click refresh, use arrows to show
 %%% each iteration in the selected range
 
-fig = figure('Name','COG Visualization');
+fig = figure('Name','COG Visualization', 'NumberTitle','off');
 set(fig,'KeyPressFcn',@keyPressed);   % <-- enable arrows
 
 % Axes for map (left side)

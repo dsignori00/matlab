@@ -1,4 +1,4 @@
-figure('Name','Row State');
+figure('Name','Row State', 'NumberTitle','off');
 tiledlayout(2,1);
 
 %% VEHICLE STATUS

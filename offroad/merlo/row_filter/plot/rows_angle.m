@@ -1,4 +1,4 @@
-figure("Name","Row Angle")
+figure("Name","Row Angle", 'NumberTitle','off');
 tiledlayout(3,1);
 
 %% cog frame

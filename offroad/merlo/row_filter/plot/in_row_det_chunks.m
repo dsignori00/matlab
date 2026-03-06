@@ -5,7 +5,7 @@ if (ismember(strategies, INROWDETSTR.AUTOMATIC))
     inrowdet_idx = true(size(bag1.debug.stamp));
     inrowdet_idx(bag1.debug.in_row_det.in_row_det_strategy ~= INROWDETSTR.AUTOMATIC) = false;
     
-    figure("Name","InRowDet - Chunks");
+    figure("Name","InRowDet - Chunks", 'NumberTitle','off');
     tiledlayout(6,2, "TileSpacing","compact")
     ax(f) = nexttile([2,2]); f=f+1;
     grid on; hold on;

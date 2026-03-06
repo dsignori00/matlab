@@ -1,6 +1,6 @@
 %% IN ROW DET CHUNKS (visualize only if automatic inrow-det was enabled)
 if (ismember(strategies,INROWDETSTR.AUTOMATIC))
-    figure("Name","InRowDet - Closest Rows");
+    figure("Name","InRowDet - Closest Rows", 'NumberTitle','off');
     tiledlayout(3,2, "TileSpacing","compact")
     ax(f) = nexttile([1,2]); f=f+1;
     grid on; hold on;
