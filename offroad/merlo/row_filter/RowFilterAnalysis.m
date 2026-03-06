@@ -6,6 +6,9 @@ compare     = false;
 line_form   = 'normal';
 
 
+%#ok<*UNRCH>
+%#ok<*INUSD>
+
 %% paths
 
 addpath("bags/");

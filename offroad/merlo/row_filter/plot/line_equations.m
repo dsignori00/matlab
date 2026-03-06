@@ -1,4 +1,4 @@
-figure('Name','Line Equations')
+figure('Name','Line Equations', 'NumberTitle','off');
 tiledlayout(3,1)
 ax(f) = nexttile([1,1]); f=f+1;hold on; grid on
 num_lines = max(bag1.lines.num_lines);
