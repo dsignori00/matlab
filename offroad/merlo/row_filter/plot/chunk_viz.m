@@ -119,7 +119,7 @@ function drawCurrentSample()
     plot(-rows_y, rows_x, 'LineStyle','--','LineWidth',0.3, 'DisplayName','Rows');
 
     txt = sprintf('sample %d / %d', i-S.iStart+1, S.iEnd-S.iStart+1);
-    title(S.ax, ['map — ' txt]);
+    title(S.ax, ['map - ' txt]);
     hold(S.ax,'off');
 
     % --------- TABLE 1: CHUNK ----------
