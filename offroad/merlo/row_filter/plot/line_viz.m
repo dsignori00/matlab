@@ -116,8 +116,17 @@ function drawCurrentSample()
     rows_y = [S.bag1.measures.start_pt(i,:,2) ; S.bag1.measures.end_pt(i,:,2)];
     plot(-rows_y, rows_x, 'LineStyle','--','LineWidth',0.3, 'DisplayName','Rows');
 
+    % Rows direction 
+    L = 3; x0 = 0; y0 = 0;
+    angle = deg2rad(S.bag1.debug.rows_angle.cog(i));
+    dx = L * cos(angle);
+    dy = L * sin(angle);
+    quiver(S.ax, y0, x0, -dy, dx, 0, ...
+        'r', 'LineWidth', 2, 'MaxHeadSize', 2, ...
+        'DisplayName','Direction');
+
     txt = sprintf('sample %d / %d', i-S.iStart+1, S.iEnd-S.iStart+1);
-    title(S.ax, ['map — ' txt]);
+    title(S.ax, ['map - ' txt]);
     hold(S.ax,'off');
 
     % --------- TABLE 1: LINES ----------
