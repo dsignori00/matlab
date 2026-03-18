@@ -12,29 +12,48 @@ c = uicontrol('Style','pushbutton', ...
     'Callback',@refreshMap);
 
 function refreshMap(src, event)
+    % ---------- persistent graphics ----------
+    persistent hAx hEgo hRows hLines initialized
 
     % --- fetch from base ---
     ax         = evalin('base', 'ax');
     bag1       = evalin('base', 'bag1');
     FOOTPRINT  = evalin('base', 'FOOTPRINT');
 
-    L = 0.3 * FOOTPRINT.length; 
+    L = 0.3 * FOOTPRINT.length;
 
-    % --- time window ---
+    % ---------- time window ----------
     t_lim = xlim(ax(1));
 
-    [ego_t1, ego_tend] = timeWindowIdx(bag1.ego.stamp, t_lim);
+    [ego_t1, ego_tend]     = timeWindowIdx(bag1.ego.stamp, t_lim);
     [debug_t1, debug_tend] = timeWindowIdx(bag1.debug.stamp, t_lim);
-    [line_t1, line_tend] = timeWindowIdx(bag1.lines.stamp, t_lim);
+    [line_t1, line_tend]   = timeWindowIdx(bag1.lines.stamp, t_lim);
 
-    x0_debug = interp1(bag1.ego.stamp(ego_t1:ego_tend), bag1.ego.x(ego_t1:ego_tend), bag1.debug.stamp(debug_t1:debug_tend));
-    y0_debug = interp1(bag1.ego.stamp(ego_t1:ego_tend), bag1.ego.y(ego_t1:ego_tend), bag1.debug.stamp(debug_t1:debug_tend));
+    % ---------- ego interpolation ----------
+    x0_debug = interp1( ...
+        bag1.ego.stamp(ego_t1:ego_tend), ...
+        bag1.ego.x(ego_t1:ego_tend), ...
+        bag1.debug.stamp(debug_t1:debug_tend));
 
-    % rotate line endpoints to world frame
-    x0_line = interp1(bag1.ego.stamp(ego_t1:ego_tend), bag1.ego.x(ego_t1:ego_tend), bag1.lines.stamp(line_t1:line_tend));
-    y0_line = interp1(bag1.ego.stamp(ego_t1:ego_tend), bag1.ego.y(ego_t1:ego_tend), bag1.lines.stamp(line_t1:line_tend));
-    yaw_line = interp1(bag1.ego.stamp(ego_t1:ego_tend), bag1.ego.heading(ego_t1:ego_tend), bag1.lines.stamp(line_t1:line_tend));
+    y0_debug = interp1( ...
+        bag1.ego.stamp(ego_t1:ego_tend), ...
+        bag1.ego.y(ego_t1:ego_tend), ...
+        bag1.debug.stamp(debug_t1:debug_tend));
 
+    % ---------- line pose interpolation ----------
+    x0_line = interp1(bag1.ego.stamp(ego_t1:ego_tend), ...
+                      bag1.ego.x(ego_t1:ego_tend), ...
+                      bag1.lines.stamp(line_t1:line_tend));
+
+    y0_line = interp1(bag1.ego.stamp(ego_t1:ego_tend), ...
+                      bag1.ego.y(ego_t1:ego_tend), ...
+                      bag1.lines.stamp(line_t1:line_tend));
+
+    yaw_line = interp1(bag1.ego.stamp(ego_t1:ego_tend), ...
+                       bag1.ego.heading(ego_t1:ego_tend), ...
+                       bag1.lines.stamp(line_t1:line_tend));
+
+    % ---------- ego → world transform ----------
     c = cos(yaw_line(:));
     s = sin(yaw_line(:));
 
@@ -42,50 +61,74 @@ function refreshMap(src, event)
     Pe = bag1.lines.end_pt(line_t1:line_tend,:,:);
 
     line_start_world = Ps;
-    line_end_world = Pe;
+    line_end_world   = Pe;
 
     line_start_world(:,:,1) = c.*Ps(:,:,1) - s.*Ps(:,:,2) + x0_line(:);
     line_start_world(:,:,2) = s.*Ps(:,:,1) + c.*Ps(:,:,2) + y0_line(:);
 
-    line_end_world(:,:,1) = c.*Pe(:,:,1) - s.*Pe(:,:,2) + x0_line(:);
-    line_end_world(:,:,2) = s.*Pe(:,:,1) + c.*Pe(:,:,2) + y0_line(:);
+    line_end_world(:,:,1)   = c.*Pe(:,:,1) - s.*Pe(:,:,2) + x0_line(:);
+    line_end_world(:,:,2)   = s.*Pe(:,:,1) + c.*Pe(:,:,2) + y0_line(:);
 
-    X = cat(3, ...
-        line_start_world(:,:,1), ...
-        line_end_world(:,:,1));      % N × M × 2
+    % --- build segments as NaN-separated vectors ---
+    tmp = line_start_world(:,:,1);
+    tmp_end = line_end_world(:,:,1);
+    xs = [tmp(:), tmp_end(:), nan(numel(tmp),1)]';
 
-    Y = cat(3, ...
-        line_start_world(:,:,2), ...
-        line_end_world(:,:,2));      % N × M × 2
+    tmp = line_start_world(:,:,2);
+    tmp_end = line_end_world(:,:,2);
+    ys = [tmp(:), tmp_end(:), nan(numel(tmp),1)]';
 
-    % reorder so dimension 1 = start/end
-    X = permute(X, [3 1 2]);   % 2 × N × M
-    Y = permute(Y, [3 1 2]);
+    xs = xs(:);
+    ys = ys(:);
 
-    % collapse (N,M) → segments
-    xs = reshape(X, 2, []);
-    ys = reshape(Y, 2, []);
-
-
-    % --- reset axes ---
-    subplot(1,1,1); cla reset; hold on;
-    grid on;
-    axis equal;
-    xlabel('x [m]');
-    ylabel('y [m]');
-
-    % --- plot ---
-    plot(x0_debug, y0_debug, 'k-', 'DisplayName', 'Ego');
-
+    % ---------- rows direction ----------
     angle = deg2rad(bag1.debug.rows_angle.map(debug_t1:debug_tend));
     sampled = NaN(size(angle));
     sampled(1:10:end) = angle(1:10:end);
-    dx = L * cos(sampled); dy = L * sin(sampled);
-    quiver(x0_debug, y0_debug, dx, dy, 0, ...
-        'r', 'LineWidth', 2, 'MaxHeadSize', 2, ...
-        'DisplayName','Rows Direction');
 
-    plot(xs, ys, 'b-', 'LineWidth',1.5,'HandleVisibility','off');
+    dx = L*cos(sampled);
+    dy = L*sin(sampled);
 
-    legend show
+    if isempty(initialized) || ...
+        ~isgraphics(hEgo) || ...
+        ~isgraphics(hRows) || ...
+        ~isgraphics(hLines)
+
+        figure(gcf);
+        hAx = axes;
+        hold(hAx,'on');
+        grid(hAx,'on');
+        axis(hAx,'equal');
+
+        xlabel(hAx,'x [m]');
+        ylabel(hAx,'y [m]');
+
+        % create ONCE
+        hEgo = plot(hAx,nan,nan,'k-','DisplayName','Ego');
+
+        hRows = quiver(hAx,nan,nan,nan,nan,0,...
+            'r','LineWidth',2,'MaxHeadSize',2,...
+            'DisplayName','Rows Direction');
+
+        hLines = plot(hAx,nan,nan,'b-',...
+            'LineWidth',1.5,...
+            'DisplayName','Lines');
+
+        legend(hAx,'show');
+
+        initialized = true;
+    end
+
+    % ---------- UPDATE ONLY DATA ----------
+    set(hEgo,'XData',x0_debug,'YData',y0_debug);
+
+    set(hRows,...
+        'XData',x0_debug,...
+        'YData',y0_debug,...
+        'UData',dx,...
+        'VData',dy);
+
+    set(hLines,'XData',xs,'YData',ys);
+
+    drawnow limitrate nocallbacks
 end
