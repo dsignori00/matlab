@@ -82,6 +82,7 @@ line_coefficients;
 rows_angle;
 line_viz;
 chunk_viz;
+map;
 
 
 % linkaxes
