@@ -1,7 +1,7 @@
 close all
 clearvars -except log log_2 log_3 log_ref trajDatabase
 
-use_ref     = true;
+use_ref     = false;
 use_sim_ref = false;
 compare     = false;
 compare2    = false;
@@ -145,7 +145,7 @@ end
 
 %% PLOTTING
 
-info;
+% info;
 detections;
 latency;
 state_map;
@@ -153,7 +153,7 @@ state_cog;
 range;
 speed_acc;
 map;
-covariance;
+% covariance;
 error_analysis;
 imm;
 dataset_analysis;
