@@ -3,12 +3,12 @@ figure('Name','Info', 'NumberTitle', 'off');
 
 if(isfield(log,'planner_manager'))
     % racetype
-    tiledlayout(3,1,'Padding','compact');
+    tiledlayout(2,1,'Padding','compact');
     axes(f) = nexttile([1,1]); f=f+1; hold on;
     plot(log.planner_manager.stamp__tot, log.planner_manager.race_type,'Color',col.tt);
     ylim([-1 5]); grid on; ylabel('RaceType');
 else 
-    tiledlayout(2,1,'Padding','compact');
+    tiledlayout(1,1,'Padding','compact');
 end
 
 % decision maker
@@ -20,10 +20,3 @@ labels = {'0 - RACING','1 - TAILGATING','2 - OVERTAKE','3 - ABORT','4 - CRITICAL
 for i = 1:numel(labels)
     plot(nan, nan, 'DisplayName', labels{i}, 'Color', 'none');
 end
-
-% opponent count
-axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot_tt(tt.stamp, tt.count, 1, col.tt, name1);
-if(compare); plot_tt(tt2.stamp, tt2.count, 1, col.tt2, name2); end
-if(compare2); plot_tt(tt3.stamp, tt3.count, 1, col.tt3, name3); end
-grid on; ylabel('Opponent count'); xlabel('timestamp [s]'); legend show;

@@ -59,7 +59,7 @@ function refreshTimeButtonPushed(src, event)
     axis equal;
     xlabel('x [m]');
     ylabel('y [m]');
-    L = 1.0;
+    L = 3.0;
 
     % --- track boundaries ---
     id_left  = numel(traj_db) - 2;
