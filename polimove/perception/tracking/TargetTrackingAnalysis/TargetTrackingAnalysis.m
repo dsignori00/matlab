@@ -3,7 +3,7 @@ clearvars -except log log_2 log_3 log_ref trajDatabase
 
 use_ref     = false;
 use_sim_ref = false;
-compare     = false;
+compare     = true;
 compare2    = false;
 
 opp_idx     = 1;
@@ -42,7 +42,7 @@ if (~exist('log','var'))
     [file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load log');
     load(fullfile(path,file));
 end
-name1 = 'new';
+name1 = 'icp';
 
 % load log 2
 if(compare)
@@ -126,10 +126,10 @@ end
 cam_yolo.sens_stamp(cam_yolo.sens_stamp < 0) = NaN;
 
 sensors = { ...
-    struct('s', lid_clust, 'col', col.lidar,   'name', 'lidar'), ...
+    % struct('s', lid_clust, 'col', col.lidar,   'name', 'lidar'), ...
     struct('s', lid_pp,    'col', col.pp,      'name', 'pointpillars'), ...
-    struct('s', rad_clust, 'col', col.radar,   'name', 'radar'), ...
-    struct('s', cam_yolo,  'col', col.camera,  'name', 'camera'), ...
+    % struct('s', rad_clust, 'col', col.radar,   'name', 'radar'), ...
+    % struct('s', cam_yolo,  'col', col.camera,  'name', 'camera'), ...
 };
 
 if(use_ref || use_sim_ref)
@@ -153,7 +153,7 @@ state_cog;
 range;
 speed_acc;
 map;
-% covariance;
+covariance;
 error_analysis;
 imm;
 dataset_analysis;
