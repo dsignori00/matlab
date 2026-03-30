@@ -42,7 +42,7 @@ if (~exist('log','var'))
     [file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load log');
     load(fullfile(path,file));
 end
-name1 = 'icp';
+name1 = 'new';
 
 % load log 2
 if(compare)
@@ -71,7 +71,7 @@ if(compare2)
         clearvars tmp;
         end
     end
-    name3 = '';
+    name3 = 'old';
 end
 
 % load log ref
@@ -82,8 +82,6 @@ if(use_ref)
         log_ref = tmp.out;
         clearvars tmp;
     end
-else
-    log_ref = [];
 end
 
 DateTime = datetime(log.time_offset_nsec,'ConvertFrom','epochtime','TicksPerSecond',1e9,'Format','dd-MMM-yyyy HH:mm:ss');
@@ -106,7 +104,7 @@ x_lim = [0 inf];
 %% PARSING
 
 [lid_clust, rad_clust, cam_yolo, lid_pp] = load_perception(log);
-gt = load_ref(log, use_sim_ref, use_ref, log_ref);
+if(use_ref || use_sim_ref); gt = load_ref(log, use_sim_ref, use_ref, log_ref); end
 tt = load_tt(log);
 tt.col = col.tt;
 tt.name = name1;
@@ -126,10 +124,10 @@ end
 cam_yolo.sens_stamp(cam_yolo.sens_stamp < 0) = NaN;
 
 sensors = { ...
-    % struct('s', lid_clust, 'col', col.lidar,   'name', 'lidar'), ...
+    struct('s', lid_clust, 'col', col.lidar,   'name', 'lidar'), ...
     struct('s', lid_pp,    'col', col.pp,      'name', 'pointpillars'), ...
-    % struct('s', rad_clust, 'col', col.radar,   'name', 'radar'), ...
-    % struct('s', cam_yolo,  'col', col.camera,  'name', 'camera'), ...
+    struct('s', rad_clust, 'col', col.radar,   'name', 'radar'), ...
+    struct('s', cam_yolo,  'col', col.camera,  'name', 'camera'), ...
 };
 
 if(use_ref || use_sim_ref)
