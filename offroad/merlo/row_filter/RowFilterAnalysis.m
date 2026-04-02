@@ -73,15 +73,15 @@ end
 
 %% Plotting
 
-% in_row_state;
-% in_row_det_chunks;
-% in_row_det_rows;
-% line_equations;
-% line_distance;
-% line_coefficients;
+in_row_state;
+in_row_det_chunks;
+in_row_det_rows;
+line_equations;
+line_distance;
+line_coefficients;
 rows_angle;
 line_viz;
-% chunk_viz;
+chunk_viz;
 map;
 
 
