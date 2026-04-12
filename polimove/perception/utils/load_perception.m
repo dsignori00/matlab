@@ -18,11 +18,13 @@ emptyDetectionStruct = struct( ...
     'x_map', NaN, ...
     'y_map', NaN, ...
     'z_map', NaN, ...
-    'yaw_map', NaN ...
+    'yaw_map', NaN, ...
+    'buffer', NaN ... 
 );
 
 emptyRadarStruct = emptyDetectionStruct;
 emptyRadarStruct.rho_dot = NaN;
+opp = log.perception__opponents;
 
 
 %  LIDAR CLUSTERING DETECTIONS
@@ -43,6 +45,7 @@ if isfield(log,'perception__lidar__clustering_detections')
     lid_clust.z_map   = replaceZeroWithNaN(d.detections__z_map);
     lid_clust.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
 
+    lid_clust.buffer   = replaceZeroWithNaN(opp.opponents__lid_clust_meas);
     lid_clust.max_det = max(sum(~isnan(lid_clust.x_rel')));
 else
     lid_clust = emptyDetectionStruct;
@@ -69,6 +72,7 @@ if isfield(log,'perception__radar__clustering_detections')
     rad_clust.z_map   = replaceZeroWithNaN(d.detections__z_map);
     rad_clust.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
 
+    rad_clust.buffer   = replaceZeroWithNaN(opp.opponents__rad_clust_meas);
     rad_clust.max_det = max(sum(~isnan(rad_clust.x_rel')));
 else
     rad_clust = emptyRadarStruct;
@@ -94,6 +98,7 @@ if isfield(log,'perception__camera__yolo_detections')
     cam_yolo.z_map   = replaceZeroWithNaN(d.detections__z_map);
     cam_yolo.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
 
+    cam_yolo.buffer   = replaceZeroWithNaN(opp.opponents__cam_yolo_meas);
     cam_yolo.max_det = max(sum(~isnan(cam_yolo.x_rel')));
 else
     cam_yolo = emptyDetectionStruct;
@@ -119,6 +124,7 @@ if isfield(log,'perception__lidar__pointpillars_detections')
     lid_pp.z_map   = replaceZeroWithNaN(d.detections__z_map);
     lid_pp.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
 
+    lid_pp.buffer   = replaceZeroWithNaN(opp.opponents__lid_pp_meas);
     lid_pp.max_det = max(sum(~isnan(lid_pp.x_rel')));
 else
     lid_pp = emptyDetectionStruct;
