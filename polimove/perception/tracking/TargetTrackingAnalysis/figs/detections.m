@@ -4,10 +4,34 @@ tiledlayout(3,1,'Padding','compact');
 
 % count
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot_area(tt.stamp, log.perception__opponents.opponents__rad_clust_meas, tt.max_opp, col.radar,        'Rad Clust');
-plot_area(tt.stamp, log.perception__opponents.opponents__lid_pp_meas,    tt.max_opp, col.pp, 'Lid PP');
-plot_area(tt.stamp, log.perception__opponents.opponents__lid_clust_meas, tt.max_opp, col.lidar,        'Lid Clust');
-plot_area(tt.stamp, log.perception__opponents.opponents__cam_yolo_meas,  tt.max_opp, col.camera,       'Camera');
+n = numel(sensors);
+N = numel(tt.stamp);
+cum = zeros(N,1);
+top = zeros(N,n);
+base = zeros(N,n);
+
+for i = 1:n
+    s = sensors{i}.s;
+
+    base(:,i) = cum;
+    cum = cum + double(s.buffer(:,1));
+    top(:,i) = cum;
+end
+
+for i = 1:n
+    x = tt.stamp;
+
+    fill([x; flipud(x)], ...
+         [base(:,i); flipud(top(:,i))], ...
+         sensors{i}.col, ...
+         'EdgeColor', 'none', ...
+         'HandleVisibility', 'off');
+
+    plot(NaN, NaN, 's', ...
+        'MarkerFaceColor', sensors{i}.col, ...
+        'MarkerEdgeColor', sensors{i}.col, ...
+        'DisplayName', sensors{i}.name);
+end
 grid on; ylabel('Count'); legend show; xlabel('timestamp [s]');
 
 
