@@ -84,8 +84,7 @@ rows_angle;
 line_viz;
 chunk_viz;
 map;
-angle_estimates;
-
+angles_estimates;
 
 % linkaxes
 t0 = 0;   
