@@ -8,7 +8,7 @@
 
 ## 🚀 Usage
 
-* Make sure you have [MatLab]([https://www.npmjs.com/package/npx](https://it.mathworks.com/help/install/ug/install-products-with-internet-connection.html)) installed. * You don't need a specified version, just install based on your preference.
+* Make sure you have [MatLab]([https://www.npmjs.com/package/npx](https://it.mathworks.com/help/install/ug/install-products-with-internet-connection.html)) installed. Tested on MatLab 2024a.
 * You may be asked to install some add-on based on the script you need.
 * Upload your .mat data in the "bags" folders to quickly access them from the UI.
 
