@@ -6,6 +6,9 @@ compare     = false;
 line_form   = 'normal';
 
 
+%#ok<*UNRCH>
+%#ok<*INUSD>
+
 %% paths
 
 addpath("bags/");
@@ -13,6 +16,7 @@ addpath("func/");
 addpath("plot/");
 addpath("../../../common/graphic_tools/");
 addpath("../../../common/constants/");
+addpath("../../../common/utils/");
 
 LoadStruct; 
 PhysicalConstants;
@@ -79,7 +83,8 @@ line_coefficients;
 rows_angle;
 line_viz;
 chunk_viz;
-
+map;
+angles_estimates;
 
 % linkaxes
 t0 = 0;   

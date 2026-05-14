@@ -1,6 +1,6 @@
 %% IN ROW DET CHUNKS (visualize only if automatic inrow-det was enabled)
 if (ismember(strategies,INROWDETSTR.AUTOMATIC))
-    figure("Name","InRowDet - Closest Rows");
+    figure("Name","InRowDet - Closest Rows", 'NumberTitle','off');
     tiledlayout(3,2, "TileSpacing","compact")
     ax(f) = nexttile([1,2]); f=f+1;
     grid on; hold on;
@@ -23,7 +23,9 @@ if (ismember(strategies,INROWDETSTR.AUTOMATIC))
         plot(bag1.debug.stamp(inrowdet_idx), x_length2(:,1), 'Color',colors.matlab{7} ,DisplayName', bag2.log_name + "LF",'LineStyle','--','LineWidth',0.3);
         plot(bag1.debug.stamp(inrowdet_idx), x_length2(:,4), 'Color',colors.matlab{8} ,DisplayName', bag2.log_name + "RF",'LineStyle','--','LineWidth',0.3);
     end
-    plot_patches(bag1.state.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);
+    if size(bag1.debug.stamp) == size(bag1.state.stamp)         
+        plot_patches(bag1.state.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);     
+    end
     ylabel("x length")
     legend show
     
@@ -47,7 +49,9 @@ if (ismember(strategies,INROWDETSTR.AUTOMATIC))
         plot(bag1.debug.stamp(inrowdet_idx), y_length2(:,1), 'Color',colors.matlab{7} ,DisplayName', bag2.log_name + "LF",'LineStyle','--','LineWidth',0.3);
         plot(bag1.debug.stamp(inrowdet_idx), y_length2(:,4), 'Color',colors.matlab{8} ,DisplayName', bag2.log_name + "RF",'LineStyle','--','LineWidth',0.3);
     end
-    plot_patches(bag1.state.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);
+    if size(bag1.debug.stamp) == size(bag1.state.stamp)         
+        plot_patches(bag1.state.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);     
+    end
     ylabel("y length")
     legend show
     
@@ -63,7 +67,9 @@ if (ismember(strategies,INROWDETSTR.AUTOMATIC))
         plot(bag2.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p1(inrowdet_idx,1), 'DisplayName', bag2.log_name + "LF",'LineStyle','--','LineWidth',0.3);
         plot(bag2.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p1(inrowdet_idx,4), 'DisplayName', bag2.log_name + "RF",'LineStyle','--','LineWidth',0.3);
     end
-    plot_patches(bag1.debug.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);
+    if size(bag1.debug.stamp) == size(bag1.state.stamp)
+        plot_patches(bag1.debug.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);
+    end
     xlabel("time [s]")
     ylabel("Slope (m)")
     legend show
@@ -80,7 +86,9 @@ if (ismember(strategies,INROWDETSTR.AUTOMATIC))
         plot(bag2.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p2(inrowdet_idx,1), 'DisplayName', bag2.log_name + "LF",'LineStyle','--','LineWidth',0.3);
         plot(bag2.debug.stamp(inrowdet_idx), bag1.debug.closest_lines.p2(inrowdet_idx,4), 'DisplayName', bag2.log_name + "RF",'LineStyle','--','LineWidth',0.3);
     end
-    plot_patches(bag1.state.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);
+    if size(bag1.debug.stamp) == size(bag1.state.stamp)         
+        plot_patches(bag1.state.stamp(inrowdet_idx), ~bag1.state.in_row(inrowdet_idx), ax(f-1), patch_properties);     
+    end
     xlabel("time [s]")
     ylabel("Intercept (q)")
     legend show

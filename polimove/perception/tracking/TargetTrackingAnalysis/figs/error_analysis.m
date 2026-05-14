@@ -1,3 +1,7 @@
+if(~use_ref && ~use_sim_ref)
+   return
+end
+
 % Error Analysis 
 figure("Name","Tracking Error", 'NumberTitle','off');
 
