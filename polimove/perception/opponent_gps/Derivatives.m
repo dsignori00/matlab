@@ -24,13 +24,18 @@ for k = 1:numel(files)
             warning("Skipping %s: variable 'out' not found.", input_file);
             continue;
         end
+    
+        framelen = floor(data.out.bag_avg_freq) / 2;
+        if(mod(framelen,2)==0)
+            framelen = framelen + 1;
+        end 
 
         out = data.out;
 
-        out.ax = sgolayfilt(gradient(out.speed(:)) ./ gradient(out.timestamp(:)) * 10^9, 3, 101);
+        out.ax = sgolayfilt(gradient(out.speed(:)) ./ gradient(out.timestamp(:)) * 10^9, 3, framelen);
         out.virtual_acc = true;
 
-        out.yaw_rate = sgolayfilt(gradient(out.yaw_map(:)) ./ gradient(out.timestamp(:)) * 10^9, 3, 101);
+        out.yaw_rate = sgolayfilt(gradient(out.yaw_map(:)) ./ gradient(out.timestamp(:)) * 10^9, 3, framelen);
         out.virtual_yawrate = true;
 
         save(input_file, 'out', '-v7.3');
