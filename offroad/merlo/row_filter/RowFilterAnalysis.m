@@ -16,6 +16,7 @@ addpath("func/");
 addpath("plot/");
 addpath("../../../common/graphic_tools/");
 addpath("../../../common/constants/");
+addpath("../../../common/utils/");
 
 LoadStruct; 
 PhysicalConstants;
@@ -83,6 +84,7 @@ rows_angle;
 line_viz;
 chunk_viz;
 map;
+angle_estimates;
 
 
 % linkaxes
