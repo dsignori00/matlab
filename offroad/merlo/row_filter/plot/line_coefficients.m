@@ -1,4 +1,4 @@
-figure('Name','Line Coefficients');
+figure('Name','Line Coefficients', 'NumberTitle','off');
 
 t = tiledlayout(4,2,'TileSpacing','compact','Padding','compact');
 

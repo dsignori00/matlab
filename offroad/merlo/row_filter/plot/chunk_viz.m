@@ -3,7 +3,7 @@
 %%% Select time portion on any plots, click refresh, use arrows to show
 %%% each iteration in the selected range
 
-fig2 = figure('Name','Chunk Visualization');
+fig2 = figure('Name','Chunk Visualization', 'NumberTitle','off');
 set(fig2,'KeyPressFcn',@keyPressed);   % <-- enable arrows
 
 % Axes for map (left side)
@@ -119,7 +119,7 @@ function drawCurrentSample()
     plot(-rows_y, rows_x, 'LineStyle','--','LineWidth',0.3, 'DisplayName','Rows');
 
     txt = sprintf('sample %d / %d', i-S.iStart+1, S.iEnd-S.iStart+1);
-    title(S.ax, ['map — ' txt]);
+    title(S.ax, ['map - ' txt]);
     hold(S.ax,'off');
 
     % --------- TABLE 1: CHUNK ----------
@@ -132,10 +132,10 @@ function drawCurrentSample()
     for k = 1:nL
 
         state_str = '';
-        if(state(k) == S.CHUNKSTATE.NO_CHUNK) state_str = 'NO_CHUNK'; end
-        if(state(k) == S.CHUNKSTATE.NOT_FITTED) state_str = 'NOT_FITTED'; end
-        if(state(k) == S.CHUNKSTATE.FITTED) state_str = 'FITTED'; end
-        if(state(k) == S.CHUNKSTATE.DISCARDED) state_str = 'DISCARDED'; end
+        if(state(k) == S.CHUNKSTATE.NO_CHUNK);   state_str = 'NO_CHUNK';   end
+        if(state(k) == S.CHUNKSTATE.NOT_FITTED); state_str = 'NOT_FITTED'; end
+        if(state(k) == S.CHUNKSTATE.FITTED);     state_str = 'FITTED';     end
+        if(state(k) == S.CHUNKSTATE.DISCARDED);  state_str = 'DISCARDED';  end
 
         dataLines{k,1} = k;
         dataLines{k,2} = state_str;

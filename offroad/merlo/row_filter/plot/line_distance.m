@@ -1,4 +1,4 @@
-figure('Name','Line distance')
+figure('Name','Line distance', 'NumberTitle','off');
 tiledlayout(2,1)
 
 ax(f) = nexttile([1,1]); f=f+1;hold on; grid on

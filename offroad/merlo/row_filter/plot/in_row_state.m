@@ -1,4 +1,4 @@
-figure('Name','Row State');
+figure('Name','Row State', 'NumberTitle','off');
 tiledlayout(2,1);
 
 %% VEHICLE STATUS
@@ -46,17 +46,14 @@ yticklabels({'TRAJECTORY', 'AUTOMATIC', 'MANUAL'});
 %% In Row State
 ax(f) = nexttile; f=f+1; hold on; grid on;
 
-% Plot supervisor trajectory if available
-if isfield(bag1, 'supervisor')
-    plot(ax(f-1), bag1.supervisor.stamp, bag1.supervisor.in_row, 'LineWidth', 1.5, 'DisplayName', 'Supervisor');
-end
-
-plot(ax(f-1), bag1.state.stamp, bag1.state.in_row, 'LineWidth', 1.5, 'DisplayName', 'Bag 1');
+plot(ax(f-1), bag1.debug.stamp, bag1.debug.in_row_det.automatic_in_row, 'LineWidth', 1.5, 'DisplayName', 'Automatic');
+plot(ax(f-1), bag1.debug.stamp, bag1.debug.in_row_det.joy_in_row, "LineWidth", 1.5, 'DisplayName', 'Joypad');
+plot(ax(f-1), bag1.debug.stamp, bag1.debug.in_row_det.trajectory_in_row, "LineWidth", 1.5, 'DisplayName', 'Trajectory');
 if compare
     plot(ax(f-1), bag2.state.stamp, bag2.state.in_row, 'LineWidth', 1.5, 'DisplayName', 'Bag 2');
 end
 legend('Location','northwest')
-ylim([-0.1 1.1]);
+ylim([-0.5 1.5]);
 ylabel('In-Row State');
 xlabel('timestamp [s]');
 
