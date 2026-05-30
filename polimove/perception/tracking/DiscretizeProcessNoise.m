@@ -24,14 +24,14 @@ syms x y v psi omega a rho tau qx qy qv qa qp qw qr ts real;
 %     omega;
 %     0];
 
-% CCV
-Q = diag([0 0 qv qp 0 0]);
-f = [v*cos(psi);
-     v*sin(psi); ...
-     0;
-     rho*v;
-     0;
-     0];
+% % CCV
+% Q = diag([0 0 qv qp 0 0]);
+% f = [v*cos(psi);
+%      v*sin(psi); ...
+%      0;
+%      rho*v;
+%      0;
+%      0];
 
 % % CCA
 % Q = diag([0 0 0 qp 0 qa]);
@@ -42,13 +42,22 @@ f = [v*cos(psi);
 %      0;
 %      0];
 
+% CCM
+Q = diag([0 0 qv qp 0 0]);
+f = [v*cos(psi);
+     v*sin(psi); ...
+     a;
+     rho*v;
+     0;
+     0];
+
 
 %% Process noise
 
-J = jacobian(f,[x,y,v,psi,rho,a]); 
+J = jacobian(f,[x,y,v,psi,omega,a]); 
 expA = expm(J*tau);
 integrand = expm(J*tau)*Q*expm(J'*tau);
-Qk = int(integrand,tau,[0 ts]);
+Qk = int(integrand,tau,[0 ts])
 
 
 %% Jacobian

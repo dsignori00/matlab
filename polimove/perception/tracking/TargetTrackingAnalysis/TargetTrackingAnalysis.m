@@ -14,14 +14,6 @@ err_stats = {'yaw_map','vx','ax'};
 %#ok<*INUSD>
 
 %% Paths
-
-addpath("../../../common/utilities/")
-addpath("../../../../common/constants/")
-addpath("../../../common/plot/")
-addpath("../../../../common/graphic_tools/")
-addpath("../../utils/")
-addpath("func/")
-addpath("figs/")
 normal_path = "../../../bags";
 opp_dir = "../../opponent_gps/mat/";
 
@@ -90,7 +82,6 @@ end
 DateTime = datetime(log.time_offset_nsec,'ConvertFrom','epochtime','TicksPerSecond',1e9,'Format','dd-MMM-yyyy HH:mm:ss');
 
 %% NAMING
-graphics_options;
 col.lidar   = colors.green{2};
 col.radar   = [77 190 238] / 255;
 col.camera  = colors.yellow{2};
