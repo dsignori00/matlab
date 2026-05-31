@@ -1,6 +1,8 @@
 close all; clc;
 clearvars -except colors log log_2 log_3 log_ref trajDatabase
 
+link_axes_mode = 'all'; % 'none', 'figure', or 'all'
+
 use_ref     = false;
 use_sim_ref = false;
 compare     = false;
@@ -154,4 +156,4 @@ speed_acc;
 % imm;
 % dataset_analysis;
 
-linkaxes(axes,'x')
+link_axes();

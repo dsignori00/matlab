@@ -44,20 +44,19 @@ sensor_points = struct();
 source_vec = reshape(tt.measures.source(:,opp_idx,:), [], 1);   % [N*M x 1]
 stamp_vec  = reshape(tt.measures.stamp(:,opp_idx,:),  [], 1);   % same size as source_vec
 
-N = size(tt.covariance,1);
-cov_xy_map = zeros(2,2,N);
-cov_xy_cog = zeros(2,2,N);
+[unique_stamps, ia] = unique(tt.stamp);
 
-for i = 1:N
-    cov = tt.covariance(i,opp_idx,:);
-    cov_xy_map(:,:,i) = [cov(1) cov(2);
-                         cov(7) cov(8)];
+yaw = deg2rad(tt.yaw_map(:,opp_idx));
+cy = cos(yaw);
+sy = sin(yaw);
+cov_xx_map = squeeze(tt.covariance(:,opp_idx,1));
+cov_xy_map = squeeze(tt.covariance(:,opp_idx,2));
+cov_yx_map = squeeze(tt.covariance(:,opp_idx,7));
+cov_yy_map = squeeze(tt.covariance(:,opp_idx,8));
+cov_xy_sum = cov_xy_map + cov_yx_map;
 
-    yaw = deg2rad(tt.yaw_map(i,opp_idx));
-    R = [cos(yaw) -sin(yaw);
-         sin(yaw)  cos(yaw)];
-    cov_xy_cog(:,:,i) = R.' * cov_xy_map(:,:,i) * R;
-end
+cov_x_cog = sqrt(cy.^2 .* cov_xx_map + cy .* sy .* cov_xy_sum + sy.^2 .* cov_yy_map);
+cov_y_cog = sqrt(sy.^2 .* cov_xx_map - cy .* sy .* cov_xy_sum + cy.^2 .* cov_yy_map);
 
 axes(f) = nexttile([1,1]); f=f+1; hold on;
 % --- Loop over each sensor type ---
@@ -68,8 +67,7 @@ for k = 1:size(sensor_list,1)
     noise = sensor_list{k,4};
     
     idx = (source_vec == type.Value);   % logical vector
-    [unique_stamps, ia] = unique(tt.stamp);
-    unique_cov = squeeze(sqrt(cov_xy_cog(1,1,ia)));
+    unique_cov = cov_x_cog(ia);
     sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
     plot(stamp_vec(idx), sensor_points.(name), 'o', ...
@@ -79,7 +77,7 @@ for k = 1:size(sensor_list,1)
         'DisplayName', ['R: ' sprintf('%.1f', noise(1,1)) ' - ' strrep(name,'_',' ')]); 
     hold on
 end
-plot(tt.stamp, squeeze(sqrt(cov_xy_cog(1,1,:))),'Color', col.tt, 'DisplayName', 'track');
+plot(tt.stamp, cov_x_cog,'Color', col.tt, 'DisplayName', 'track');
 grid on; ylabel('x cog [m]'); legend show;
 
 
@@ -92,8 +90,7 @@ for k = 1:size(sensor_list,1)
     noise = sensor_list{k,4};
     
     idx = (source_vec == type.Value);   % logical vector
-    [unique_stamps, ia] = unique(tt.stamp);
-    unique_cov = squeeze(sqrt(cov_xy_cog(2,2,ia)));
+    unique_cov = cov_y_cog(ia);
     sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
     plot(stamp_vec(idx), sensor_points.(name), 'o', ...
@@ -103,7 +100,7 @@ for k = 1:size(sensor_list,1)
         'DisplayName', ['R: ' sprintf('%.1f', noise(2,2)) ' - ' strrep(name,'_',' ')]); 
     hold on
 end
-plot(tt.stamp,squeeze(sqrt(cov_xy_cog(2,2,:))),'Color',col.tt,'DisplayName','track');
+plot(tt.stamp,cov_y_cog,'Color',col.tt,'DisplayName','track');
 grid on; ylabel('y cog [m]');  legend show;
 
 
@@ -116,7 +113,6 @@ for k = 1:size(sensor_list,1)
     color = sensor_list{k,3};
     
     idx = (source_vec == type.Value);   % logical vector
-    [unique_stamps, ia] = unique(tt.stamp);
     unique_cov = sqrt(tt.covariance(ia,opp_idx,22));
     sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
@@ -143,7 +139,6 @@ for k = 1:size(sensor_list,1)
     color = sensor_list{k,3};
     
     idx = (source_vec == type.Value);   % logical vector
-    [unique_stamps, ia] = unique(tt.stamp);
     unique_cov = sqrt(tt.covariance(ia,opp_idx,15));
     sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
@@ -167,7 +162,6 @@ for k = 1:size(sensor_list,1)
     color = sensor_list{k,3};
     
     idx = (source_vec == type.Value);   % logical vector
-    [unique_stamps, ia] = unique(tt.stamp);
     unique_cov = sqrt(tt.covariance(ia,opp_idx,36));
     sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
@@ -190,7 +184,6 @@ for k = 1:size(sensor_list,1)
     color = sensor_list{k,3};
     
     idx = (source_vec == type.Value);   % logical vector
-    [unique_stamps, ia] = unique(tt.stamp);
     unique_cov = sqrt(tt.covariance(ia,opp_idx,29));
     sensor_points.(name) = interp1(unique_stamps, unique_cov, stamp_vec(idx));
 
