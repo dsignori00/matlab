@@ -66,7 +66,7 @@ Most scripts:
 
 ## Notes and troubleshooting
 
-- If `currentProject` errors appear, reopen `Polimove.prj`.
+- If `currentProject()` errors appear, reopen `Polimove.prj`.
 - If no files appear in dialogs, verify logs are in `/bags` and have `.mat` extension.
 - Some scripts keep variables between runs (`clearvars -except ...`); use a fresh workspace if results look inconsistent.
 
