@@ -1,7 +1,5 @@
-/offroad/merlo/row_filter/bags/*
-/polimove/bags/*
-/polimove/scripts/csv_to_share/*
 /.vscode
+bags/*
+!/bags/.gitkeep
+/src/scripts/csv_to_share/*
 
-!polimove/bags/.gitkeep
-!/offroad/merlo/row_filter/bags/.gitkeep
