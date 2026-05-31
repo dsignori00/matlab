@@ -1,5 +1,5 @@
-close all
-clearvars -except log log_2 log_3 log_ref trajDatabase
+close all; clc;
+clearvars -except colors log log_2 log_3 log_ref trajDatabase
 
 use_ref     = false;
 use_sim_ref = false;
@@ -82,6 +82,7 @@ end
 DateTime = datetime(log.time_offset_nsec,'ConvertFrom','epochtime','TicksPerSecond',1e9,'Format','dd-MMM-yyyy HH:mm:ss');
 
 %% NAMING
+graphics_options;
 col.lidar   = colors.green{2};
 col.radar   = [77 190 238] / 255;
 col.camera  = colors.yellow{2};
@@ -144,10 +145,10 @@ state_map;
 state_cog;
 range;
 speed_acc;
-map;
-covariance;
-error_analysis;
-imm;
-dataset_analysis;
+% map;
+% covariance;
+% error_analysis;
+% imm;
+% dataset_analysis;
 
 linkaxes(axes,'x')
