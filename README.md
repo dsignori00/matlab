@@ -18,7 +18,7 @@ MATLAB scripts and utilities for PoliMOVE data analysis, with a focus on:
 
 ## Prerequisites
 
-- MATLAB (tested on R2024a)
+- MATLAB (tested on R2024a; older versions may work but are not validated in this repository)
 - Input data as `.mat` files (or CSV bags converted to `.mat`)
 - Optional: CasADi for `polimove/autonoma/opponent_comparison/main.m` (`import casadi.*`)
 
@@ -67,7 +67,7 @@ Run:
 
 ### 3) Convert parsed CSV bags to `.mat`
 
-If your source data is CSV (for example ROS parsed topics), use:
+If your source data is CSV (for example, ROS parsed topics), use:
 - `polimove/common/scripts/TopicsCsvToMat.m`
 
 The script prompts for one or more bag folders (expects a `Parsed_Data/` subfolder) and generates `.mat` logs.
