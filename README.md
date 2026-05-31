@@ -1,9 +1,9 @@
 # polimove
 
 MATLAB project for Polimove perception/offline analysis, with scripts for:
-- sensor detection analysis (radar, camera yolo, pointpillars),
-- target tracking analysis,
-- opponent GPS and ground-truth alignment,
+- sensor detection analysis (radar, camera YOLO, PointPillars)
+- target tracking analysis
+- opponent GPS and ground-truth alignment
 - plotting and utility workflows.
 
 ## Requirements
