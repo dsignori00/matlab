@@ -28,7 +28,12 @@ grid on; ylabel('y rel [m]'); legend show;
 
 % rho dot
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-plot_detections(rad_clust.sens_stamp, rad_clust.rho_dot, rad_clust.max_det, col.radar, 'Rad Clust');
+for i = 1:numel(sensors)
+    s = sensors{i}.s;
+    if isfield(s, 'rho_dot')
+        plot_detections(s.sens_stamp, s.rho_dot, s.max_det, sensors{i}.col, sensors{i}.name);
+    end
+end
 plot_tt(tt.stamp, tt.rho_dot, tt.max_opp, col.tt, name1);
 if(compare); plot_tt(tt2.stamp, tt2.rho_dot, tt2.max_opp, col.tt2, name2); end
 if(compare2); plot_tt(tt3.stamp, tt3.rho_dot, tt3.max_opp, col.tt3, name3); end

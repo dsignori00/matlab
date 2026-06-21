@@ -1,7 +1,7 @@
-function [lid_clust, rad_clust, cam_yolo, lid_pp] = load_perception(log)
+function [lid_clust, rad_clust, cam_yolo, lid_pp, v2v] = load_perception(log)
 % LOAD_PERCEPTION  Parse perception detections.
 %
-%   All four detection structs are guaranteed to exist. Missing sources
+%   All detection structs are guaranteed to exist. Missing sources
 %   are replaced with empty structs containing NaN fields.
 
 
@@ -19,6 +19,7 @@ emptyDetectionStruct = struct( ...
     'y_map', NaN, ...
     'z_map', NaN, ...
     'yaw_map', NaN, ...
+    'count', NaN, ...
     'buffer', NaN ... 
 );
 
@@ -45,6 +46,7 @@ if isfield(log,'perception__lidar__clustering_detections')
     lid_clust.z_map   = replaceZeroWithNaN(d.detections__z_map);
     lid_clust.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
 
+    lid_clust.count    = getDetectionCount(d, lid_clust.x_rel);
     lid_clust.buffer   = opp.opponents__lid_clust_meas;
     lid_clust.max_det = max(sum(~isnan(lid_clust.x_rel')));
 else
@@ -72,6 +74,7 @@ if isfield(log,'perception__radar__clustering_detections')
     rad_clust.z_map   = replaceZeroWithNaN(d.detections__z_map);
     rad_clust.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
 
+    rad_clust.count    = getDetectionCount(d, rad_clust.x_rel);
     rad_clust.buffer   = opp.opponents__rad_clust_meas;
     rad_clust.max_det = max(sum(~isnan(rad_clust.x_rel')));
 else
@@ -98,6 +101,7 @@ if isfield(log,'perception__camera__yolo_detections')
     cam_yolo.z_map   = replaceZeroWithNaN(d.detections__z_map);
     cam_yolo.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
 
+    cam_yolo.count    = getDetectionCount(d, cam_yolo.x_rel);
     cam_yolo.buffer   = opp.opponents__cam_yolo_meas;
     cam_yolo.max_det = max(sum(~isnan(cam_yolo.x_rel')));
 else
@@ -124,11 +128,40 @@ if isfield(log,'perception__lidar__pointpillars_detections')
     lid_pp.z_map   = replaceZeroWithNaN(d.detections__z_map);
     lid_pp.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
 
+    lid_pp.count    = getDetectionCount(d, lid_pp.x_rel);
     lid_pp.buffer   = opp.opponents__lid_pp_meas;
     lid_pp.max_det = max(sum(~isnan(lid_pp.x_rel')));
 else
     lid_pp = emptyDetectionStruct;
     lid_pp.max_det = 1;
+end
+
+
+%  V2V DETECTIONS
+
+if isfield(log,'perception__v2v__detections')
+    d = log.perception__v2v__detections;
+
+    v2v.sens_stamp = d.sensor_stamp__tot;
+    v2v.stamp      = d.stamp__tot;
+
+    v2v.x_rel   = replaceZeroWithNaN(d.detections__x_rel);
+    v2v.y_rel   = replaceZeroWithNaN(d.detections__y_rel);
+    v2v.z_rel   = replaceZeroWithNaN(d.detections__z_rel);
+    v2v.yaw_rel = rad2deg(replaceZeroWithNaN(d.detections__yaw_rel));
+    v2v.vx      = replaceZeroWithNaN(d.detections__vx);
+
+    v2v.x_map   = replaceZeroWithNaN(d.detections__x_map);
+    v2v.y_map   = replaceZeroWithNaN(d.detections__y_map);
+    v2v.z_map   = replaceZeroWithNaN(d.detections__z_map);
+    v2v.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
+
+    v2v.count   = getDetectionCount(d, v2v.x_rel);
+    v2v.buffer  = opp.opponents__v2v_meas;
+    v2v.max_det = max(sum(~isnan(v2v.x_rel')));
+else
+    v2v = emptyDetectionStruct;
+    v2v.max_det = 1;
 end
 
 %  NaN CHECK: Confirm at least one detection source contains data
@@ -141,7 +174,8 @@ if all([
     isAllNaNStruct(lid_clust), ...
     isAllNaNStruct(rad_clust), ...
     isAllNaNStruct(cam_yolo), ...
-    isAllNaNStruct(lid_pp)
+    isAllNaNStruct(lid_pp), ...
+    isAllNaNStruct(v2v)
 ])
     error('No detections found: all detection structures are empty or contain only NaN values.');
 end
@@ -154,4 +188,12 @@ end % FUNCTION END
 function out = replaceZeroWithNaN(x)
     out = x;
     out(out == 0) = NaN;
+end
+
+function count = getDetectionCount(d, x_rel)
+    if isfield(d, 'count')
+        count = d.count;
+    else
+        count = sum(isfinite(x_rel), 2);
+    end
 end

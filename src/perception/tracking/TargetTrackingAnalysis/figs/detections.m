@@ -4,33 +4,13 @@ tiledlayout(3,1,'Padding','compact');
 
 % count
 axes(f) = nexttile([1,1]); f=f+1; hold on;
-n = numel(sensors);
-N = numel(tt.stamp);
-cum = zeros(N,1);
-top = zeros(N,n);
-base = zeros(N,n);
-
-for i = 1:n
+for i = 1:numel(sensors)
     s = sensors{i}.s;
-
-    base(:,i) = cum;
-    cum = cum + double(s.buffer(:,1));
-    top(:,i) = cum;
-end
-
-for i = 1:n
-    x = tt.stamp;
-
-    fill([x; flipud(x)], ...
-         [base(:,i); flipud(top(:,i))], ...
-         sensors{i}.col, ...
-         'EdgeColor', 'none', ...
-         'HandleVisibility', 'off');
-
-    plot(NaN, NaN, 's', ...
-        'MarkerFaceColor', sensors{i}.col, ...
-        'MarkerEdgeColor', sensors{i}.col, ...
-        'DisplayName', sensors{i}.name);
+    if isfield(s, 'count') && any(isfinite(s.count(:))) && any(isfinite(s.sens_stamp(:)))
+        stairs(s.sens_stamp, s.count, ...
+            'Color', sensors{i}.col, ...
+            'DisplayName', sensors{i}.name);
+    end
 end
 grid on; ylabel('Count'); legend show; xlabel('timestamp [s]');
 
@@ -43,11 +23,14 @@ allSensorId  = [];
 
 for i = 1:numel(sensors)
     s = sensors{i}.s;
-    n = numel(s.stamp);
+    valid = isfinite(s.stamp(:)) & isfinite(s.sens_stamp(:));
+    if ~any(valid)
+        continue;
+    end
 
-    allStamp     = [allStamp;     s.stamp(:)];
-    allSensStamp = [allSensStamp; s.sens_stamp(:)];
-    allSensorId  = [allSensorId;  repmat(i,n,1)];
+    allStamp     = [allStamp;     s.stamp(valid)];
+    allSensStamp = [allSensStamp; s.sens_stamp(valid)];
+    allSensorId  = [allSensorId;  repmat(i,sum(valid),1)];
 end
 
 % Sort by arrival time (filter iteration order)

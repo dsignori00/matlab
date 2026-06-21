@@ -31,7 +31,7 @@ grid on; ylabel('y map [m]'); legend show;
 axes(f) = nexttile([1,1]); f=f+1; hold on;
 for i = 1:numel(sensors)
     s = sensors{i}.s;
-    plot_detections(s.sens_stamp, s.yaw_map, s.max_det, sensors{i}.col, sensors{i}.name);
+    plot_detections(s.sens_stamp, unwrap_pi(s.yaw_map), s.max_det, sensors{i}.col, sensors{i}.name);
 end
     
 plot_tt(tt.stamp, tt.yaw_map, tt.max_opp, col.tt, name1);

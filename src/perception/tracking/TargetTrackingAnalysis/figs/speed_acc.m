@@ -4,6 +4,12 @@ tiledlayout(3,1,'Padding','compact');
 
 % vx
 axes(f) = nexttile([1,1]); f=f+1; hold on;
+for i = 1:numel(sensors)
+    s = sensors{i}.s;
+    if isfield(s, 'vx')
+        plot_detections(s.sens_stamp, s.vx, s.max_det, sensors{i}.col, sensors{i}.name);
+    end
+end
 plot_tt(tt.stamp, tt.vx, tt.max_opp, col.tt, name1);
 if(compare); plot_tt(tt2.stamp, tt2.vx, tt2.max_opp, col.tt2, name2); end
 if(compare2); plot_tt(tt3.stamp, tt3.vx, tt3.max_opp, col.tt3, name3); end

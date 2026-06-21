@@ -92,6 +92,7 @@ col.lidar   = colors.green{2};
 col.radar   = [77 190 238] / 255;
 col.camera  = colors.yellow{2};
 col.pp      = colors.orange{2};
+col.v2v     = colors.red{2};
 col.tt      = colors.matlab{1};
 col.tt2     = colors.matlab{2};
 col.tt3     = colors.matlab{3};
@@ -103,7 +104,7 @@ x_lim = [0 inf];
 
 %% PARSING
 
-[lid_clust, rad_clust, cam_yolo, lid_pp] = load_perception(log);
+[lid_clust, rad_clust, cam_yolo, lid_pp, v2v] = load_perception(log);
 if(use_ref || use_sim_ref); gt = load_ref(log, use_sim_ref, use_ref, log_ref); end
 tt = load_tt(log);
 tt.col = col.tt;
@@ -130,6 +131,10 @@ sensors = { ...
     struct('s', cam_yolo,  'col', col.camera,  'name', 'camera'), ...
 };
 
+if any(~isnan(v2v.sens_stamp(:)))
+    sensors{end+1} = struct('s', v2v, 'col', col.v2v, 'name', 'v2v');
+end
+
 if(use_ref || use_sim_ref)
     errors = process_states(gt, tt, err_thr, err_stats);
     if(compare)
@@ -150,7 +155,7 @@ state_map;
 state_cog;
 range;
 speed_acc;
-% map;
+map;
 % covariance;
 % error_analysis;
 % imm;
