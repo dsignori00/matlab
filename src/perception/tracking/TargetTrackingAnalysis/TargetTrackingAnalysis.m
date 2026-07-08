@@ -150,14 +150,14 @@ end
 
 % info;
 detections;
-latency;
-state_map;
-state_cog;
-range;
-speed_acc;
+% latency;
+% state_map;
+% state_cog;
+% range;
+% speed_acc;
 map;
-% covariance;
-% error_analysis;
+covariance;
+error_analysis;
 % imm;
 % dataset_analysis;
 

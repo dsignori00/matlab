@@ -1,4 +1,5 @@
 if(~use_ref && ~use_sim_ref)
+   print("[ErrorAnalysis] no ground truth given")
    return
 end
 
