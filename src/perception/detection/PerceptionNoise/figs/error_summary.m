@@ -128,11 +128,11 @@ function refreshErrorSummaryButtonPushed(~,~)
     for i = 1:numel(sensors)
         si = sensors{i}.s;
 
-        e = rad2deg(si.yaw_map_err(si.idx));
+        e = si.yaw_map_err(si.idx);
         yaw_err = [yaw_err; e];
         group   = [group; repmat({sensors{i}.name}, numel(e), 1)];
 
-        YawMaxStd = max(YawMaxStd, rad2deg(si.yaw_map_std));
+        YawMaxStd = max(YawMaxStd, si.yaw_map_std);
     end
 
     boxplot(ax_yaw, yaw_err, group, 'Symbol','')

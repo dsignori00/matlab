@@ -18,7 +18,7 @@ tiledlayout(numel(sensors),1,'Padding','compact')
 for i = 1:numel(sensors)
     ax(f) = nexttile; hold on; grid on; f=f+1;
     plot(t0, zeros(size(t0)),'--k','LineWidth',0.3, 'HandleVisibility','off')
-    plot_detections(sensors{i}.s.sens_stamp, sensors{i}.s.x_map_err,sensors{i}.s.max_det, sensors{i}.col, sensors{i}.name)
+    plot_detections(sensors{i}.s.sens_stamp, gated_error(sensors{i}.s, 'x_map_err', err_thr), 1, sensors{i}.col, sensors{i}.name)
     xlim([0 inf]); ylim(y_err_lim), ylabel('error [m]'), legend show;
 end
 xlabel('timestamp [s]');
@@ -30,7 +30,7 @@ tiledlayout(numel(sensors),1,'Padding','compact')
 for i = 1:numel(sensors)
     ax(f) = nexttile; hold on; grid on; f=f+1;
     plot(t0, zeros(size(t0)),'--k','LineWidth',0.3, 'HandleVisibility','off')
-    plot_detections(sensors{i}.s.sens_stamp, sensors{i}.s.y_map_err,sensors{i}.s.max_det, sensors{i}.col, sensors{i}.name)
+    plot_detections(sensors{i}.s.sens_stamp, gated_error(sensors{i}.s, 'y_map_err', err_thr), 1, sensors{i}.col, sensors{i}.name)
     xlim([0 inf]); ylim(y_err_lim), ylabel('error [m]'), legend show;
 end
 xlabel('timestamp [s]');
@@ -42,7 +42,13 @@ tiledlayout(numel(sensors),1,'Padding','compact')
 for i = 1:numel(sensors)
     ax(f) = nexttile; hold on; grid on; f=f+1;
     plot(t0, zeros(size(t0)),'--k','LineWidth',0.3, 'HandleVisibility','off')
-    plot_detections(sensors{i}.s.sens_stamp, rad2deg(sensors{i}.s.yaw_map_err),sensors{i}.s.max_det, sensors{i}.col, sensors{i}.name)
+    plot_detections(sensors{i}.s.sens_stamp, gated_error(sensors{i}.s, 'yaw_map_err', err_thr), 1, sensors{i}.col, sensors{i}.name)
     xlim([0 inf]); ylim(y_err_lim), ylabel('error [deg]'), legend show;
 end
 xlabel('timestamp [s]');
+
+function err = gated_error(sensor, field, err_thr)
+    gate = hypot(sensor.x_map_err(:,1), sensor.y_map_err(:,1)) < err_thr;
+    err = sensor.(field)(:,1);
+    err(~gate) = NaN;
+end

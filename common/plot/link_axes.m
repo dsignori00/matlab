@@ -1,6 +1,12 @@
 function link_axes()
-    if evalin('caller', "exist('axes','var')") && ~evalin('caller', "isempty(axes)")
-        ax_handles = evalin('caller', 'axes');
+    has_axes = evalin('caller', "(exist('axes','var') && ~isempty(axes)) || (exist('ax','var') && ~isempty(ax))");
+    if has_axes
+        if evalin('caller', "exist('axes','var') && ~isempty(axes)")
+            ax_handles = evalin('caller', 'axes');
+        else
+            ax_handles = evalin('caller', 'ax');
+        end
+
         plot_axes = ax_handles(isgraphics(ax_handles,'axes'));
     
         if ~isempty(plot_axes)
@@ -30,13 +36,37 @@ function link_axes()
                             linkaxes(fig_axes,'x');
                         end
                     end
+
+                case 'active'
+                    fig_handles = arrayfun(@(ax) ancestor(ax,'figure'), plot_axes);
+                    for fig = reshape(unique(fig_handles), 1, [])
+                        fig_axes = plot_axes(fig_handles == fig);
+                        if numel(fig_axes) > 1
+                            linkaxes(fig_axes,'x');
+                        end
+
+                        listener = addlistener(fig, 'WindowMousePress', ...
+                            @(source, ~) sync_active_figure(source, plot_axes));
+                        setappdata(fig, 'LinkAxesActiveFigureListener', listener);
+                    end
     
                 case 'none'
                     % Keep independent axes for fastest plotting.
     
                 otherwise
-                    warning('Unknown link_axes_mode "%s". Use "none", "figure", or "all".', link_axes_mode);
+                    warning('Unknown link_axes_mode "%s". Use "none", "figure", "active", or "all".', link_axes_mode);
             end
         end
     end
+end
+
+function sync_active_figure(source_figure, plot_axes)
+    source_axes = source_figure.CurrentAxes;
+    valid_axes = plot_axes(isgraphics(plot_axes, 'axes'));
+
+    if isempty(source_axes) || ~any(source_axes == valid_axes)
+        return;
+    end
+
+    set(valid_axes, 'XLim', source_axes.XLim);
 end

@@ -3,13 +3,16 @@ clc; close all; clearvars -except log log_ref trajDatabase
 use_sim_ref         = false;
 show_error_series   = true;
 search_correlations = false;
+link_axes_mode      = 'all'; % 'none', 'figure', 'active', or 'all'
 
 %% Paths
 
 proj = currentProject();
+scriptDir = fileparts(mfilename('fullpath'));
 addpath(fullfile(proj.RootFolder,'src','perception','utils'));
-addpath("func/")
-addpath("figs/")
+addpath(fullfile(proj.RootFolder,'common','plot'));
+addpath(fullfile(scriptDir,'func'));
+addpath(fullfile(scriptDir,'figs'));
 
 %#ok<*UNRCH>
 %#ok<*INUSD>
@@ -29,17 +32,23 @@ end
 % load log
 if (~exist('log','var'))
     [file,path] = uigetfile(fullfile(get_bags_dir(),'*.mat'),'Load log');
+    if isequal(file, 0)
+        error('No log selected');
+    end
     load(fullfile(path,file));
 end
 
 % load ref
 if(~use_sim_ref)
     if (~exist('log_ref','var'))
-    [file,path_dir] = uigetfile(fullfile(get_gt_dir(),'*.mat'),'Load ground truth mat');
-    tmp = load(fullfile(path_dir,file));
-    fields = fieldnames(tmp);
-    log_ref = tmp.(fields{1});
-    clearvars tmp;
+        [file,path_dir] = uigetfile(fullfile(get_gt_dir(),'*.mat'),'Load ground truth mat');
+        if isequal(file, 0)
+            error('No ground truth selected');
+        end
+        tmp = load(fullfile(path_dir,file));
+        fields = fieldnames(tmp);
+        log_ref = tmp.(fields{1});
+        clearvars tmp;
     end
 else
     log_ref = [];
@@ -74,8 +83,8 @@ cam_yolo.sens_stamp(cam_yolo.sens_stamp < 0) = NaN;
 % ego
 ego.speed_stamp = log.estimation.stamp__tot;
 ego.speed = log.estimation.vx;
-ego.rpm_stamp = log.vehicle_fbk.stamp__tot;
-ego.rpm = log.vehicle_fbk.engine_rpm;
+% ego.rpm_stamp = log.vehicle_fbk.stamp__tot;
+% ego.rpm = log.vehicle_fbk.engine_rpm;
 
 % target tracking
 tt.stamp = log.perception__opponents.stamp__tot;
@@ -104,25 +113,9 @@ time_series_map;
 time_series_cog;
 time_series_range;
 time_series_errors;
-correlations;
+% correlations;
 error_summary;
 sensors_fov;
 map;
 
-% linkaxes
-ax = ax(isgraphics(ax, 'axes'));
-if ~isempty(ax)
-    t0 = 0;                     
-    t1 = max(arrayfun(@(a) a.XLim(2), ax));   
-    
-    % Set manual x-limits for each axes
-    for k = 1:numel(ax)
-        ax(k).XLim = [t0 t1];
-        ax(k).XLimMode = 'manual';
-    end
-    
-    % Link axes along x-axis
-    linkaxes(ax, 'x');
-end
-
-
+link_axes();
