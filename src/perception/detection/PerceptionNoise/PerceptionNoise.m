@@ -114,6 +114,7 @@ time_series_cog;
 time_series_range;
 time_series_errors;
 % correlations;
+fit_gaussian;
 error_summary;
 sensors_fov;
 map;
