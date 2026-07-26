@@ -65,8 +65,8 @@ function refreshTimeButtonPushed(src, event)
     id_left  = numel(traj_db) - 2;
     id_right = numel(traj_db) - 1;
 
-    plot(traj_db(id_left).X,  traj_db(id_left).Y,  'k','LineWidth',1,'HandleVisibility','off');
-    plot(traj_db(id_right).X, traj_db(id_right).Y, 'k','LineWidth',1,'HandleVisibility','off');
+    plot(traj_db(id_left).x,  traj_db(id_left).y,  'k','LineWidth',1,'HandleVisibility','off');
+    plot(traj_db(id_right).x, traj_db(id_right).y, 'k','LineWidth',1,'HandleVisibility','off');
 
     % --- sensor detections ---
     for i = 1:numel(sensors)
