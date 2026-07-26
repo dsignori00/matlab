@@ -33,16 +33,9 @@
 % NOTE: for UTM conversion, install following add-on
 % https://github.com/geographiclib/geographiclib-octave
 
-%% Paths
+%% Load Data
 clc; close all; clearvars -except ego opp_log closest_idxs opp_idxs file_name out.clos_idx
 
-proj = currentProject();
-addpath(fullfile(proj.RootFolder,'src','perception','utils'));
-
-addpath("opp_data/")
-output_path = "mat/";
-
-%% Load Data
 
 % load ego log
 if (~exist('ego','var'))
@@ -122,14 +115,15 @@ switch(opp_id)
 
     case 6
         ref_sys = "utm";
-        opp_lat0 = 24.46477;
-        opp_lon0 = 54.60523;
+        opp_lat0 = 44.344351;
+        opp_lon0 = 11.714010;
         opp_alt0 = 0.0;
-        out.timestamp = opp_log.x__loc_vehicle_state_head_stamp;
-        out.x_map = opp_log.x__loc_vehicle_state_position_value0;
-        out.y_map = opp_log.x__loc_vehicle_state_position_value1;
-        out.yaw_map = unwrap(opp_log.x__loc_vehicle_state_orientation_value2);
-        out.speed = opp_log.x__loc_vehicle_state_linVel_value0;
+        out.timestamp = opp_log.stamp;
+        out.x_map = opp_log.x;
+        out.y_map = opp_log.y;
+        out.yaw_map = unwrap(opp_log.yaw);
+        out.speed = opp_log.vx;
+        out.ax = opp_log.ax;
 
     case 71
         ref_sys = "lla";
