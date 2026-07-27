@@ -11,12 +11,6 @@ NAME_2 = "old - ";
 %#ok<*UNRCH>
 %#ok<*INUSD>
 
-%% Paths
-
-proj = currentProject();
-addpath(fullfile(proj.RootFolder,'src','perception','utils'));
-
-
 %% LOAD FILES
 
 %load database
