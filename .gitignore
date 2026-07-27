@@ -6,5 +6,3 @@ bags/*
 !/src/perception/opponent_gps/mat/.gitkeep
 /src/scripts/csv_to_share/*
 
-*.mat
-
