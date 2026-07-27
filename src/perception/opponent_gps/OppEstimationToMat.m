@@ -9,7 +9,7 @@
 % timestamp                 % timestamp in epoch format (nanoseconds)
 % header_stamp              % header stamp from driver
 % latitude                  % latitude
-% longitude                 % longiude
+% longitude                 % longitude
 % bag_avg_frequency         % average publishing frequency
 % x_map                     % x in global reference frame (ENU)
 % y_map                     % y in global reference frame (ENU)
@@ -35,6 +35,7 @@
 
 %% Load Data
 clc; close all; clearvars -except ego opp_log closest_idxs opp_idxs file_name out.clos_idx
+proj = currentProject;
 
 
 % load ego log
@@ -47,7 +48,8 @@ end
 
 % load opponent estimation file
 if  (~exist('opp_log','var'))
-    [file,normal_path] = uigetfile(fullfile("opp_data",'*.csv'),'Load opp localization');
+    opp_data_folder = fullfile(proj.RootFolder, 'src', 'perception', 'opponent_gps', 'opp_data', '*.csv');
+    [file,normal_path] = uigetfile(opp_data_folder,'Load opp localization');
     file = dir(fullfile(normal_path,file));
     files_list = string(file.name);
 
@@ -90,11 +92,12 @@ end
 
 %Select opponent and gps
 opp_id = -1;
-lista_opponents = [0,3,6,71];
+lista_opponents = [0,3,6,33,71];
 while ~ismember(opp_id, lista_opponents)
     disp( "Choose opponent:" + newline + ...
-        " 3: Tum " + newline + ...
+        " 3: Kinetiz " + newline + ...
         " 6: Unimore " + newline + ...
+        "33: Tum" + newline + ...
         "71: Tii " + newline + ...
         " 0: Quit");
     opp_id = input("Choose opponent identifier: ");
@@ -104,14 +107,15 @@ end
 switch(opp_id)
     case 3
         ref_sys = "lla";
-        opp_lat0 = 24.471024;
-        opp_lon0 = 54.605536;
-        opp_alt0 = -29.96;
-        out.timestamp = opp_log.stamp*10^9;
-        out.x_map = opp_log.x_cog;
-        out.y_map = opp_log.y_cog;
-        out.yaw_map = unwrap(opp_log.heading());
+        opp_lat0 = 44.344351;
+        opp_lon0 = 11.714010;
+        opp_alt0 = 0.0;
+        out.timestamp = opp_log.timestamp*10^9;
+        out.x_map = opp_log.x;
+        out.y_map = opp_log.y;
+        out.yaw_map = unwrap(opp_log.yaw);
         out.speed = opp_log.vx;
+        out.ax = opp_log.ax;
 
     case 6
         ref_sys = "utm";
@@ -125,6 +129,18 @@ switch(opp_id)
         out.speed = opp_log.vx;
         out.ax = opp_log.ax;
 
+    case 33
+        ref_sys = "lla";
+        opp_lat0 = 24.471024;
+        opp_lon0 = 54.605536;
+        opp_alt0 = -29.96;
+        out.timestamp = opp_log.stamp*10^9;
+        out.x_map = opp_log.x_cog;
+        out.y_map = opp_log.y_cog;
+        out.yaw_map = unwrap(opp_log.heading());
+        out.speed = opp_log.vx;
+        out.ax = opp_log.ax;
+
     case 71
         ref_sys = "lla";
         opp_lat0 = 24.46992202098782;
@@ -135,11 +151,12 @@ switch(opp_id)
         out.y_map = opp_log.position_y;
         out.yaw_map = unwrap(opp_log.yaw);
         out.speed = opp_log.vel_x;
+        out.ax = opp_log.ax;
 
 end
 
 %Select the track
-track_list = [0,1,2,3,4,5];
+track_list = [0,1,2,3,4,5,6];
 track_id = -1;
 while ~ismember(track_id, track_list)
     disp( "Choose track:" + newline + ...
@@ -148,6 +165,7 @@ while ~ismember(track_id, track_list)
           " 3: LVMS " + newline + ...
           " 4: YasMarina " + newline + ...
           " 5: YasNorth " + newline + ...
+          " 6: Imola " + newline + ...
           " 0: Quit");
     track_id = input("Insert track identifier: ");
 end
@@ -160,7 +178,7 @@ switch (track_id)
         lat0    = 38.711552404047440;
         lon0    = -84.916952255229230;
         alt0    = 182.9;
-        % load("Ks.mat")
+        load("Ks.mat")
     case 2
         % IMS
         lat0    =  39.793145808368780;	
@@ -185,6 +203,12 @@ switch (track_id)
         lon0 = 54.605170726971520;
         alt0 = 182.9;
         load("YasNorth.mat")
+     case 6
+        % Imola
+        lat0 = 44.34266668085731;
+        lon0 = 11.71339346495961;
+        alt0 = 40.0;
+        load("Imola.mat")
     case 0
         error("Quit");
     otherwise
@@ -196,11 +220,12 @@ if strcmp(ref_sys, "lla")
     out.x_map = out.x_map + x0;
     out.y_map = out.y_map + y0;
 elseif strcmp(ref_sys, "utm")
-    [opp_e0, opp_n0, zone, is_north] = utmups_fwd(opp_lat0, opp_lon0);
-    out.x_map = out.x_map + opp_e0;
-    out.y_map = out.y_map + opp_n0;
-    [out.x_map,out.y_map] = utmups_inv(out.x_map,out.y_map,zone, is_north);
-    [out.x_map,out.y_map,~] = geodetic2enu(out.x_map,out.y_map,zeros(size(out.x_map)),lat0,lon0,alt0,wgs84);
+    [originEasting, originNorthing, zone, isNorth] = utmups_fwd(opp_lat0, opp_lon0);
+    easting = out.x_map + originEasting;
+    northing = out.y_map + originNorthing;
+    [latitude, longitude, meridianConvergence] = utmups_inv(easting, northing, zone, isNorth);
+    [out.x_map, out.y_map, ~] = geodetic2enu(latitude, longitude, zeros(size(latitude)), lat0, lon0, alt0, wgs84);
+    out.yaw_map = unwrap(out.yaw_map - deg2rad(meridianConvergence));
 else
     disp("Unrecognized reference system")
 end
@@ -223,15 +248,21 @@ freq = 1./diff;
 avg_freq = mean(freq)*10^9;
 out.bag_avg_freq = avg_freq;
 
+framelen = floor(avg_freq) / 2;
+if(mod(framelen,2)==0)
+    framelen = framelen + 1;
+end 
+
+% TO DO: prova a filtrare l'informazione della imu (2 poli a 10Hz)
 % acceleration
 if ~isfield(out,'ax') || all(isnan(out.ax))
-    out.ax = sgolayfilt(gradient(out.speed(:)) ./ gradient(out.timestamp(:))*10^9, 3, 101);
+    out.ax = sgolayfilt(gradient(out.speed(:)) ./ gradient(out.timestamp(:))*10^9, 3, framelen);
     out.virtual_acc = true;
 end
 
 % yaw rate
 if ~isfield(out,'yaw_rate') || all(isnan(out.yaw_rate))
-    out.yaw_rate = sgolayfilt(gradient(out.yaw_map(:)) ./ gradient(out.timestamp(:))*10^9, 3, 101);
+    out.yaw_rate = sgolayfilt(gradient(out.yaw_map(:)) ./ gradient(out.timestamp(:))*10^9, 3, framelen);
     out.virtual_yawrate = true;
 end
 
@@ -333,6 +364,7 @@ out.rho_dot = rho_dot;
 
 
 %% Save the output struct
+output_path = fullfile(proj.RootFolder, 'src', 'perception', 'opponent_gps', 'mat');
 
 try
     output_file = fullfile(output_path, file_name + ".mat");
