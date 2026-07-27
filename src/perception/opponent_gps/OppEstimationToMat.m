@@ -253,8 +253,19 @@ if(mod(framelen,2)==0)
     framelen = framelen + 1;
 end 
 
-% TO DO: prova a filtrare l'informazione della imu (2 poli a 10Hz)
 % acceleration
+if opp_id == 3
+    imu_cutoff_freq = 10;
+    imu_filter_order = 2;
+
+    if ~isfinite(avg_freq) || avg_freq <= 2 * imu_cutoff_freq
+        error("The IMU sample frequency must be greater than 20 Hz.");
+    end
+
+    [imu_filter_b, imu_filter_a] = butter(imu_filter_order, imu_cutoff_freq / (avg_freq / 2), "low");
+    out.ax = filtfilt(imu_filter_b, imu_filter_a, out.ax);
+end
+
 if ~isfield(out,'ax') || all(isnan(out.ax))
     out.ax = sgolayfilt(gradient(out.speed(:)) ./ gradient(out.timestamp(:))*10^9, 3, framelen);
     out.virtual_acc = true;
