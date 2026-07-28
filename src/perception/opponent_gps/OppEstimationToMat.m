@@ -131,9 +131,9 @@ switch(opp_id)
 
     case 33
         ref_sys = "lla";
-        opp_lat0 = 24.471024;
-        opp_lon0 = 54.605536;
-        opp_alt0 = -29.96;
+        opp_lat0 = 44.342534100;
+        opp_lon0 = 11.711892000;
+        opp_alt0 = -39.992;
         out.timestamp = opp_log.stamp*10^9;
         out.x_map = opp_log.x_cog;
         out.y_map = opp_log.y_cog;
@@ -254,7 +254,7 @@ if(mod(framelen,2)==0)
 end 
 
 % acceleration
-if opp_id == 3
+if opp_id == 3 || opp_id == 33
     imu_cutoff_freq = 10;
     imu_filter_order = 2;
 
