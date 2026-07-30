@@ -39,31 +39,6 @@ Why this matters: several utilities use `currentProject()` and assume the projec
 - Keep track databases in `/databases` (already populated with sample track files).
 - Ground-truth files used by opponent GPS/tracking workflows are expected under project paths resolved by utility functions.
 
-## How to run common analyses
-
-From MATLAB (with project open), run scripts from the Editor or Command Window.
-
-### Detection
-- `src/perception/detection/RadarAnalysis.m`
-- `src/perception/detection/CameraYoloAnalysis.m`
-- `src/perception/detection/PointpillarsAnalysis.m`
-- `src/perception/detection/PerceptionNoise/PerceptionNoise.m`
-
-### Tracking
-- `src/perception/tracking/TargetTrackingAnalysis/TargetTrackingAnalysis.m`
-- `src/perception/tracking/SpeedStdAnalysis.m`
-- `src/perception/tracking/SafeStopAnalysis.m`
-
-### Opponent GPS / preprocessing
-- `src/perception/opponent_gps/OppGpsToMat.m`
-- `src/perception/opponent_gps/AlignDatabases.m`
-- `src/perception/opponent_gps/OppEstimationToMat.m`
-
-Most scripts:
-- ask you to select inputs with `uigetfile`,
-- load one database from `/databases` via `choose_database`,
-- generate figures directly.
-
 ## Notes and troubleshooting
 
 - If `currentProject()` errors appear, reopen `Polimove.prj`.
