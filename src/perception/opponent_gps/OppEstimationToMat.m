@@ -255,11 +255,11 @@ end
 
 % acceleration
 if opp_id == 3 || opp_id == 33
-    imu_cutoff_freq = 10;
+    imu_cutoff_freq = 5;
     imu_filter_order = 2;
 
     if ~isfinite(avg_freq) || avg_freq <= 2 * imu_cutoff_freq
-        error("The IMU sample frequency must be greater than 20 Hz.");
+        error("The IMU sample frequency must be greater than twice the cutoff frequency (%.1f Hz).", imu_cutoff_freq);
     end
 
     [imu_filter_b, imu_filter_a] = butter(imu_filter_order, imu_cutoff_freq / (avg_freq / 2), "low");
