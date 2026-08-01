@@ -11,12 +11,6 @@ NAME_2 = "old - ";
 %#ok<*UNRCH>
 %#ok<*INUSD>
 
-%% Paths
-
-proj = currentProject();
-addpath(fullfile(proj.RootFolder,'src','perception','utils'));
-
-
 %% LOAD FILES
 
 %load database
@@ -187,7 +181,7 @@ function fovButtonPushed(~,~)
     end
 
     % Sensor Plot
-    subplot(1,2,1)
+    subplot(2,2,[1 3])
     cla reset 
     legend('Location','northwest')
     hold on
@@ -218,5 +212,35 @@ function fovButtonPushed(~,~)
     plot(range.x_75m,range.y_75m,'--','LineWidth',0.3,'Color',[0.5 0.5 0.5],'HandleVisibility','off')
     plot(range.x_100m,range.y_100m,'--','LineWidth',0.3,'Color',[0.5 0.5 0.5],'HandleVisibility','off')
     plot(0,0,'d','Color','default','LineWidth',1,'DisplayName','Ego','MarkerSize',10)
+    xlim([-125 125])
+
+    % Normalized Range distribution
+    rangeAxes(1) = subplot(2,2,2);
+    cla reset,hold on, grid on
+    xlabel('range [m]')
+    ylabel('normalized counts')
+    title(NAME_1)
+
+    histogram(lid_clust.range(t1_lid_clust:tend_lid_clust), 'Normalization','probability','BinWidth',1,'FaceColor',col.lidar,'DisplayName',"lidar");
+    histogram(rad_clust.range(t1_rad_clust:tend_rad_clust), 'Normalization','probability','BinWidth',1,'FaceColor',col.radar,'DisplayName',"radar");
+    histogram(lid_pp.range(t1_lid_pp:tend_lid_pp), 'Normalization','probability','BinWidth',1,'FaceColor',col.pp,'DisplayName',"pointpillars");
+    histogram(cam_yolo.range(t1_cam_yolo:tend_cam_yolo), 'Normalization','probability','BinWidth',1,'FaceColor',col.camera,'DisplayName',"yolo");
+    
+    if(compare)
+        rangeAxes(2) = subplot(2,2,4);
+        cla reset,hold on, grid on
+        xlabel('range [m]')
+        ylabel('normalized counts')
+        title(NAME_2)
+        histogram(lid_clust2.range(t1_lid_clust2:tend_lid_clust2), 'Normalization','probability','BinWidth',1,'FaceColor',col.lidar2,'DisplayName',"lidar");
+        histogram(rad_clust2.range(t1_rad_clust2:tend_rad_clust2), 'Normalization','probability','BinWidth',1,'FaceColor',col.radar2,'DisplayName',"radar");
+        histogram(lid_pp2.range(t1_lid_pp2:tend_lid_pp2), 'Normalization','probability','BinWidth',1,'FaceColor',col.pointpillars2,'DisplayName',"pointpillars");
+        histogram(cam_yolo2.range(t1_cam_yolo2:tend_cam_yolo2), 'Normalization','probability','BinWidth',1,'FaceColor',col.camera2,'DisplayName',"yolo");
+
+        linkaxes(rangeAxes,'x');
+    end
+
+    xlim(rangeAxes,[0 150]);
+    ylim(rangeAxes,[0 0.005]);
 
 end

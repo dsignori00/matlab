@@ -31,6 +31,13 @@ function tt = load_tt(log)
             tt.yaw_rate = rad2deg(log.perception__opponents.opponents__psi_dot);
             tt.yaw_rate(tt.yaw_rate==0)=nan;
         end
+        if isfield(log.perception__opponents,"opponents__ax_dot")
+            tt.ax_dot = log.perception__opponents.opponents__ax_dot;
+            tt.ax_dot(tt.ax_dot==0)=nan;
+        end
+        if isfield(log.perception__opponents,"opponents__ff_flag")
+            tt.ff_flag = log.perception__opponents.opponents__ff_flag;
+        end
         if isfield(log.perception__opponents,"opponents__probabilities")
             tt.imm.probabilities = log.perception__opponents.opponents__probabilities;
             tt.imm.likelihoods = log.perception__opponents.opponents__likelihoods;

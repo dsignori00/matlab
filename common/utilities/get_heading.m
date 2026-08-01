@@ -9,11 +9,11 @@ function [heading, idxs] = get_heading (pos, trajDatabase, traj)
         end
         min_dist = inf;
         if (traj~=-1)
-            [~, clos_idx] = compute_dist(x,y,trajDatabase(traj).X,trajDatabase(traj).Y);
+            [~, clos_idx] = compute_dist(x,y,trajDatabase(traj).x,trajDatabase(traj).y);
         else
             traj = 0;
             for i=1:length(trajDatabase)
-                [dist, idx] = compute_dist(x,y,trajDatabase(i).X,trajDatabase(i).Y);
+                [dist, idx] = compute_dist(x,y,trajDatabase(i).x,trajDatabase(i).y);
                 if(dist<min_dist)
                     min_dist = dist;
                     clos_idx = idx;
@@ -21,7 +21,7 @@ function [heading, idxs] = get_heading (pos, trajDatabase, traj)
                 end
             end
         end
-        out(j,1) = trajDatabase(traj).Heading(clos_idx);
+        out(j,1) = trajDatabase(traj).yaw(clos_idx);
         out(j,2) = clos_idx;
     end
     heading = out(:,1);
