@@ -20,7 +20,8 @@ emptyDetectionStruct = struct( ...
     'z_map', NaN, ...
     'yaw_map', NaN, ...
     'count', NaN, ...
-    'buffer', NaN ... 
+    'buffer', NaN, ... 
+    'valid_yaw', NaN ...
 );
 
 emptyRadarStruct = emptyDetectionStruct;
@@ -45,6 +46,7 @@ if isfield(log,'perception__lidar__clustering_detections')
     lid_clust.y_map   = replaceZeroWithNaN(d.detections__y_map);
     lid_clust.z_map   = replaceZeroWithNaN(d.detections__z_map);
     lid_clust.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
+    lid_clust.valid_yaw = d.detections__valid_yaw;
 
     lid_clust.count    = getDetectionCount(d, lid_clust.x_rel);
     lid_clust.buffer   = opp.opponents__lid_clust_meas;
@@ -73,6 +75,7 @@ if isfield(log,'perception__radar__clustering_detections')
     rad_clust.y_map   = replaceZeroWithNaN(d.detections__y_map);
     rad_clust.z_map   = replaceZeroWithNaN(d.detections__z_map);
     rad_clust.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
+    rad_clust.valid_yaw = d.detections__valid_yaw;
 
     rad_clust.count    = getDetectionCount(d, rad_clust.x_rel);
     rad_clust.buffer   = opp.opponents__rad_clust_meas;
@@ -100,6 +103,7 @@ if isfield(log,'perception__camera__yolo_detections')
     cam_yolo.y_map   = replaceZeroWithNaN(d.detections__y_map);
     cam_yolo.z_map   = replaceZeroWithNaN(d.detections__z_map);
     cam_yolo.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
+    cam_yolo.valid_yaw = d.detections__valid_yaw;
 
     cam_yolo.count    = getDetectionCount(d, cam_yolo.x_rel);
     cam_yolo.buffer   = opp.opponents__cam_yolo_meas;
@@ -127,6 +131,7 @@ if isfield(log,'perception__lidar__pointpillars_detections')
     lid_pp.y_map   = replaceZeroWithNaN(d.detections__y_map);
     lid_pp.z_map   = replaceZeroWithNaN(d.detections__z_map);
     lid_pp.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
+    lid_pp.valid_yaw = d.detections__valid_yaw;
 
     lid_pp.count    = getDetectionCount(d, lid_pp.x_rel);
     lid_pp.buffer   = opp.opponents__lid_pp_meas;
@@ -155,6 +160,7 @@ if isfield(log,'perception__v2v__detections')
     v2v.y_map   = replaceZeroWithNaN(d.detections__y_map);
     v2v.z_map   = replaceZeroWithNaN(d.detections__z_map);
     v2v.yaw_map = rad2deg(replaceZeroWithNaN(d.detections__yaw_map));
+    v2v.valid_yaw = d.detections__valid_yaw;
 
     v2v.count   = getDetectionCount(d, v2v.x_rel);
     v2v.buffer  = opp.opponents__v2v_meas;

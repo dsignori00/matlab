@@ -28,4 +28,4 @@ for i = 1:numel(sensors)
     plot_detections(s.sens_stamp, s.yaw_map, s.max_det, sensors{i}.col, sensors{i}.name);
 end
 plot(gt.stamp,gt.yaw_map,'Color',col.ref,'DisplayName','gt'); 
-grid on; ylabel('yaw [rad]'); legend show; xlabel('timestamp [s]');
+grid on; ylabel('yaw [deg]'); legend show; xlabel('timestamp [s]');

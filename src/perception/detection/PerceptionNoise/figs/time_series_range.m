@@ -16,6 +16,10 @@ grid on; ylabel('range [m]'); ylim([0 200]); legend show;
 
 % rho dot
 ax(f) = nexttile([1,1]); f=f+1; hold on;
-plot_detections(rad_clust.sens_stamp, rad_clust.rho_dot, rad_clust.max_det, col.radar, 'Rad Clust');
+radarIdx = find(cellfun(@(sensor) sensor.has_rho_dot, sensors), 1);
+if ~isempty(radarIdx)
+    radar = sensors{radarIdx}.s;
+    plot_detections(radar.sens_stamp, radar.rho_dot, radar.max_det, sensors{radarIdx}.col, sensors{radarIdx}.name);
+end
 plot(gt.stamp, gt.rho_dot, 'Color',col.ref,'DisplayName','gt')
 grid on; ylabel('rho dot [m/s]'); legend show; ylim([-50 50]); xlabel('timestamp [s]');

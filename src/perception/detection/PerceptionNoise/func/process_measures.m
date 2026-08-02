@@ -2,16 +2,22 @@
 for k = 1:numel(sensors)
     s = sensors{k}.s;
 
-    valid = ~isnan(s.x_map(:,1));
+    valid = isfinite(s.sens_stamp) & isfinite(s.x_map(:,1));
     for l = fields
-        s.(l{1}) = s.(l{1})(valid,:);
+        field = l{1};
+        s.(field) = s.(field)(valid,:);
+
+        % This analysis intentionally evaluates only the first detection.
+        if ~ismember(field, {'stamp','sens_stamp'})
+            s.(field) = s.(field)(:,1);
+        end
     end
 
     if isfield(s,'rho_dot')
-        s.rho_dot = s.rho_dot(valid,:);
+        s.rho_dot = s.rho_dot(valid,1);
     end
 
-    s.yaw_rel = unwrap(rad2deg(s.yaw_rel));
+    s.yaw_rel = rad2deg(unwrap(deg2rad(s.yaw_rel)));
     s.max_det = 1;
 
     sensors{k}.s = s;  
@@ -32,9 +38,10 @@ for k = 1:numel(sensors)
         s.rho_dot_err = s.rho_dot - s.rho_dot_gt;
     end
 
-    s.yaw_map = unwrap_angle_smart(s.yaw_map, s.yaw_map_gt);
-    s.yaw_rel = unwrap_angle_smart(s.yaw_rel, s.yaw_rel_gt);
+    s.yaw_map = unwrap_angle_smart_deg(s.yaw_map, s.yaw_map_gt);
+    s.yaw_rel = unwrap_angle_smart_deg(s.yaw_rel, s.yaw_rel_gt);
     s.yaw_map_err = s.yaw_map - s.yaw_map_gt;
+    s.yaw_rel_err = s.yaw_rel - s.yaw_rel_gt;
 
     sensors{k}.s = s;  
 end
@@ -43,7 +50,7 @@ end
 for k = 1:numel(sensors)
     s = sensors{k}.s;
 
-    ass = hypot(s.x_map_err, s.y_map_err) < 10;
+    ass = hypot(s.x_map_err, s.y_map_err) < err_thr;
 
     stats = {'x_rel','y_rel','yaw_map'};
     for l = stats
@@ -61,4 +68,3 @@ for k = 1:numel(sensors)
 
     sensors{k}.s = s;  
 end
-

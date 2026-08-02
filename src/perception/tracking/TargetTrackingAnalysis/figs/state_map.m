@@ -35,15 +35,7 @@ for i = 1:numel(sensors)
 end
     
 plot_tt(tt.stamp, tt.yaw_map, tt.max_opp, col.tt, name1);
-
-if(compare)
-    plot_tt(tt2.stamp, tt2.yaw_map, tt2.max_opp, col.tt2, name2);
-end
-if(compare2)
-    plot_tt(tt3.stamp, tt3.yaw_map, tt3.max_opp, col.tt3, name3);
-end
-
-if(use_ref || use_sim_ref)
-    plot(gt.stamp,gt.yaw_map,'Color',col.ref,'DisplayName','gt');
-end
+if(compare); plot_tt(tt2.stamp, tt2.yaw_map, tt2.max_opp, col.tt2, name2); end
+if(compare2); plot_tt(tt3.stamp, tt3.yaw_map, tt3.max_opp, col.tt3, name3); end
+if(use_ref || use_sim_ref); plot(gt.stamp,gt.yaw_map,'Color',col.ref,'DisplayName','gt'); end
 grid on; ylabel('yaw [deg]'); xlabel('timestamp [s]'); legend show;

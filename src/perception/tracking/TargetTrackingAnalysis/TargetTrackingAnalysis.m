@@ -156,6 +156,7 @@ state_cog;
 range;
 speed_acc;
 map;
+icp;
 % covariance;
 % error_analysis;
 % imm;
