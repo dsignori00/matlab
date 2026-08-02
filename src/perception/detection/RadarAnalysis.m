@@ -302,8 +302,8 @@ function refreshTimeButtonPushed(src,event)
     % plot track lines
     id_left = length(traj_db) - 2;
     id_right = length(traj_db) - 1;
-    plot(traj_db(id_left).X, traj_db(id_left).Y, 'color', 'k', 'LineWidth', 1, 'HandleVisibility','off');
-    plot(traj_db(id_right).X, traj_db(id_right).Y, 'color', 'k', 'LineWidth', 1, 'HandleVisibility','off');
+    plot(traj_db(id_left).x, traj_db(id_left).y, 'color', 'k', 'LineWidth', 1, 'HandleVisibility','off');
+    plot(traj_db(id_right).x, traj_db(id_right).y, 'color', 'k', 'LineWidth', 1, 'HandleVisibility','off');
 
     plot(rad1.x_map(t1_rad_clust:tend_rad_clust), rad1.y_map(t1_rad_clust:tend_rad_clust),'.','markersize',20,'Color',col.radar,'displayname','Rad Clust');
     if(compare); plot(rad2.x_map(t1_rad_clust2:tend_rad_clust2), rad2.y_map(t1_rad_clust2:tend_rad_clust2),'.','markersize',20,'Color',col.radar2,'displayname','Rad Clust'); end
