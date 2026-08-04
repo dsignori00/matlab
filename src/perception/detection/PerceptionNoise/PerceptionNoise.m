@@ -5,15 +5,6 @@ show_error_series   = true;
 search_correlations = false;
 link_axes_mode      = 'all'; % 'none', 'figure', 'active', or 'all'
 
-%% Paths
-
-proj = currentProject();
-scriptDir = fileparts(mfilename('fullpath'));
-addpath(fullfile(proj.RootFolder,'src','perception','utils'));
-addpath(fullfile(proj.RootFolder,'common','plot'));
-addpath(fullfile(scriptDir,'func'));
-addpath(fullfile(scriptDir,'figs'));
-
 %#ok<*UNRCH>
 %#ok<*INUSD>
 

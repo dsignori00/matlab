@@ -110,12 +110,12 @@ switch(opp_id)
         opp_lat0 = 44.344351;
         opp_lon0 = 11.714010;
         opp_alt0 = 0.0;
-        out.timestamp = opp_log.timestamp*10^9;
-        out.x_map = opp_log.x;
-        out.y_map = opp_log.y;
-        out.yaw_map = unwrap(opp_log.yaw);
-        out.speed = opp_log.vx;
-        out.ax = opp_log.ax;
+        out.timestamp = opp_log.timestamp_s*10^9;
+        out.x_map = opp_log.x_m;
+        out.y_map = opp_log.y_m;
+        out.yaw_map = unwrap(opp_log.yaw_rad);
+        out.speed = opp_log.vx_mps;
+        out.ax = opp_log.ax_mps2;
 
     case 6
         ref_sys = "utm";

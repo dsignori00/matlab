@@ -18,9 +18,6 @@ err_stats = {'yaw_map','vx','ax'};
 %% Paths
 normal_path = get_bags_dir();
 opp_dir = get_gt_dir();
-scriptDir = fileparts(mfilename('fullpath'));
-addpath(fullfile(scriptDir,'func'));
-addpath(fullfile(scriptDir,'figs'));
 
 %% Load Data
 
