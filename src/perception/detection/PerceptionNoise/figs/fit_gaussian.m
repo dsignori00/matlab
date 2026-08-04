@@ -23,7 +23,7 @@ if ~exist('sz', 'var'); sz = 3; end
 
 pos_thr = 5.0;
 v_thr   = 2.0;
-yaw_thr = 5.0;
+yaw_thr = 30.0;
 
 % Use all sensors: lid_clust, rad_clust, cam_yolo, lid_pp
 sensors_r = sensors;

@@ -1,5 +1,5 @@
 %% SPEED AND ACC
-figure('name', 'Filter - Speed Acc', 'NumberTitle', 'off');
+figure('name', 'Filter - Pointpillars Icp', 'NumberTitle', 'off');
 tiledlayout(3,1,'Padding','compact');
 
 % rho 
