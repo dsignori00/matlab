@@ -28,13 +28,15 @@ emptyRadarStruct = emptyDetectionStruct;
 emptyRadarStruct.rho_dot = NaN;
 opp = log.perception__opponents;
 
+% sens_stamp_field = "detections__sensor_stamp__tot";
+sens_stamp_field = "sensor_stamp__tot";
 
 %  LIDAR CLUSTERING DETECTIONS
 
 if isfield(log,'perception__lidar__clustering_detections')
     d = log.perception__lidar__clustering_detections;
 
-    lid_clust.sens_stamp = d.sensor_stamp__tot;
+    lid_clust.sens_stamp = d.(sens_stamp_field);
     lid_clust.stamp      = d.stamp__tot;
 
     lid_clust.x_rel   = replaceZeroWithNaN(d.detections__x_rel);
@@ -62,7 +64,7 @@ end
 if isfield(log,'perception__radar__clustering_detections')
     d = log.perception__radar__clustering_detections;
 
-    rad_clust.sens_stamp = d.sensor_stamp__tot;
+    rad_clust.sens_stamp = d.(sens_stamp_field) ;
     rad_clust.stamp      = d.stamp__tot;
 
     rad_clust.x_rel   = replaceZeroWithNaN(d.detections__x_rel);
@@ -91,7 +93,7 @@ end
 if isfield(log,'perception__camera__yolo_detections')
     d = log.perception__camera__yolo_detections;
 
-    cam_yolo.sens_stamp = d.sensor_stamp__tot;
+    cam_yolo.sens_stamp = d.(sens_stamp_field)  ;
     cam_yolo.stamp      = d.stamp__tot;
 
     cam_yolo.x_rel   = replaceZeroWithNaN(d.detections__x_rel);
@@ -119,7 +121,7 @@ end
 if isfield(log,'perception__lidar__pointpillars_detections')
     d = log.perception__lidar__pointpillars_detections;
 
-    lid_pp.sens_stamp = d.sensor_stamp__tot;
+    lid_pp.sens_stamp = d.(sens_stamp_field);
     lid_pp.stamp      = d.stamp__tot;
 
     lid_pp.x_rel   = replaceZeroWithNaN(d.detections__x_rel);
@@ -147,7 +149,7 @@ end
 if isfield(log,'perception__v2v__detections')
     d = log.perception__v2v__detections;
 
-    v2v.sens_stamp = d.sensor_stamp__tot;
+    v2v.sens_stamp = d.(sens_stamp_field);
     v2v.stamp      = d.stamp__tot;
 
     v2v.x_rel   = replaceZeroWithNaN(d.detections__x_rel);

@@ -128,7 +128,7 @@ sensors = { ...
     struct('s', lid_clust, 'col', col.lidar,   'name', 'lidar'), ...
     struct('s', lid_pp,    'col', col.pp,      'name', 'pointpillars'), ...
     struct('s', rad_clust, 'col', col.radar,   'name', 'radar'), ...
-    struct('s', cam_yolo,  'col', col.camera,  'name', 'camera'), ...
+    % struct('s', cam_yolo,  'col', col.camera,  'name', 'camera'), ...
 };
 
 if any(~isnan(v2v.sens_stamp(:)))
@@ -149,8 +149,8 @@ end
 %% PLOTTING
 
 % info;
-detections;
-latency;
+% detections;
+% latency;
 state_map;
 state_cog;
 range;
