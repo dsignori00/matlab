@@ -7,9 +7,7 @@ axes(f) = nexttile([1,1]); f=f+1; hold on;
 for i = 1:numel(sensors)
     s = sensors{i}.s;
     if isfield(s, 'count') && any(isfinite(s.count(:))) && any(isfinite(s.sens_stamp(:)))
-        stairs(s.sens_stamp, s.count, ...
-            'Color', sensors{i}.col, ...
-            'DisplayName', sensors{i}.name);
+        scatter(s.sens_stamp, s.count, 36, sensors{i}.col,'filled', 'DisplayName', sensors{i}.name);
     end
 end
 grid on; ylabel('Count'); legend show; xlabel('timestamp [s]');
