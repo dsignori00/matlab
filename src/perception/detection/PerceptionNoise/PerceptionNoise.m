@@ -70,6 +70,7 @@ y_err_lim = [-err_thr err_thr];
 [lid_clust, rad_clust, cam_yolo, lid_pp] = load_perception(log);
 gt = load_ref(log, use_sim_ref, ~use_sim_ref, log_ref);
 cam_yolo.sens_stamp(cam_yolo.sens_stamp < 0) = NaN;
+cam_yolo.sens_stamp(cam_yolo.x_rel < 0) = NaN;
 
 % ego
 ego.speed_stamp = log.estimation.stamp__tot;
