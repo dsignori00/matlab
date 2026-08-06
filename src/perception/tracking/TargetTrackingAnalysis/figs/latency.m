@@ -1,7 +1,7 @@
 %% LATENCY FIGURE
 figure('name','Detections - Latency', 'NumberTitle', 'off');
 
-movingAverageWindowSeconds = 2;
+movingAverageWindowSeconds = 10;
 
 validSensors = [];
 for i = 1:numel(sensors)

@@ -3,7 +3,7 @@ clearvars -except colors log log_2 log_3 log_ref trajDatabase
 
 link_axes_mode = 'all'; % 'none', 'figure', or 'all'
 
-use_ref     = false;
+use_ref     = true;
 use_sim_ref = false;
 compare     = false;
 compare2    = false;
@@ -39,7 +39,7 @@ if (~exist('log','var'))
     [file,path] = uigetfile(fullfile(normal_path,'*.mat'),'Load log');
     load(fullfile(path,file));
 end
-name1 = 'new';
+name1 = 'old';
 
 % load log 2
 if(compare)
@@ -53,7 +53,7 @@ if(compare)
         clearvars tmp;
         end
     end
-    name2 = 'old';
+    name2 = 'new';
 end
 
 % load log 3
@@ -68,7 +68,7 @@ if(compare2)
         clearvars tmp;
         end
     end
-    name3 = 'old';
+    name3 = 'Q500';
 end
 
 % load log ref
@@ -86,8 +86,15 @@ end
 
 DateTime = datetime(log.time_offset_nsec,'ConvertFrom','epochtime','TicksPerSecond',1e9,'Format','dd-MMM-yyyy HH:mm:ss');
 
-%% NAMING
-graphics_options;
+% %% NAMING
+%graphics_options;
+%% graphics_options.m - definizione palette colori
+colors.green  = {[0.40 0.75 0.40], [0.00 0.55 0.00]};
+colors.yellow = {[0.95 0.85 0.20], [0.85 0.65 0.00]};
+colors.orange = {[0.95 0.65 0.20], [0.90 0.45 0.00]};
+colors.red    = {[0.90 0.40 0.40], [0.80 0.00 0.00]};
+colors.matlab = {[0 0.4470 0.7410], [0.8500 0.3250 0.0980], [0.9290 0.6940 0.1250]};
+colors.black  = [0 0 0];
 col.lidar   = colors.green{2};
 col.radar   = [77 190 238] / 255;
 col.camera  = colors.yellow{2};
@@ -149,17 +156,23 @@ end
 %% PLOTTING
 
 % info;
-% detections;
+%detections;
 % latency;
-state_map;
-state_cog;
-range;
-speed_acc;
-map;
-icp;
-% covariance;
-% error_analysis;
+%state_map;
+%state_cog;
+%range;
+%speed_acc;
+%P_diag;
+%jerk_activation;
+%map;
+%covariance;
+%error_analysis;
 % imm;
 % dataset_analysis;
+%jerk_derivation;
+%ff_jerk_flag;
+%ramp;
+%latency_delay;
+%outlier_analysis;
 
 link_axes();

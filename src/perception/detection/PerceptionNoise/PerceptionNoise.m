@@ -49,21 +49,29 @@ end
 DateTime = datetime(log.time_offset_nsec,'ConvertFrom','epochtime','TicksPerSecond',1e9,'Format','dd-MMM-yyyy HH:mm:ss');
 
 %% NAMING
-graphics_options;
-col.lidar        = colors.green{2};
-col.radar        = [77 190 238] / 255;
-col.camera       = colors.yellow{2};
-col.pp           = colors.orange{2};
-col.tt           = colors.blue{2};
-col.tt2          = colors.blue{1};
-col.ref          = colors.black;
+%graphics_options;
+%% graphics_options.m - definizione palette colori
+colors.green  = {[0.40 0.75 0.40], [0.00 0.55 0.00]};
+colors.yellow = {[0.95 0.85 0.20], [0.85 0.65 0.00]};
+colors.orange = {[0.95 0.65 0.20], [0.90 0.45 0.00]};
+colors.red    = {[0.90 0.40 0.40], [0.80 0.00 0.00]};
+colors.matlab = {[0 0.4470 0.7410], [0.8500 0.3250 0.0980], [0.9290 0.6940 0.1250]};
+colors.black  = [0 0 0];
+col.lidar   = colors.green{2};
+col.radar   = [77 190 238] / 255;
+col.camera  = colors.yellow{2};
+col.pp      = colors.orange{2};
+col.v2v     = colors.red{2};
+col.tt      = colors.matlab{1};
+col.tt2     = colors.matlab{2};
+col.tt3     = colors.matlab{3};
+col.ref     = colors.black;
 sz=3; % Marker size
 f=1;
-b=0;
-
-err_thr = 10;
+c = 0;
 x_lim = [0 inf];
-y_err_lim = [-err_thr err_thr];
+
+
 
 %% LOAD DATA
 
@@ -100,15 +108,18 @@ process_measures;
 
 %% PLOTTING
 
-latency;
-time_series_map;
-time_series_cog;
-time_series_range;
-time_series_errors;
+l%atency;
+%time_series_map;
+%time_series_cog;
+%time_series_range;
+%time_series_errors;
 % correlations;
 fit_gaussian;
-error_summary;
-sensors_fov;
-map;
+%error_summary;
+%sensors_fov;
+%map;
+
+
+
 
 link_axes();
