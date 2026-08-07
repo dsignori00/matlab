@@ -150,7 +150,7 @@ end
 
 % info;
 % detections;
-% latency;
+latency;
 state_map;
 state_cog;
 range;

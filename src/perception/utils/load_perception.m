@@ -28,8 +28,8 @@ emptyRadarStruct = emptyDetectionStruct;
 emptyRadarStruct.rho_dot = NaN;
 opp = log.perception__opponents;
 
-% sens_stamp_field = "detections__sensor_stamp__tot";
-sens_stamp_field = "sensor_stamp__tot";
+sens_stamp_field = "detections__sensor_stamp__tot";
+% sens_stamp_field = "sensor_stamp__tot";
 
 %  LIDAR CLUSTERING DETECTIONS
 
