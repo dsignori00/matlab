@@ -18,7 +18,7 @@ end
 tiledlayout(max(1, numel(validSensors)),1,'Padding','compact');
 
 for i = validSensors
-    axes(f) = nexttile([1,1]); f=f+1; hold on;
+    ax(f) = nexttile([1,1]); f=f+1; hold on;
     s = sensors{i}.s;
 
     sensorStamp = s.sens_stamp;

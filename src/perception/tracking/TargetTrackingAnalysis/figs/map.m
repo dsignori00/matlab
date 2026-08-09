@@ -15,7 +15,7 @@ b(c) = uicontrol('Style','pushbutton', ...
 function refreshTimeButtonPushed(src, event)
 
     % --- fetch from base ---
-    ax        = evalin('base','axes');
+    ax        = evalin('base','ax');
     traj_db  = evalin('base','trajDatabase');
     sensors  = evalin('base','sensors');
     col      = evalin('base','col');

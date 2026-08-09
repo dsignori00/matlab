@@ -73,7 +73,7 @@ end
 
 % load log ref
 if(use_ref)
-    if  (~exist('log_ref','var'))
+    if  (~exist('log_ref','var') || isempty(log_ref))
         [file,path] = uigetfile(fullfile(opp_dir,'*.mat'),'Load ground truth');
         tmp = load(fullfile(path,file));
         log_ref = tmp.out;
@@ -128,7 +128,7 @@ sensors = { ...
     struct('s', lid_clust, 'col', col.lidar,   'name', 'lidar'), ...
     struct('s', lid_pp,    'col', col.pp,      'name', 'pointpillars'), ...
     struct('s', rad_clust, 'col', col.radar,   'name', 'radar'), ...
-    % struct('s', cam_yolo,  'col', col.camera,  'name', 'camera'), ...
+    struct('s', cam_yolo,  'col', col.camera,  'name', 'camera'), ...
 };
 
 if any(~isnan(v2v.sens_stamp(:)))
@@ -149,7 +149,7 @@ end
 %% PLOTTING
 
 % info;
-% detections;
+detections;
 latency;
 state_map;
 state_cog;

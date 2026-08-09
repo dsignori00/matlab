@@ -12,7 +12,7 @@ function refreshTimeButtonPushed(~, ~)
 
     % --- fetch from base ---
     col          = evalin('base','col');
-    ax           = evalin('base','axes');
+    ax           = evalin('base','ax');
     log          = evalin('base','log');
     tt           = evalin('base','tt');
     sensors      = evalin('base','sensors');
