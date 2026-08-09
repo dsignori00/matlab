@@ -110,7 +110,7 @@ switch(opp_id)
         opp_lat0 = 44.344351;
         opp_lon0 = 11.714010;
         opp_alt0 = 0.0;
-        out.timestamp = opp_log.timestamp_s*10^9;
+        out.timestamp = opp_log.timestamp*10^9;
         out.x_map = opp_log.x_m;
         out.y_map = opp_log.y_m;
         out.yaw_map = unwrap(opp_log.yaw_rad);
