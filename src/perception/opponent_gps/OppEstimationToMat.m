@@ -119,8 +119,8 @@ switch(opp_id)
 
     case 6
         ref_sys = "utm";
-        opp_lat0 = 44.344351;
-        opp_lon0 = 11.714010;
+        opp_lat0 = 36.586455;
+        opp_lon0 = -121.756645;
         opp_alt0 = 0.0;
         out.timestamp = opp_log.stamp;
         out.x_map = opp_log.x;
@@ -156,7 +156,7 @@ switch(opp_id)
 end
 
 %Select the track
-track_list = [0,1,2,3,4,5,6];
+track_list = [0,1,2,3,4,5,6,7];
 track_id = -1;
 while ~ismember(track_id, track_list)
     disp( "Choose track:" + newline + ...
@@ -166,6 +166,7 @@ while ~ismember(track_id, track_list)
           " 4: YasMarina " + newline + ...
           " 5: YasNorth " + newline + ...
           " 6: Imola " + newline + ...
+          " 7: LagunaSeca " + newline + ...
           " 0: Quit");
     track_id = input("Insert track identifier: ");
 end
@@ -209,6 +210,11 @@ switch (track_id)
         lon0 = 11.71339346495961;
         alt0 = 40.0;
         load("Imola.mat")
+     case 7
+         lat0 = 36.586062395673760 + 1.0e-5;
+         lon0 = -121.7562012288262;
+         alt0 = 231.0461153351115;
+         load("LagunaSeca.mat")
     case 0
         error("Quit");
     otherwise
@@ -248,7 +254,7 @@ freq = 1./diff;
 avg_freq = mean(freq)*10^9;
 out.bag_avg_freq = avg_freq;
 
-framelen = floor(avg_freq) / 2;
+framelen = floor(avg_freq / 2);
 if(mod(framelen,2)==0)
     framelen = framelen + 1;
 end 
