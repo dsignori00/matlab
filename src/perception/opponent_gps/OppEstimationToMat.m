@@ -92,19 +92,32 @@ end
 
 %Select opponent and gps
 opp_id = -1;
-lista_opponents = [0,3,6,33,71];
+lista_opponents = [0,2,3,6,33,71];
 while ~ismember(opp_id, lista_opponents)
     disp( "Choose opponent:" + newline + ...
         " 3: Kinetiz " + newline + ...
         " 6: Unimore " + newline + ...
         "33: Tum" + newline + ...
         "71: Tii " + newline + ...
+        " 2: Purdue " + newline + ...
         " 0: Quit");
     opp_id = input("Choose opponent identifier: ");
 end
 
 
 switch(opp_id)
+    case 2 
+        ref_sys = "lla";
+        opp_lat0 = 36.58733835;
+        opp_lon0 = -121.75566957;
+        opp_alt0 = -2.35619;
+        out.timestamp = opp_log.stamp*10^9;
+        out.x_map = opp_log.x_cog;
+        out.y_map = opp_log.y_cog;
+        out.yaw_map = unwrap(opp_log.heading);
+        out.speed = opp_log.vx;
+        out.ax = opp_log.ax;
+
     case 3
         ref_sys = "lla";
         opp_lat0 = 44.344351;
